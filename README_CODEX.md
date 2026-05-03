@@ -1,5 +1,28 @@
 # Instrucciones para Codex - AKINOMASS
 
+# Regla prioritaria sobre pruebas y entorno Codex
+
+El entorno de Codex puede no tener disponibles las dependencias completas del proyecto, especialmente el directorio `vendor/`, Composer, Node, npm, Redis o la base de datos PostgreSQL.
+
+Por esta razón, cualquier instrucción de este documento que solicite ejecutar comandos de verificación debe interpretarse como una indicación para el desarrollador local, no como una obligación estricta para Codex.
+
+Codex debe priorizar:
+
+- Crear o modificar los archivos solicitados.
+- Mantener el código sintácticamente correcto.
+- Respetar la arquitectura definida.
+- No alterar el proyecto para intentar corregir limitaciones de su propio entorno.
+- Indicar al final los comandos que el desarrollador debe ejecutar localmente.
+
+Si Codex encuentra errores como:
+
+`````txt
+vendor/autoload.php not found
+composer: command not found
+npm: command not found
+database connection failed
+Redis connection failed
+
 Este proyecto es AKINOMASS, un sistema web comercial multicanal para centralizar ventas, clientes, leads, pedidos, productos, inventario, pagos, reportes y dashboards.
 
 El objetivo de este documento es definir reglas obligatorias para que Codex implemente el sistema respetando la arquitectura acordada, sin inventar estructuras, integraciones externas o lógica desordenada.
@@ -1491,4 +1514,4 @@ Inertia React para frontend
 FastAPI preparado para futuro
 
 La primera versión debe ser funcional, ordenada y defendible académicamente, sin sobrecargar el sistema con integraciones externas prematuras.
-````
+`````
