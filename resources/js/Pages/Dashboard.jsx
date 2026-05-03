@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 const NumberCard = ({ title, value }) => (
     <div className="rounded border bg-white p-4 shadow-sm">
@@ -27,6 +27,22 @@ const ListBlock = ({ title, items }) => (
 );
 
 export default function Dashboard({ metricas }) {
+    const { auth } = usePage().props;
+    const permissions = auth?.permissions ?? [];
+    const hasPermission = (permission) => permissions.includes(permission);
+
+    const quickLinks = [
+        { label: 'Clientes', routeName: 'clientes.index', canView: hasPermission('clientes.ver') },
+        { label: 'Leads', routeName: 'leads.index', canView: hasPermission('leads.ver') },
+        { label: 'Plantillas', routeName: 'plantillas-mensaje.index', canView: hasPermission('leads.ver') },
+        { label: 'Productos', routeName: 'productos.index', canView: hasPermission('productos.ver') },
+        { label: 'Inventario', routeName: 'inventario.index', canView: hasPermission('inventario.ver') },
+        { label: 'Pedidos', routeName: 'pedidos.index', canView: hasPermission('pedidos.ver') },
+        { label: 'Pagos', routeName: 'pagos.index', canView: hasPermission('pagos.ver') },
+        { label: 'LiveSales', routeName: 'live-sales.index', canView: hasPermission('pedidos.ver') || hasPermission('leads.ver') },
+        { label: 'Reportes', routeName: 'reportes.index', canView: hasPermission('reportes.ver') },
+    ].filter((item) => item.canView);
+
     const amountFormatter = new Intl.NumberFormat('es-PE', {
         style: 'currency',
         currency: 'PEN',
@@ -40,6 +56,27 @@ export default function Dashboard({ metricas }) {
             <Head title="Dashboard comercial" />
 
             <div className="py-8">
+                <div className="mx-auto mb-4 max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="rounded border bg-white p-4 shadow-sm">
+                        <h3 className="text-sm font-semibold text-gray-700">Accesos rápidos</h3>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {quickLinks.length ? (
+                                quickLinks.map((item) => (
+                                    <Link
+                                        key={item.routeName}
+                                        href={route(item.routeName)}
+                                        className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))
+                            ) : (
+                                <p className="text-sm text-gray-400">Sin accesos disponibles</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 xl:grid-cols-4">
                     <NumberCard title="Clientes" value={metricas.clientes.total} />
                     <NumberCard title="Leads" value={metricas.leads.total} />
