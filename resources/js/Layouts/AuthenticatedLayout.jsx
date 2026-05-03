@@ -3,13 +3,37 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const { auth } = usePage().props;
+    const user = auth?.user;
+    const permissions = auth?.permissions ?? [];
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    const hasPermission = (permission) => permissions.includes(permission);
+
+    const navigationItems = useMemo(
+        () => [
+            { label: 'Dashboard', routeName: 'dashboard', canView: hasPermission('dashboard.ver') },
+            { label: 'Clientes', routeName: 'clientes.index', canView: hasPermission('clientes.ver') },
+            { label: 'Leads', routeName: 'leads.index', canView: hasPermission('leads.ver') },
+            { label: 'Plantillas', routeName: 'plantillas-mensaje.index', canView: hasPermission('leads.ver') },
+            { label: 'Categorías de producto', routeName: 'categorias-producto.index', canView: hasPermission('productos.ver') },
+            { label: 'Productos', routeName: 'productos.index', canView: hasPermission('productos.ver') },
+            { label: 'Inventario', routeName: 'inventario.index', canView: hasPermission('inventario.ver') },
+            { label: 'Movimientos de inventario', routeName: 'inventario.movimientos', canView: hasPermission('inventario.movimientos') },
+            { label: 'Pedidos', routeName: 'pedidos.index', canView: hasPermission('pedidos.ver') },
+            { label: 'Pagos', routeName: 'pagos.index', canView: hasPermission('pagos.ver') },
+            { label: 'LiveSales', routeName: 'live-sales.index', canView: hasPermission('pedidos.ver') || hasPermission('leads.ver') },
+            { label: 'Reportes', routeName: 'reportes.index', canView: hasPermission('reportes.ver') },
+        ],
+        [permissions],
+    );
+
+    const visibleNavigationItems = navigationItems.filter((item) => item.canView);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -23,13 +47,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Link>
                             </div>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </NavLink>
+                            <div className="hidden space-x-6 sm:-my-px sm:ms-8 sm:flex sm:items-center">
+                                {visibleNavigationItems.map((item) => (
+                                    <NavLink
+                                        key={item.routeName}
+                                        href={route(item.routeName)}
+                                        active={route().current(item.routeName)}
+                                    >
+                                        {item.label}
+                                    </NavLink>
+                                ))}
                             </div>
                         </div>
 
@@ -42,7 +69,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
-                                                {user.name}
+                                                {user?.name}
 
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
@@ -61,9 +88,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
+                                        <Dropdown.Link href={route('profile.edit')}>
                                             Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link
@@ -128,21 +153,24 @@ export default function AuthenticatedLayout({ header, children }) {
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
+                        {visibleNavigationItems.map((item) => (
+                            <ResponsiveNavLink
+                                key={item.routeName}
+                                href={route(item.routeName)}
+                                active={route().current(item.routeName)}
+                            >
+                                {item.label}
+                            </ResponsiveNavLink>
+                        ))}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800">
-                                {user.name}
+                                {user?.name}
                             </div>
                             <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                                {user?.email}
                             </div>
                         </div>
 
