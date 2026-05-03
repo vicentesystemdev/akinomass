@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\CRM\ClienteController;
 use App\Http\Controllers\CRM\LeadController;
+use App\Http\Controllers\Catalogo\CategoriaProductoController;
+use App\Http\Controllers\Catalogo\ProductoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('leads', LeadController::class)->except(['show', 'destroy']);
     Route::patch('/leads/{lead}/estado', [LeadController::class, 'updateEstado'])->name('leads.update-estado');
     Route::post('/leads/{lead}/convertir', [LeadController::class, 'convertir'])->name('leads.convertir');
+    Route::resource('categorias-producto', CategoriaProductoController::class)->except(['show', 'destroy']);
+    Route::resource('productos', ProductoController::class)->except(['show', 'destroy']);
 });
 
 require __DIR__.'/auth.php';
