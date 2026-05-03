@@ -9,6 +9,7 @@ use App\Http\Controllers\Catalogo\ProductoController;
 use App\Http\Controllers\Inventario\InventarioController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\Comercial\LiveSalesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,6 +53,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('pedidos', PedidoController::class);
     Route::post('/pedidos/{pedido}/confirmar', [PedidoController::class, 'confirmar'])->name('pedidos.confirmar');
     Route::post('/pedidos/{pedido}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
+
+
+    Route::resource('live-sales', LiveSalesController::class);
+    Route::patch('/live-sales/{live_sale}/estado', [LiveSalesController::class, 'cambiarEstado'])->name('live-sales.cambiar-estado');
+    Route::post('/live-sales/{live_sale}/productos', [LiveSalesController::class, 'agregarProducto'])->name('live-sales.agregar-producto');
+    Route::post('/live-sales/{live_sale}/interacciones', [LiveSalesController::class, 'registrarInteraccion'])->name('live-sales.registrar-interaccion');
+    Route::post('/interacciones-live/{interaccion_live}/convertir-lead', [LiveSalesController::class, 'convertirLead'])->name('live-sales.convertir-lead');
+    Route::post('/interacciones-live/{interaccion_live}/convertir-pedido', [LiveSalesController::class, 'convertirPedido'])->name('live-sales.convertir-pedido');
 
     Route::resource('pagos', PagoController::class);
     Route::post('/pagos/{pago}/confirmar', [PagoController::class, 'confirmar'])->name('pagos.confirmar');

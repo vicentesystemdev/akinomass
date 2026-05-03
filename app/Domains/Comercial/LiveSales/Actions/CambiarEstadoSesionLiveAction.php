@@ -1,0 +1,1 @@
+<?php namespace App\Domains\Comercial\LiveSales\Actions; use App\Models\SesionLive; class CambiarEstadoSesionLiveAction{ public function execute(SesionLive $sesion,string $estado):SesionLive{ $sesion->update(['estado_ses'=>$estado]); return $sesion->refresh();} }

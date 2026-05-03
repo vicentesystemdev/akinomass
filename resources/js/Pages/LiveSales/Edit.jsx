@@ -1,0 +1,1 @@
+import { useForm } from '@inertiajs/react'; export default function Edit({sesion}){const {data,setData,put}=useForm({...sesion});return <form onSubmit={e=>{e.preventDefault();put(route('live-sales.update',sesion.cod_sesion_live));}}><input value={data.titulo_ses||''} onChange={e=>setData('titulo_ses',e.target.value)}/><button>Actualizar</button></form>}
