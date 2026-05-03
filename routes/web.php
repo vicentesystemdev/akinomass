@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+
+use App\Http\Controllers\CRM\ClienteController;
+use App\Http\Controllers\CRM\LeadController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,6 +25,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    Route::resource('clientes', ClienteController::class)->except(['show', 'destroy']);
+    Route::resource('leads', LeadController::class)->except(['show', 'destroy']);
+    Route::patch('/leads/{lead}/estado', [LeadController::class, 'updateEstado'])->name('leads.update-estado');
+    Route::post('/leads/{lead}/convertir', [LeadController::class, 'convertir'])->name('leads.convertir');
 });
 
 require __DIR__.'/auth.php';
