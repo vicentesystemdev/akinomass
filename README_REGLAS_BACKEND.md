@@ -1,5 +1,30 @@
 # Reglas Backend AKINOMASS
 
+# Reglas de base de datos
+
+Las tablas propias del negocio deben nombrarse en español.
+
+Los atributos deben usar la convención:
+
+nombreDelAtributo_abreviaturaTabla
+
+Ejemplo:
+
+- nombre_cli
+- telefono_cli
+- correo_cli
+
+Las claves primarias de tablas propias deben usar preferentemente:
+
+cod_nombre_singular
+
+Ejemplo:
+
+- cod_cliente
+- cod_producto
+- cod_pedido
+
+No modificar tablas internas del framework o paquetes externos.
 ## 1. Controladores delgados
 
 Los controladores solo deben:
@@ -191,4 +216,3 @@ No deben enviar mensajes automáticamente.
 No deben depender de APIs externas.
 
 Deben permitir copiar, adaptar y usar manualmente el texto sugerido.
-  

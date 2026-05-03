@@ -51,6 +51,113 @@ El proyecto ya cuenta con:
 - Axios
 
 ---
+# Regla de nomenclatura de base de datos
+
+Para las tablas propias del negocio de AKINOMASS, se debe usar nomenclatura en español en la medida de lo posible.
+
+Esta regla aplica a tablas creadas para los módulos propios del sistema, como:
+
+- clientes
+- leads
+- canales_venta
+- tipos_flujo_comercial
+- productos
+- categorias_producto
+- inventarios
+- movimientos_inventario
+- pedidos
+- detalles_pedido
+- pagos
+- sesiones_live
+- plantillas_mensaje
+
+No aplica a tablas internas de Laravel, Breeze, Sanctum o Spatie Permission, las cuales deben conservar sus nombres originales para evitar conflictos con el framework y los paquetes instalados.
+
+Ejemplos de tablas que NO deben renombrarse:
+
+- users
+- password_reset_tokens
+- sessions
+- cache
+- jobs
+- roles
+- permissions
+- model_has_roles
+- model_has_permissions
+- role_has_permissions
+
+## Convención de atributos
+
+Los atributos de tablas propias del negocio deben seguir la estructura:
+
+nombreDelAtributo_abreviaturaTabla
+
+Ejemplos:
+
+Tabla `clientes`:
+
+- nombre_cli
+- telefono_cli
+- correo_cli
+- estado_cli
+
+Tabla `canales_venta`:
+
+- nombre_can
+- codigo_can
+- descripcion_can
+- activo_can
+
+Tabla `tipos_flujo_comercial`:
+
+- nombre_tip
+- codigo_tip
+- descripcion_tip
+- activo_tip
+
+Tabla `productos`:
+
+- nombre_pro
+- descripcion_pro
+- precio_pro
+- estado_pro
+
+## Claves primarias
+
+Para tablas propias del negocio se recomienda usar claves primarias con el formato:
+
+cod_nombre_singular
+
+Ejemplos:
+
+- cod_cliente
+- cod_lead
+- cod_canal_venta
+- cod_tipo_flujo_comercial
+- cod_producto
+- cod_pedido
+- cod_pago
+
+Si se usa una clave primaria personalizada, el modelo Eloquent debe declarar correctamente:
+
+- protected $primaryKey
+- public $incrementing
+- protected $keyType si corresponde
+
+## Timestamps
+
+Se pueden mantener los timestamps estándar de Laravel:
+
+- created_at
+- updated_at
+
+Esto se permite para mantener compatibilidad con Eloquent y evitar complejidad innecesaria.
+
+## Regla importante
+
+Codex no debe modificar tablas internas existentes de Laravel, Breeze, Sanctum o Spatie.
+
+La convención en español aplica solamente a nuevas tablas de negocio creadas para AKINOMASS.
 
 # 2. Tipo de arquitectura
 
