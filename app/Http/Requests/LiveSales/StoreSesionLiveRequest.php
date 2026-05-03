@@ -1,0 +1,3 @@
+<?php
+namespace App\Http\Requests\LiveSales; use App\Domains\Comercial\LiveSales\Enums\EstadoSesionLiveEnum; use Illuminate\Foundation\Http\FormRequest; use Illuminate\Validation\Rule;
+class StoreSesionLiveRequest extends FormRequest{ public function authorize():bool{return $this->user()?->can('pedidos.crear')??false;} public function rules():array{return ['titulo_ses'=>['required','string','max:255'],'fecha_inicio_ses'=>['required','date'],'fecha_fin_ses'=>['nullable','date','after_or_equal:fecha_inicio_ses'],'estado_ses'=>['required',Rule::enum(EstadoSesionLiveEnum::class)],'resumen_ses'=>['nullable','string'],'cod_canal_venta'=>['required','exists:canales_venta,cod_canal_venta'],'cod_usuario_responsable'=>['nullable','exists:users,id']];}}

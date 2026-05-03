@@ -1,0 +1,1 @@
+<?php namespace App\Domains\Comercial\LiveSales\Actions; use App\Models\SesionLive; class ActualizarSesionLiveAction{ public function execute(SesionLive $sesion,array $data):SesionLive{ $sesion->update($data); return $sesion->refresh();} }

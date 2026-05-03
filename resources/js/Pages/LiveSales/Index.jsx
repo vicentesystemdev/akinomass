@@ -1,0 +1,1 @@
+import { Link } from '@inertiajs/react'; export default function Index({sesiones=[]}){return <div><h1>Sesiones Live</h1><Link href={route('live-sales.create')}>Nueva</Link><ul>{sesiones.map(s=><li key={s.cod_sesion_live}><Link href={route('live-sales.show',s.cod_sesion_live)}>{s.titulo_ses} - {s.estado_ses}</Link></li>)}</ul></div>}

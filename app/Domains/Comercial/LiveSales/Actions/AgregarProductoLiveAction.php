@@ -1,0 +1,1 @@
+<?php namespace App\Domains\Comercial\LiveSales\Actions; use App\Models\ProductoLive; class AgregarProductoLiveAction{ public function execute(array $data):ProductoLive{ return ProductoLive::create($data);} }
