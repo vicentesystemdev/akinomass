@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\CRM\ClienteController;
 use App\Http\Controllers\CRM\LeadController;
+use App\Http\Controllers\CRM\PlantillaMensajeController;
 use App\Http\Controllers\Catalogo\CategoriaProductoController;
 use App\Http\Controllers\Catalogo\ProductoController;
 use App\Http\Controllers\Inventario\InventarioController;
@@ -37,6 +38,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('clientes', ClienteController::class)->except(['show', 'destroy']);
     Route::resource('leads', LeadController::class)->except(['show', 'destroy']);
+    Route::resource('plantillas-mensaje', PlantillaMensajeController::class)->except(['show', 'destroy']);
+    Route::patch('/plantillas-mensaje/{plantillas_mensaje}/toggle', [PlantillaMensajeController::class, 'toggle'])->name('plantillas-mensaje.toggle');
     Route::patch('/leads/{lead}/estado', [LeadController::class, 'updateEstado'])->name('leads.update-estado');
     Route::post('/leads/{lead}/convertir', [LeadController::class, 'convertir'])->name('leads.convertir');
     Route::resource('categorias-producto', CategoriaProductoController::class)->except(['show', 'destroy']);

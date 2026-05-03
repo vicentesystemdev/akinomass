@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use Database\Seeders\PlantillasMensajeSeeder;
+
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -16,6 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            PlantillasMensajeSeeder::class,
             RolesAndPermissionsSeeder::class,
             CanalesVentaSeeder::class,
             TiposFlujoComercialSeeder::class,
