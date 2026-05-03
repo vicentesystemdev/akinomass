@@ -1,0 +1,2 @@
+import { Link } from '@inertiajs/react';
+export default function Index({ pedidos }) { return <div><h1>Pedidos</h1><Link href={route('pedidos.create')}>Nuevo pedido</Link><table><thead><tr><th>Número</th><th>Cliente</th><th>Estado</th><th>Total</th><th></th></tr></thead><tbody>{pedidos.map(p => <tr key={p.cod_pedido}><td>{p.numero_pedido_ped}</td><td>{p.cliente?.nombre_cli}</td><td>{p.estado_ped}</td><td>{p.total_ped}</td><td><Link href={route('pedidos.show', p.cod_pedido)}>Ver</Link></td></tr>)}</tbody></table></div>; }

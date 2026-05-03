@@ -7,6 +7,7 @@ use App\Http\Controllers\CRM\LeadController;
 use App\Http\Controllers\Catalogo\CategoriaProductoController;
 use App\Http\Controllers\Catalogo\ProductoController;
 use App\Http\Controllers\Inventario\InventarioController;
+use App\Http\Controllers\PedidoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,6 +47,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/inventario/salida', [InventarioController::class, 'registrarSalida'])->name('inventario.salida');
     Route::get('/inventario/ajuste', [InventarioController::class, 'ajusteForm'])->name('inventario.ajuste.form');
     Route::post('/inventario/ajuste', [InventarioController::class, 'registrarAjuste'])->name('inventario.ajuste');
+
+    Route::resource('pedidos', PedidoController::class);
+    Route::post('/pedidos/{pedido}/confirmar', [PedidoController::class, 'confirmar'])->name('pedidos.confirmar');
+    Route::post('/pedidos/{pedido}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
 
 });
 

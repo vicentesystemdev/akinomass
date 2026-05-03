@@ -1,0 +1,2 @@
+import { Link, router } from '@inertiajs/react';
+export default function Show({ pedido }) { return <div><h1>Pedido {pedido.numero_pedido_ped}</h1><p>Estado: {pedido.estado_ped}</p><p>Total: {pedido.total_ped}</p><button onClick={()=>router.post(route('pedidos.confirmar', pedido.cod_pedido))}>Confirmar</button><button onClick={()=>router.post(route('pedidos.cancelar', pedido.cod_pedido))}>Cancelar</button><Link href={route('pedidos.edit', pedido.cod_pedido)}>Editar</Link></div>; }
