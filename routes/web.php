@@ -6,6 +6,7 @@ use App\Http\Controllers\CRM\ClienteController;
 use App\Http\Controllers\CRM\LeadController;
 use App\Http\Controllers\Catalogo\CategoriaProductoController;
 use App\Http\Controllers\Catalogo\ProductoController;
+use App\Http\Controllers\Inventario\InventarioController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,6 +36,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/leads/{lead}/convertir', [LeadController::class, 'convertir'])->name('leads.convertir');
     Route::resource('categorias-producto', CategoriaProductoController::class)->except(['show', 'destroy']);
     Route::resource('productos', ProductoController::class)->except(['show', 'destroy']);
+
+    Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
+    Route::post('/inventario', [InventarioController::class, 'store'])->name('inventario.store');
+    Route::get('/inventario/movimientos', [InventarioController::class, 'movimientos'])->name('inventario.movimientos');
+    Route::get('/inventario/entrada', [InventarioController::class, 'entradaForm'])->name('inventario.entrada.form');
+    Route::post('/inventario/entrada', [InventarioController::class, 'registrarEntrada'])->name('inventario.entrada');
+    Route::get('/inventario/salida', [InventarioController::class, 'salidaForm'])->name('inventario.salida.form');
+    Route::post('/inventario/salida', [InventarioController::class, 'registrarSalida'])->name('inventario.salida');
+    Route::get('/inventario/ajuste', [InventarioController::class, 'ajusteForm'])->name('inventario.ajuste.form');
+    Route::post('/inventario/ajuste', [InventarioController::class, 'registrarAjuste'])->name('inventario.ajuste');
+
 });
 
 require __DIR__.'/auth.php';
