@@ -18,6 +18,15 @@ Su objetivo es centralizar el seguimiento de interesados provenientes de canales
 
 - Clientes
 - Leads
+- Plantillas
+
+## Plantillas de mensajes
+
+El dominio CRM incluye un subdominio de Plantillas para gestionar mensajes sugeridos.
+
+Estas plantillas ayudan al seguimiento comercial de leads y clientes.
+
+No representan automatización de envío ni integración con APIs externas.
 
 ## Reglas
 
