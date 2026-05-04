@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             CanalesVentaSeeder::class,
             TiposFlujoComercialSeeder::class,
+            UserSeeder::class,
         ]);
 
         // User::factory(10)->create();
