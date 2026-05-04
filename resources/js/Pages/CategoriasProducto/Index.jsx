@@ -1,8 +1,9 @@
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ categorias }) {
   return (
-    <>
+    <AuthenticatedLayout header="Categorías de Producto">
       <Head title="Categorías de producto" />
       <div className="p-6">
         <div className="mb-4 flex justify-between">
@@ -22,6 +23,7 @@ export default function Index({ categorias }) {
           </tbody>
         </table>
       </div>
-    </>
+    </AuthenticatedLayout>
   );
 }
+

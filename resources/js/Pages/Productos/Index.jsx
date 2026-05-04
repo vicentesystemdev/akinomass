@@ -1,8 +1,9 @@
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ productos }) {
   return (
-    <>
+    <AuthenticatedLayout header="Catálogo de Productos">
       <Head title="Productos" />
       <div className="p-6">
         <div className="mb-4 flex justify-between">
@@ -14,6 +15,7 @@ export default function Index({ productos }) {
           <tbody>{productos.map((producto) => (<tr key={producto.cod_producto}><td>{producto.nombre_pro}</td><td>{producto.categoria?.nombre_cat}</td><td>{producto.estado_pro}</td><td><Link href={route('productos.edit', producto.cod_producto)}>Editar</Link></td></tr>))}</tbody>
         </table>
       </div>
-    </>
+    </AuthenticatedLayout>
   );
 }
+

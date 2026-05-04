@@ -12,11 +12,29 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                olive: {
+                    DEFAULT: '#3C473A',
+                    dark: '#2A3329',
+                },
+                terracotta: {
+                    DEFAULT: '#D77A61',
+                    dark: '#C56952',
+                },
+                cream: {
+                    DEFAULT: '#FDF6F0',
+                    light: '#FFFFFF',
+                },
+                coffee: {
+                    DEFAULT: '#2B221E',
+                },
+            },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Figtree', 'Inter', ...defaultTheme.fontFamily.sans],
             },
         },
     },
+
 
     plugins: [forms],
 };
