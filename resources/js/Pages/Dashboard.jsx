@@ -43,9 +43,9 @@ export default function Dashboard({ metricas }) {
         { label: 'Reportes', routeName: 'reportes.index', canView: hasPermission('reportes.ver') },
     ].filter((item) => item.canView);
 
-    const amountFormatter = new Intl.NumberFormat('es-PE', {
+    const amountFormatter = new Intl.NumberFormat('es-BO', {
         style: 'currency',
-        currency: 'PEN',
+        currency: 'BOB',
         minimumFractionDigits: 2,
     });
 
