@@ -34,7 +34,7 @@ resources/js/
 
 El equipo frontend puede trabajar:
 
-- Colores.
+- Paleta de colores a utilizar Azul y todos los derivados de ese grupo de color.
 - Tipografía.
 - Espaciado.
 - Animaciones.
@@ -44,7 +44,7 @@ El equipo frontend puede trabajar:
 - Cards.
 - Formularios.
 
-Pero no debe cambiar la arquitectura backend.
+Pero no debe cambiar la arquitectura BACKEND.
 
 ## Interfaz multicanal
 

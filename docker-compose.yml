@@ -1,0 +1,65 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    image: akinomass_php_laravel13:1.0
+    container_name: akinomass_app_laravel
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8013:8000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - akinomass_network
+
+  node:
+    image: node:24-bookworm-slim
+    container_name: akinomass_node_vite
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "5188:5173"
+    command: sh -c "npm run dev -- --host 0.0.0.0 --port 5173"
+    networks:
+      - akinomass_network
+
+  postgres:
+    image: postgres:16.13
+    container_name: akinomass_postgres_db
+    environment:
+      POSTGRES_DB: akinomass_db
+      POSTGRES_USER: akinomass_user
+      POSTGRES_PASSWORD: akinomass_pass
+    ports:
+      - "5443:5432"
+    volumes:
+      - akinomass_postgres_data:/var/lib/postgresql/data
+    networks:
+      - akinomass_network
+
+  redis:
+    image: redis:7.4
+    container_name: akinomass_redis_cache
+    ports:
+      - "6388:6379"
+    volumes:
+      - akinomass_redis_data:/data
+    networks:
+      - akinomass_network
+
+volumes:
+  akinomass_postgres_data:
+    name: akinomass_postgres_data
+
+  akinomass_redis_data:
+    name: akinomass_redis_data
+
+networks:
+  akinomass_network:
+    name: akinomass_network
+    driver: bridge
