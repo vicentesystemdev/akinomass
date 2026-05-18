@@ -1,55 +1,63 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import Card from '@/Components/Card';
+import PageHeader from '@/Components/UI/PageHeader';
+import SectionCard from '@/Components/UI/SectionCard';
 import Badge from '@/Components/Badge';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-const StatCard = ({ title, value, icon, trend, variant = 'blue' }) => {
+const StatCard = ({ title, value, icon, trend, variant = 'oliva' }) => {
     const variants = {
-        blue: {
-            bg: 'bg-primary-50',
-            iconBg: 'bg-primary-100',
-            iconColor: 'text-primary-600',
-            trendUp: 'text-success',
-            trendDown: 'text-danger',
+        oliva: {
+            bg: 'bg-oliva-50',
+            iconBg: 'bg-oliva-100',
+            iconColor: 'text-oliva-600',
+            trendUp: 'text-green-600',
+            trendDown: 'text-red-600',
+        },
+        terracota: {
+            bg: 'bg-terracota-50',
+            iconBg: 'bg-terracota-100',
+            iconColor: 'text-terracota-600',
+            trendUp: 'text-green-600',
+            trendDown: 'text-red-600',
         },
         green: {
             bg: 'bg-green-50',
             iconBg: 'bg-green-100',
-            iconColor: 'text-success',
-            trendUp: 'text-success',
-            trendDown: 'text-danger',
+            iconColor: 'text-green-600',
+            trendUp: 'text-green-600',
+            trendDown: 'text-red-600',
         },
         amber: {
             bg: 'bg-amber-50',
             iconBg: 'bg-amber-100',
-            iconColor: 'text-warning',
-            trendUp: 'text-success',
-            trendDown: 'text-danger',
+            iconColor: 'text-amber-600',
+            trendUp: 'text-green-600',
+            trendDown: 'text-red-600',
         },
         red: {
             bg: 'bg-red-50',
             iconBg: 'bg-red-100',
-            iconColor: 'text-danger',
-            trendUp: 'text-success',
-            trendDown: 'text-danger',
+            iconColor: 'text-red-600',
+            trendUp: 'text-green-600',
+            trendDown: 'text-red-600',
         },
         cyan: {
             bg: 'bg-cyan-50',
             iconBg: 'bg-cyan-100',
-            iconColor: 'text-info',
-            trendUp: 'text-success',
-            trendDown: 'text-danger',
+            iconColor: 'text-cyan-600',
+            trendUp: 'text-green-600',
+            trendDown: 'text-red-600',
         },
     };
 
-    const style = variants[variant] || variants.blue;
+    const style = variants[variant] || variants.oliva;
 
     return (
-        <div className={`relative overflow-hidden rounded-xl ${style.bg} p-5 border border-gray-100`}>
+        <div className={`relative overflow-hidden rounded-xl ${style.bg} p-5 border border-gray-100 transition-all duration-200 hover:shadow-card-hover`}>
             <div className="flex items-start justify-between">
                 <div>
                     <p className="text-sm font-medium text-gray-600">{title}</p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
+                    <p className="mt-2 text-3xl font-bold text-cafe-950">{value}</p>
                     {trend !== undefined && (
                         <div className={`mt-2 flex items-center text-sm ${trend >= 0 ? style.trendUp : style.trendDown}`}>
                             <span className="flex items-center">
@@ -80,42 +88,43 @@ const QuickLinkCard = ({ links }) => {
     if (!links || links.length === 0) return null;
 
     return (
-        <Card title="Accesos Rápidos" className="mb-6">
+        <SectionCard title="Accesos Rápidos" className="mb-6">
             <div className="flex flex-wrap gap-3">
                 {links.map((item) => (
                     <Link
                         key={item.routeName}
                         href={route(item.routeName)}
-                        className="inline-flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors border border-primary-200"
+                        className="inline-flex items-center px-4 py-2 bg-oliva-50 text-oliva-700 rounded-lg text-sm font-medium hover:bg-oliva-100 transition-all duration-200 border border-oliva-200"
                     >
                         {item.icon && <span className="mr-2">{item.icon}</span>}
                         {item.label}
                     </Link>
                 ))}
             </div>
-        </Card>
+        </SectionCard>
     );
 };
 
-const ListWidget = ({ title, items, colorClass = 'primary' }) => {
+const ListWidget = ({ title, items, colorClass = 'oliva' }) => {
     const colors = {
-        primary: 'bg-primary-500',
-        green: 'bg-success',
-        amber: 'bg-warning',
-        cyan: 'bg-info',
+        oliva: 'bg-oliva-500',
+        terracota: 'bg-terracota-500',
+        green: 'bg-green-500',
+        amber: 'bg-amber-500',
+        cyan: 'bg-cyan-500',
     };
 
     return (
-        <Card title={title}>
+        <SectionCard title={title}>
             <div className="space-y-3">
                 {items?.length ? (
                     items.map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                             <div className="flex items-center">
-                                <div className={`w-2 h-2 rounded-full ${colors[colorClass] || colors.primary} me-3`}></div>
-                                <span className="text-sm text-gray-700">{item.etiqueta}</span>
+                                <div className={`w-2 h-2 rounded-full ${colors[colorClass] || colors.oliva} me-3`}></div>
+                                <span className="text-sm text-cafe-700">{item.etiqueta}</span>
                             </div>
-                            <Badge variant={colorClass === 'green' ? 'success' : colorClass === 'amber' ? 'warning' : 'primary'}>
+                            <Badge variant={colorClass === 'green' ? 'success' : colorClass === 'amber' ? 'warning' : 'oliva'}>
                                 {item.total}
                             </Badge>
                         </div>
@@ -124,16 +133,9 @@ const ListWidget = ({ title, items, colorClass = 'primary' }) => {
                     <p className="text-sm text-gray-400 text-center py-4">Sin datos disponibles</p>
                 )}
             </div>
-        </Card>
+        </SectionCard>
     );
 };
-
-const SectionTitle = ({ children }) => (
-    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        <span className="w-1 h-6 bg-primary-600 rounded-full me-3"></span>
-        {children}
-    </h3>
-);
 
 export default function Dashboard({ metricas }) {
     const { auth } = usePage().props;
@@ -160,17 +162,15 @@ export default function Dashboard({ metricas }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-800">Dashboard Comercial</h2>
-                        <p className="text-sm text-gray-500 mt-1">Resumen general de tu negocio</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Badge variant="primary">
+                <PageHeader
+                    title="Dashboard Comercial"
+                    subtitle="Resumen general de tu negocio"
+                    actions={
+                        <Badge variant="oliva">
                             {new Date().toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </Badge>
-                    </div>
-                </div>
+                    }
+                />
             }
         >
             <Head title="Dashboard Comercial" />
@@ -179,13 +179,16 @@ export default function Dashboard({ metricas }) {
                 <QuickLinkCard links={quickLinks} />
 
                 <div>
-                    <SectionTitle>Clientes y Leads</SectionTitle>
+                    <h3 className="text-lg font-semibold text-cafe-800 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-oliva-600 rounded-full me-3"></span>
+                        Clientes y Leads
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard
                             title="Total Clientes"
                             value={metricas?.clientes?.total ?? 0}
                             icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
-                            variant="blue"
+                            variant="oliva"
                         />
                         <StatCard
                             title="Total Leads"
@@ -209,13 +212,16 @@ export default function Dashboard({ metricas }) {
                 </div>
 
                 <div>
-                    <SectionTitle>Productos e Inventario</SectionTitle>
+                    <h3 className="text-lg font-semibold text-cafe-800 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-terracota-500 rounded-full me-3"></span>
+                        Productos e Inventario
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard
                             title="Total Productos"
                             value={metricas?.productos?.total ?? 0}
                             icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>}
-                            variant="blue"
+                            variant="oliva"
                         />
                         <StatCard
                             title="Productos Activos"
@@ -239,13 +245,16 @@ export default function Dashboard({ metricas }) {
                 </div>
 
                 <div>
-                    <SectionTitle>Pedidos</SectionTitle>
+                    <h3 className="text-lg font-semibold text-cafe-800 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-oliva-600 rounded-full me-3"></span>
+                        Pedidos
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard
                             title="Total Pedidos"
                             value={metricas?.pedidos?.total ?? 0}
                             icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>}
-                            variant="blue"
+                            variant="oliva"
                         />
                         <StatCard
                             title="Borrador"
@@ -269,13 +278,16 @@ export default function Dashboard({ metricas }) {
                 </div>
 
                 <div>
-                    <SectionTitle>Pagos</SectionTitle>
+                    <h3 className="text-lg font-semibold text-cafe-800 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-terracota-500 rounded-full me-3"></span>
+                        Pagos
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard
                             title="Total Pagos"
                             value={metricas?.pagos?.total ?? 0}
                             icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>}
-                            variant="blue"
+                            variant="oliva"
                         />
                         <StatCard
                             title="Pendientes"
@@ -299,7 +311,10 @@ export default function Dashboard({ metricas }) {
                 </div>
 
                 <div>
-                    <SectionTitle>Live Sales</SectionTitle>
+                    <h3 className="text-lg font-semibold text-cafe-800 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-oliva-600 rounded-full me-3"></span>
+                        Live Sales
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <StatCard
                             title="Sesiones Totales"
@@ -317,7 +332,7 @@ export default function Dashboard({ metricas }) {
                             title="Interacciones"
                             value={metricas?.live_sales?.interacciones_totales ?? 0}
                             icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>}
-                            variant="blue"
+                            variant="oliva"
                         />
                     </div>
                 </div>
@@ -326,7 +341,7 @@ export default function Dashboard({ metricas }) {
                     <ListWidget
                         title="Ventas por Canal"
                         items={metricas?.ventas_por_canal}
-                        colorClass="primary"
+                        colorClass="oliva"
                     />
                     <ListWidget
                         title="Ventas por Tipo de Flujo"

@@ -1,14 +1,150 @@
-import { useForm } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PageHeader from '@/Components/UI/PageHeader';
+import FormCard from '@/Components/UI/FormCard';
+import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import { Head, Link, useForm } from '@inertiajs/react';
+
+const metodoLabels = {
+    qr: 'QR',
+    transferencia: 'Transferencia',
+    efectivo: 'Efectivo',
+    deposito: 'Depósito',
+    otro: 'Otro',
+};
 
 export default function Edit({ pago, metodosPago }) {
-  const { data, setData, put, processing, errors } = useForm({ metodo_pago_pag: pago.metodo_pago_pag, monto_pag: pago.monto_pag, referencia_pag: pago.referencia_pag ?? '', fecha_pago_pag: pago.fecha_pago_pag?.slice(0,10) ?? '', observacion_pag: pago.observacion_pag ?? '' });
-  const submit = (e) => { e.preventDefault(); put(route('pagos.update', pago.cod_pago)); };
-  return <form className="p-6 space-y-3" onSubmit={submit}><h1 className="text-xl">Editar pago #{pago.cod_pago}</h1>
-    <select value={data.metodo_pago_pag} onChange={e=>setData('metodo_pago_pag',e.target.value)}>{metodosPago.map(m=><option key={m} value={m}>{m}</option>)}</select>
-    <input value={data.monto_pag} onChange={e=>setData('monto_pag',e.target.value)} />
-    <input value={data.referencia_pag} onChange={e=>setData('referencia_pag',e.target.value)} />
-    <input type="date" value={data.fecha_pago_pag} onChange={e=>setData('fecha_pago_pag',e.target.value)} />
-    <textarea value={data.observacion_pag} onChange={e=>setData('observacion_pag',e.target.value)} />
-    {Object.values(errors).map((er, i) => <p className="text-red-600" key={i}>{er}</p>)}
-    <button disabled={processing}>Actualizar</button></form>;
+    const form = useForm({
+        metodo_pago_pag: pago?.metodo_pago_pag ?? '',
+        monto_pag: pago?.monto_pag ?? '',
+        referencia_pag: pago?.referencia_pag ?? '',
+        fecha_pago_pag: pago?.fecha_pago_pag?.slice(0, 10) ?? '',
+        observacion_pag: pago?.observacion_pag ?? '',
+    });
+
+    const submit = () => {
+        form.put(route('pagos.update', pago.cod_pago));
+    };
+
+    const inputClass = "w-full rounded-xl border-gray-300 shadow-sm focus:border-terracota-500 focus:ring-terracota-500 py-2.5 px-3 text-sm text-cafe-700 transition-all duration-200";
+    const labelClass = "block text-sm font-medium text-cafe-700 mb-1.5";
+    const errorClass = "mt-1 text-xs text-red-600";
+
+    return (
+        <AuthenticatedLayout
+            header={
+                <PageHeader
+                    title={`Editar Pago #${pago.cod_pago}`}
+                    subtitle="Modifique los datos del pago"
+                    breadcrumbs={[
+                        { label: 'Dashboard', href: route('dashboard') },
+                        { label: 'Pagos', href: route('pagos.index') },
+                        { label: `Pago #${pago.cod_pago}` },
+                    ]}
+                />
+            }
+        >
+            <Head title={`Editar Pago #${pago.cod_pago}`} />
+
+            <div className="max-w-2xl mx-auto">
+                <FormCard
+                    title="Datos del Pago"
+                    subtitle="Modifique la información del pago"
+                    onSubmit={(e) => { e.preventDefault(); submit(); }}
+                >
+                    <FormCard.Section title="Pago">
+                        <FormCard.Row>
+                            <div>
+                                <label className={labelClass}>
+                                    Método de Pago <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    value={form.data.metodo_pago_pag ?? ''}
+                                    onChange={(e) => form.setData('metodo_pago_pag', e.target.value)}
+                                    className={`${inputClass} ${form.errors.metodo_pago_pag ? 'border-red-500' : ''}`}
+                                >
+                                    <option value="">Seleccionar método</option>
+                                    {metodosPago.map((m) => (
+                                        <option key={m} value={m}>{metodoLabels[m] || m}</option>
+                                    ))}
+                                </select>
+                                {form.errors.metodo_pago_pag && <p className={errorClass}>{form.errors.metodo_pago_pag}</p>}
+                            </div>
+
+                            <div>
+                                <label className={labelClass}>
+                                    Monto <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Bs</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        value={form.data.monto_pag ?? ''}
+                                        onChange={(e) => form.setData('monto_pag', e.target.value)}
+                                        className={`${inputClass} pl-10 ${form.errors.monto_pag ? 'border-red-500' : ''}`}
+                                        placeholder="0.00"
+                                        required
+                                    />
+                                </div>
+                                {form.errors.monto_pag && <p className={errorClass}>{form.errors.monto_pag}</p>}
+                            </div>
+                        </FormCard.Row>
+
+                        <FormCard.Row>
+                            <div>
+                                <label className={labelClass}>Referencia</label>
+                                <input
+                                    type="text"
+                                    value={form.data.referencia_pag ?? ''}
+                                    onChange={(e) => form.setData('referencia_pag', e.target.value)}
+                                    className={`${inputClass} ${form.errors.referencia_pag ? 'border-red-500' : ''}`}
+                                    placeholder="Nro. de comprobante, transferencia, etc."
+                                />
+                                {form.errors.referencia_pag && <p className={errorClass}>{form.errors.referencia_pag}</p>}
+                            </div>
+
+                            <div>
+                                <label className={labelClass}>Fecha de Pago</label>
+                                <input
+                                    type="date"
+                                    value={form.data.fecha_pago_pag ?? ''}
+                                    onChange={(e) => form.setData('fecha_pago_pag', e.target.value)}
+                                    className={`${inputClass} ${form.errors.fecha_pago_pag ? 'border-red-500' : ''}`}
+                                />
+                                {form.errors.fecha_pago_pag && <p className={errorClass}>{form.errors.fecha_pago_pag}</p>}
+                            </div>
+                        </FormCard.Row>
+                    </FormCard.Section>
+
+                    <FormCard.Section title="Observaciones">
+                        <div>
+                            <label className={labelClass}>Observaciones</label>
+                            <textarea
+                                value={form.data.observacion_pag ?? ''}
+                                onChange={(e) => form.setData('observacion_pag', e.target.value)}
+                                rows={3}
+                                className={`${inputClass} resize-y`}
+                                placeholder="Detalles adicionales sobre el pago"
+                            />
+                        </div>
+                    </FormCard.Section>
+
+                    <FormCard.Actions>
+                        <Link href={route('pagos.show', pago.cod_pago)}>
+                            <SecondaryButton>Cancelar</SecondaryButton>
+                        </Link>
+                        <PrimaryActionButton
+                            type="submit"
+                            loading={form.processing}
+                            disabled={form.processing}
+                        >
+                            Actualizar Pago
+                        </PrimaryActionButton>
+                    </FormCard.Actions>
+                </FormCard>
+            </div>
+        </AuthenticatedLayout>
+    );
 }

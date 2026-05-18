@@ -1,3 +1,106 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /* Scrollbar personalizado */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #c5c5c5;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Selección de texto */
+    ::selection {
+        background-color: #D77A61;
+        color: white;
+    }
+
+    /* Focus ring accesible */
+    :focus-visible {
+        outline: 2px solid #D77A61;
+        outline-offset: 2px;
+    }
+
+    /* Transiciones suaves para inputs */
+    input, select, textarea {
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* Smooth scroll */
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+@layer components {
+    /* Clase para cards con hover */
+    .card-hover {
+        @apply transition-all duration-200 ease-in-out hover:shadow-card-hover hover:-translate-y-0.5;
+    }
+
+    /* Clase para inputs con focus */
+    .input-focus {
+        @apply focus:ring-2 focus:ring-terracota-500 focus:border-terracota-500 focus:bg-white;
+    }
+
+    /* Clase para sidebar scroll */
+    .sidebar-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+}
+
+@layer utilities {
+    /* Utilidad para gradientes */
+    .gradient-oliva {
+        background: linear-gradient(135deg, #3C473A 0%, #4e5849 100%);
+    }
+
+    .gradient-terracota {
+        background: linear-gradient(135deg, #D77A61 0%, #c56950 100%);
+    }
+
+    /* Utilidad para textos truncados */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Utilidad para sombras de sidebar */
+    .shadow-sidebar {
+        box-shadow: 4px 0 6px -1px rgb(0 0 0 / 0.1);
+    }
+}

@@ -252,4 +252,137 @@ class ReporteComercialRepository
             'nombre_tip' => $t->nombre_tip,
         ])->all();
     }
+
+    public function pagosPorMetodo(array $filtros): array
+    {
+        $query = DB::table('pagos')
+            ->selectRaw('metodo_pago_pag as metodo, COUNT(*) as total, SUM(monto_pag) as monto_total')
+            ->groupBy('metodo_pago_pag')
+            ->orderByDesc('monto_total');
+
+        if (! empty($filtros['fecha_inicio'])) {
+            $query->whereDate('fecha_pago_pag', '>=', $filtros['fecha_inicio']);
+        }
+        if (! empty($filtros['fecha_fin'])) {
+            $query->whereDate('fecha_pago_pag', '<=', $filtros['fecha_fin']);
+        }
+        if (! empty($filtros['estado_pago'])) {
+            $query->where('estado_pago_pag', $filtros['estado_pago']);
+        }
+
+        return $query->get()->map(fn ($item) => [
+            'metodo' => $item->metodo,
+            'total' => (int) $item->total,
+            'monto_total' => (float) $item->monto_total,
+        ])->all();
+    }
+
+    public function leadsPorCanal(array $filtros): array
+    {
+        $query = DB::table('leads as l')
+            ->leftJoin('canales_venta as c', 'c.cod_canal_venta', '=', 'l.cod_canal_venta')
+            ->selectRaw("COALESCE(c.nombre_can, 'Sin canal') as canal, COUNT(*) as total")
+            ->groupBy('c.nombre_can')
+            ->orderByDesc('total');
+
+        if (! empty($filtros['estado_lead'])) {
+            $query->where('l.estado_lea', $filtros['estado_lead']);
+        }
+        if (! empty($filtros['cod_canal_venta'])) {
+            $query->where('l.cod_canal_venta', $filtros['cod_canal_venta']);
+        }
+
+        return $query->get()->map(fn ($item) => [
+            'canal' => $item->canal,
+            'total' => (int) $item->total,
+        ])->all();
+    }
+
+    public function clientesPorEstado(): array
+    {
+        return DB::table('clientes')
+            ->selectRaw('estado_cli as estado, COUNT(*) as total')
+            ->groupBy('estado_cli')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($item) => ['estado' => $item->estado, 'total' => (int) $item->total])
+            ->all();
+    }
+
+    public function sesionesLivePorEstado(): array
+    {
+        return DB::table('sesiones_live')
+            ->selectRaw('estado_ses as estado, COUNT(*) as total')
+            ->groupBy('estado_ses')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($item) => ['estado' => $item->estado, 'total' => (int) $item->total])
+            ->all();
+    }
+
+    public function interaccionesPorSesion(): array
+    {
+        return DB::table('sesiones_live as sl')
+            ->leftJoin('interacciones_live as il', 'il.cod_sesion_live', '=', 'sl.cod_sesion_live')
+            ->selectRaw('sl.titulo_ses as sesion, COUNT(il.cod_interaccion_live) as total_interacciones')
+            ->groupBy('sl.cod_sesion_live', 'sl.titulo_ses')
+            ->orderByDesc('total_interacciones')
+            ->get()
+            ->map(fn ($item) => [
+                'sesion' => $item->sesion,
+                'total_interacciones' => (int) $item->total_interacciones,
+            ])
+            ->all();
+    }
+
+    public function leadsDesdeLive(): int
+    {
+        return DB::table('interacciones_live')
+            ->whereNotNull('cod_lead')
+            ->count();
+    }
+
+    public function pedidosDesdeLive(): int
+    {
+        return DB::table('interacciones_live')
+            ->whereNotNull('cod_pedido')
+            ->count();
+    }
+
+    public function totalInteraccionesLive(): int
+    {
+        return DB::table('interacciones_live')->count();
+    }
+
+    public function totalSesionesLive(): int
+    {
+        return DB::table('sesiones_live')->count();
+    }
+
+    public function totalClientes(): int
+    {
+        return DB::table('clientes')->count();
+    }
+
+    public function totalLeads(): int
+    {
+        return DB::table('leads')->count();
+    }
+
+    public function totalPedidos(): int
+    {
+        return DB::table('pedidos')->count();
+    }
+
+    public function totalPagos(): int
+    {
+        return DB::table('pagos')->count();
+    }
+
+    public function montoTotalPagado(): float
+    {
+        return (float) DB::table('pagos')
+            ->where('estado_pago_pag', EstadoPagoEnum::PAGADO->value)
+            ->sum('monto_pag');
+    }
 }

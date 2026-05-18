@@ -22,6 +22,9 @@ class ClienteController extends Controller
 
         return Inertia::render('Clientes/Index', [
             'clientes' => Cliente::with(['canalVenta', 'tipoFlujoComercial'])->latest()->get(),
+            'canales' => CanalVenta::all(),
+            'tiposFlujo' => TipoFlujoComercial::all(),
+            'estados' => array_column(EstadoClienteEnum::cases(), 'value'),
         ]);
     }
 
