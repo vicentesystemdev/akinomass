@@ -23,14 +23,14 @@ export default function Dashboard({ metricas }) {
                     <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-white/5 blur-2xl"></div>
                     
                     <div className="relative z-10">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-terracotta/10 text-terracotta text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                             Resumen de Operaciones
                         </span>
-                        <h1 className="text-4xl font-black text-white mb-2 tracking-tight">
+                        <h1 className="text-4xl font-black text-terracotta mb-2 tracking-tight">
                             ¡Bienvenido de vuelta!
                         </h1>
-                        <p className="text-white/60 text-lg max-w-xl font-medium">
-                            Aquí tienes el pulso comercial de <span className="text-white font-bold">AKINOMASS</span> para el día de hoy. 
+                        <p className="text-terracotta/60 text-lg max-w-xl font-medium">
+                            Aquí tienes el pulso comercial de <span className="text-terracotta font-bold">AKINOMASS</span> para el día de hoy. 
                             Revisa tus ventas, leads e inventario en un solo lugar.
                         </p>
                     </div>
@@ -81,8 +81,8 @@ export default function Dashboard({ metricas }) {
                                 <span className="text-3xl font-black text-olive">{metricas.leads.convertidos}</span>
                                 <StatusBadge type="success" className="ml-2">+{Math.round((metricas.leads.convertidos / metricas.leads.total) * 100) || 0}%</StatusBadge>
                             </div>
-                            <div className="p-6 rounded-3xl bg-olive text-white shadow-xl">
-                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-1 text-white/50">Clientes Reales</span>
+                            <div className="p-6 rounded-3xl bg-terracotta text-terracotta shadow-xl">
+                                <span className="text-[10px] font-black text-terracotta/40 uppercase tracking-widest block mb-1 text-terracotta/50">Clientes Reales</span>
                                 <span className="text-3xl font-black">{metricas.clientes.total}</span>
                             </div>
                         </div>
@@ -159,12 +159,12 @@ export default function Dashboard({ metricas }) {
 
                     {/* Live Sales Mini Panel */}
                     <SectionCard title="Sesiones Live">
-                        <div className="flex items-center gap-4 mb-6 p-4 rounded-2xl bg-coffee text-white shadow-xl">
+                        <div className="flex items-center gap-4 mb-6 p-4 rounded-2xl bg-terracotta text-terracotta shadow-xl">
                             <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center animate-pulse">
                                 <div className="h-3 w-3 rounded-full bg-red-500"></div>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">En Vivo ahora</span>
+                                <span className="text-[10px] font-black text-terracotta/40 uppercase tracking-widest">En Vivo ahora</span>
                                 <span className="text-xl font-black">{metricas.live_sales.sesiones_en_vivo_o_programadas} Activas</span>
                             </div>
                         </div>
