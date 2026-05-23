@@ -1,16 +1,11 @@
-import React from 'react';
-
-export default function EmptyState({ message = "No hay datos disponibles para este reporte con los filtros seleccionados." }) {
+export default function EmptyState({ title = 'Sin datos', description = 'Todavia no hay registros para mostrar.' }) {
     return (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-[#FDF6F0]/30 rounded-3xl border border-dashed border-[#3C473A]/10">
-            <div className="w-16 h-16 bg-olive/5 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-olive/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                </svg>
+        <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-akin-surface-soft text-xl font-black text-akin-accent dark:bg-white/5">
+                AK
             </div>
-            <p className="text-sm font-medium text-[#3C473A]/50 max-w-[200px]">
-                {message}
-            </p>
+            <h3 className="mt-4 text-base font-black text-akin-text">{title}</h3>
+            <p className="akin-muted mt-2 max-w-sm text-sm leading-6">{description}</p>
         </div>
     );
 }

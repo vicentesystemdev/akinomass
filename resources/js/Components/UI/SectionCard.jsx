@@ -1,18 +1,30 @@
-import React from 'react';
-
-export default function SectionCard({ title, subtitle, children, actions }) {
+export default function SectionCard({ title, description, action, children, className = '' }) {
     return (
-        <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(43,34,30,0.03)] border border-[#3C473A]/5">
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h2 className="text-xl font-bold text-[#2B221E]">{title}</h2>
-                    {subtitle && <p className="text-sm text-[#3C473A]/50 mt-1 font-medium">{subtitle}</p>}
+        <section
+            className={[
+                'akin-card shadow-sm dark:shadow-black/20',
+                className,
+            ].join(' ')}
+        >
+            {(title || description || action) && (
+                <div className="akin-divider flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        {title && (
+                            <h2 className="akin-section-title text-lg font-black">
+                                {title}
+                            </h2>
+                        )}
+                        {description && (
+                            <p className="akin-muted mt-1 text-sm leading-5">
+                                {description}
+                            </p>
+                        )}
+                    </div>
+                    {action}
                 </div>
-                {actions && <div className="flex gap-2">{actions}</div>}
-            </div>
-            <div>
-                {children}
-            </div>
-        </div>
+            )}
+
+            {children}
+        </section>
     );
 }

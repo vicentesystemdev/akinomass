@@ -1,180 +1,288 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import MetricCard from '@/Components/UI/MetricCard';
+import ChartCard from '@/Components/Dashboard/ChartCard';
+import DataTable from '@/Components/Dashboard/DataTable';
+import RecentActivity from '@/Components/Dashboard/RecentActivity';
+import StatCard from '@/Components/Dashboard/StatCard';
+import QuickActionCard from '@/Components/UI/QuickActionCard';
 import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { Head, Link } from '@inertiajs/react';
 
-export default function Dashboard({ metricas }) {
-    const amountFormatter = new Intl.NumberFormat('es-BO', {
-        style: 'currency',
-        currency: 'BOB',
-        minimumFractionDigits: 2,
-    });
+const defaultStats = [
+    {
+        title: 'Ventas del dia',
+        value: 'Bs 4.820',
+        description: 'Ingresos registrados desde canales sociales.',
+        trend: '+12%',
+        trendType: 'positive',
+        tone: 'clay',
+        icon: 'Bs',
+    },
+    {
+        title: 'Pedidos pendientes',
+        value: '18',
+        description: 'Ordenes por confirmar, preparar o despachar.',
+        trend: '+5 hoy',
+        trendType: 'warning',
+        tone: 'earth',
+        icon: '#',
+    },
+    {
+        title: 'Leads nuevos',
+        value: '34',
+        description: 'Contactos captados por campanas y lives.',
+        trend: '+9%',
+        trendType: 'positive',
+        tone: 'green',
+        icon: '+',
+    },
+    {
+        title: 'Productos con bajo stock',
+        value: '7',
+        description: 'Items que requieren reposicion comercial.',
+        trend: 'alerta',
+        trendType: 'warning',
+        tone: 'red',
+        icon: '!',
+    },
+    {
+        title: 'Conversion estimada',
+        value: '23%',
+        description: 'Relacion entre leads y pedidos confirmados.',
+        trend: '+3.1%',
+        trendType: 'positive',
+        tone: 'blue',
+        icon: '%',
+    },
+    {
+        title: 'Canales activos',
+        value: '5',
+        description: 'TikTok, WhatsApp, Instagram, Facebook y manual.',
+        trend: 'online',
+        trendType: 'neutral',
+        tone: 'neutral',
+        icon: 'ON',
+    },
+];
 
+const defaultOrders = [
+    { code: 'PED-1028', customer: 'Mariana Rojas', channel: 'TikTok LIVE', status: 'Pendiente', paymentStatus: 'Pendiente', total: 'Bs 320', date: '23/05/2026', href: '#' },
+    { code: 'PED-1027', customer: 'Luis Fernandez', channel: 'WhatsApp', status: 'Confirmado', paymentStatus: 'Pagado', total: 'Bs 180', date: '23/05/2026', href: '#' },
+    { code: 'PED-1026', customer: 'Camila Torres', channel: 'Instagram', status: 'En preparacion', paymentStatus: 'Observado', total: 'Bs 245', date: '22/05/2026', href: '#' },
+    { code: 'PED-1025', customer: 'Andrea Salazar', channel: 'Facebook', status: 'Entregado', paymentStatus: 'Pagado', total: 'Bs 410', date: '22/05/2026', href: '#' },
+    { code: 'PED-1024', customer: 'Diego Vargas', channel: 'Manual', status: 'Cancelado', paymentStatus: 'Rechazado', total: 'Bs 95', date: '21/05/2026', href: '#' },
+];
+
+const defaultChannelSales = [
+    { label: 'TikTok LIVE', shortLabel: 'TT', value: 1680 },
+    { label: 'WhatsApp', shortLabel: 'WA', value: 1260 },
+    { label: 'Instagram', shortLabel: 'IG', value: 980 },
+    { label: 'Facebook', shortLabel: 'FB', value: 620 },
+    { label: 'Manual', shortLabel: 'MN', value: 280 },
+];
+
+const defaultActivities = [
+    {
+        icon: 'L',
+        title: 'Nuevo lead registrado desde TikTok LIVE',
+        description: 'Contacto interesado en jeans wide leg y envio nacional.',
+        time: 'Hace 8 min',
+        tone: 'info',
+    },
+    {
+        icon: 'P',
+        title: 'Pedido confirmado por WhatsApp',
+        description: 'La orden PED-1027 paso a preparacion comercial.',
+        time: 'Hace 18 min',
+        tone: 'success',
+    },
+    {
+        icon: 'S',
+        title: 'Producto marcado con bajo stock',
+        description: 'Polera basica algodon llego al umbral minimo.',
+        time: 'Hace 32 min',
+        tone: 'warning',
+    },
+    {
+        icon: 'C',
+        title: 'Cliente actualizado',
+        description: 'Se completo telefono, canal favorito y ciudad.',
+        time: 'Hace 46 min',
+        tone: 'neutral',
+    },
+    {
+        icon: 'V',
+        title: 'Venta registrada desde Instagram',
+        description: 'Nueva venta de outfit casual femenino.',
+        time: 'Hace 1 h',
+        tone: 'success',
+    },
+    {
+        icon: '!',
+        title: 'Pago observado pendiente de revision',
+        description: 'Comprobante requiere validacion antes del despacho.',
+        time: 'Hace 2 h',
+        tone: 'warning',
+    },
+];
+
+const channelSummary = [
+    { label: 'TikTok LIVE', leads: 52, orders: 21, conversion: '40%', tone: 'info' },
+    { label: 'WhatsApp', leads: 39, orders: 18, conversion: '46%', tone: 'success' },
+    { label: 'Instagram', leads: 31, orders: 12, conversion: '39%', tone: 'warning' },
+    { label: 'Facebook', leads: 18, orders: 7, conversion: '38%', tone: 'info' },
+];
+
+const funnel = [
+    { label: 'Leads captados', value: 140, width: '100%' },
+    { label: 'Contactados', value: 96, width: '74%' },
+    { label: 'Pedidos creados', value: 58, width: '48%' },
+    { label: 'Ventas pagadas', value: 39, width: '34%' },
+];
+
+export default function Dashboard({
+    auth,
+    stats = defaultStats,
+    recentOrders = defaultOrders,
+    channelSales = defaultChannelSales,
+    activities = defaultActivities,
+}) {
+    const safeHref = (routeName, fallback = '#') => {
+        try {
+            if (typeof route === 'function') {
+                const router = route();
+
+                if (router?.has) {
+                    return router.has(routeName) ? route(routeName) : fallback;
+                }
+
+                return route(routeName);
+            }
+        } catch (error) {
+            return fallback;
+        }
+
+        return fallback;
+    };
+
+    const quickActions = [
+        { title: 'Registrar lead', description: 'Captura contacto desde live o redes.', href: safeHref('leads.create', '#'), icon: '+', tone: 'earth' },
+        { title: 'Crear pedido', description: 'Prepara una orden comercial.', href: '#', icon: '#', tone: 'clay' },
+        { title: 'Agregar producto', description: 'Publica una prenda o variante.', href: safeHref('productos.create', '#'), icon: 'P', tone: 'leaf' },
+        { title: 'Registrar pago', description: 'Controla pagos observados.', href: '#', icon: 'Bs', tone: 'sky' },
+        { title: 'Ver reportes', description: 'Analiza ventas y conversion.', href: '#', icon: '%', tone: 'stone' },
+    ];
 
     return (
-        <AuthenticatedLayout header="Dashboard Comercial">
-            <Head title="Dashboard Comercial" />
+        <DashboardLayout user={auth?.user}>
+            <Head title="Dashboard" />
 
-            {/* Hero Section */}
-            <div className="mb-10">
-                <div className="relative overflow-hidden rounded-[2.5rem] bg-olive p-10 shadow-2xl">
-                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-terracotta/20 blur-3xl"></div>
-                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-white/5 blur-2xl"></div>
-                    
-                    <div className="relative z-10">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-terracotta/10 text-terracotta text-[10px] font-black uppercase tracking-[0.2em] mb-4">
-                            Resumen de Operaciones
-                        </span>
-                        <h1 className="text-4xl font-black text-terracotta mb-2 tracking-tight">
-                            ¡Bienvenido de vuelta!
-                        </h1>
-                        <p className="text-terracotta/60 text-lg max-w-xl font-medium">
-                            Aquí tienes el pulso comercial de <span className="text-terracotta font-bold">AKINOMASS</span> para el día de hoy. 
-                            Revisa tus ventas, leads e inventario en un solo lugar.
-                        </p>
+            <div className="space-y-6">
+                <section className="relative overflow-hidden rounded-3xl bg-akin-primary p-6 text-white shadow-xl shadow-black/20 dark:bg-akin-surfaceSoft dark:text-akin-text dark:shadow-black/30 sm:p-8">
+                    <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-akin-accent to-transparent opacity-30 lg:block" />
+                    <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-akin-accent opacity-20 blur-3xl" />
+
+                    <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-3xl">
+                            <p className="text-sm font-black uppercase tracking-[0.22em] text-akin-accentSoft">
+                                AKINOMASS CRM ecommerce
+                            </p>
+                            <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                                Operacion comercial multicanal
+                            </h1>
+                            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70 dark:text-akin-muted">
+                                Gestiona clientes, leads, pedidos, inventario y pagos desde TikTok LIVE,
+                                WhatsApp, Instagram, Facebook y ventas manuales con una vista preparada
+                                para datos reales de Laravel/Inertia.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <Link
+                                href={safeHref('leads.create', '#')}
+                                className="akin-btn-primary h-11 px-5 text-sm shadow-lg shadow-black/10"
+                            >
+                                Registrar lead
+                            </Link>
+                            <Link
+                                href={safeHref('productos.index', '/productos')}
+                                className="inline-flex h-11 items-center justify-center rounded-xl bg-white/10 px-5 text-sm font-black text-white ring-1 ring-white/20 transition hover:bg-white/20"
+                            >
+                                Ver catalogo
+                            </Link>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </section>
 
-            {/* Top Metrics Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-                <MetricCard 
-                    title="Ventas Totales" 
-                    value={amountFormatter.format(metricas.pagos.monto_total_pagado)} 
-                    color="terracotta"
-                    trend="up"
-                    trendValue="12%"
-                />
-                <MetricCard 
-                    title="Pedidos Confirmados" 
-                    value={metricas.pedidos.confirmado} 
-                    color="olive"
-                />
-                <MetricCard 
-                    title="Leads Nuevos" 
-                    value={metricas.leads.nuevos} 
-                    color="cream"
-                />
-                <MetricCard 
-                    title="Interacciones Live" 
-                    value={metricas.live_sales.interacciones_totales} 
-                    color="coffee"
-                />
-            </div>
+                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+                    {stats.map((stat) => (
+                        <StatCard key={stat.title} {...stat} />
+                    ))}
+                </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content Column */}
-                <div className="lg:col-span-2 space-y-8">
-                    {/* CRM & Funnel Summary */}
-                    <SectionCard 
-                        title="Embudo de Conversión" 
-                        subtitle="Seguimiento de leads y clientes activos"
-                    >
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="p-6 rounded-3xl bg-[#FDF6F0] border border-olive/5">
-                                <span className="text-[10px] font-black text-olive/40 uppercase tracking-widest block mb-1">Total Leads</span>
-                                <span className="text-3xl font-black text-olive">{metricas.leads.total}</span>
-                            </div>
-                            <div className="p-6 rounded-3xl bg-[#FDF6F0] border border-olive/5">
-                                <span className="text-[10px] font-black text-olive/40 uppercase tracking-widest block mb-1">Convertidos</span>
-                                <span className="text-3xl font-black text-olive">{metricas.leads.convertidos}</span>
-                                <StatusBadge type="success" className="ml-2">+{Math.round((metricas.leads.convertidos / metricas.leads.total) * 100) || 0}%</StatusBadge>
-                            </div>
-                            <div className="p-6 rounded-3xl bg-terracotta text-terracotta shadow-xl">
-                                <span className="text-[10px] font-black text-terracotta/40 uppercase tracking-widest block mb-1 text-terracotta/50">Clientes Reales</span>
-                                <span className="text-3xl font-black">{metricas.clientes.total}</span>
-                            </div>
+                <section className="grid gap-6 xl:grid-cols-3">
+                    <div className="xl:col-span-2">
+                        <ChartCard data={channelSales} />
+                    </div>
+                    <RecentActivity items={activities} />
+                </section>
+
+                <section className="grid gap-6 xl:grid-cols-3">
+                    <div className="xl:col-span-2">
+                        <DataTable orders={recentOrders} />
+                    </div>
+
+                    <SectionCard title="Acciones rapidas" description="Atajos preparados para conectar rutas reales.">
+                        <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-1">
+                            {quickActions.map((action) => (
+                                <QuickActionCard key={action.title} {...action} />
+                            ))}
                         </div>
                     </SectionCard>
+                </section>
 
-                    {/* Sales Channels Table */}
-                    <SectionCard title="Ventas por Canal" subtitle="Distribución del volumen comercial por plataforma">
-                        <div className="overflow-hidden rounded-2xl border border-olive/5">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#3C473A]/5">
-                                    <tr>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-olive/60">Canal de Venta</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-olive/60 text-right">Total Pedidos</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-olive/60 text-center">Rendimiento</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-olive/5">
-                                    {metricas.ventas_por_canal.map((item) => (
-                                        <tr key={item.etiqueta} className="hover:bg-[#FDF6F0]/50 transition-colors">
-                                            <td className="px-6 py-4 text-sm font-bold text-coffee uppercase tracking-tight">{item.etiqueta}</td>
-                                            <td className="px-6 py-4 text-sm font-black text-olive text-right">{item.total}</td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="w-full bg-olive/5 rounded-full h-1.5 max-w-[100px] mx-auto">
-                                                    <div 
-                                                        className="bg-terracotta h-1.5 rounded-full" 
-                                                        style={{ width: `${Math.min(100, (item.total / metricas.pedidos.total) * 100)}%` }}
-                                                    ></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </SectionCard>
-                </div>
-
-                {/* Sidebar Column */}
-                <div className="space-y-8">
-                    {/* Inventory Status */}
-                    <SectionCard title="Estado de Inventario">
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-[#FDF6F0]">
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-olive/50 uppercase tracking-wider">Productos Totales</span>
-                                    <span className="text-2xl font-black text-olive">{metricas.productos.total}</span>
-                                </div>
-                                <StatusBadge type="primary">Catálogo</StatusBadge>
-                            </div>
-                            
-                            <div className="flex items-center justify-between p-4 rounded-2xl border-2 border-red-100 bg-red-50/30">
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Stock Bajo</span>
-                                    <span className="text-2xl font-black text-red-600">{metricas.productos.stock_bajo}</span>
-                                </div>
-                                <StatusBadge type="danger">Revisar</StatusBadge>
-                            </div>
-
-                            <div className="pt-2">
-                                <h4 className="text-[10px] font-black text-olive/30 uppercase tracking-[0.2em] mb-4">Métricas de Pago</h4>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="font-bold text-coffee">Pagos Completados</span>
-                                        <span className="font-black text-olive">{metricas.pagos.pagado}</span>
+                <section className="grid gap-6 lg:grid-cols-2">
+                    <SectionCard title="Resumen por canal" description="Lectura comercial de captacion y conversion.">
+                        <div className="divide-y divide-akin-border">
+                            {channelSummary.map((channel) => (
+                                <div key={channel.label} className="grid grid-cols-4 items-center gap-3 px-5 py-4">
+                                    <div className="col-span-4 sm:col-span-1">
+                                        <p className="font-black text-akin-text">{channel.label}</p>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="font-bold text-coffee/60">Pendientes de Pago</span>
-                                        <span className="font-black text-terracotta">{metricas.pagos.pendiente}</span>
+                                    <p className="akin-muted text-sm">
+                                        <span className="font-black text-akin-text">{channel.leads}</span> leads
+                                    </p>
+                                    <p className="akin-muted text-sm">
+                                        <span className="font-black text-akin-text">{channel.orders}</span> pedidos
+                                    </p>
+                                    <StatusBadge tone={channel.tone}>{channel.conversion}</StatusBadge>
+                                </div>
+                            ))}
+                        </div>
+                    </SectionCard>
+
+                    <SectionCard title="Embudo CRM" description="Flujo simulado desde lead hasta venta pagada.">
+                        <div className="space-y-4 p-5">
+                            {funnel.map((step) => (
+                                <div key={step.label}>
+                                    <div className="mb-2 flex items-center justify-between text-sm">
+                                        <span className="akin-muted font-bold">{step.label}</span>
+                                        <span className="font-black text-akin-text">{step.value}</span>
+                                    </div>
+                                    <div className="h-10 rounded-2xl bg-akin-surface-soft ring-1 ring-akin-border">
+                                        <div
+                                            className="flex h-10 items-center justify-end rounded-2xl bg-akin-accent px-3 text-xs font-black text-white shadow-sm"
+                                            style={{ width: step.width }}
+                                        >
+                                            {step.width}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
                     </SectionCard>
-
-                    {/* Live Sales Mini Panel */}
-                    <SectionCard title="Sesiones Live">
-                        <div className="flex items-center gap-4 mb-6 p-4 rounded-2xl bg-terracotta text-terracotta shadow-xl">
-                            <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center animate-pulse">
-                                <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-terracotta/40 uppercase tracking-widest">En Vivo ahora</span>
-                                <span className="text-xl font-black">{metricas.live_sales.sesiones_en_vivo_o_programadas} Activas</span>
-                            </div>
-                        </div>
-                        <p className="text-xs text-[#3C473A]/60 leading-relaxed font-medium">
-                            Tus sesiones en vivo están generando un alto nivel de interacción. Considera aumentar el stock de los productos más comentados.
-                        </p>
-                    </SectionCard>
-                </div>
+                </section>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
-
