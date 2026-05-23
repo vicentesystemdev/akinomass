@@ -7,23 +7,23 @@ export default function Header({ user, onMenuClick, safeRoute }) {
     const initials = getInitials(user?.name || user?.email || 'A');
 
     return (
-        <header className="sticky top-0 z-20 border-b border-[#EADFD6]/80 bg-[#FDF6F0]/90 backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-[#171512]/90">
+        <header className="sticky top-0 z-20 border-b border-akin-border bg-akin-bg backdrop-blur-xl transition-colors">
             <div className="flex min-h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
                 <div className="flex min-w-0 items-center gap-3">
                     <button
                         type="button"
                         onClick={onMenuClick}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#EADFD6] bg-white text-[#3C473A] shadow-sm transition hover:border-[#D77A61]/40 hover:text-[#D77A61] lg:hidden dark:border-white/10 dark:bg-[#24211D] dark:text-[#FDF6F0]"
+                        className="akin-btn-secondary h-11 w-11 shadow-sm lg:hidden"
                         aria-label="Abrir menu"
                     >
                         <MenuIcon className="h-5 w-5" />
                     </button>
 
                     <div className="min-w-0">
-                        <p className="text-xs font-black uppercase tracking-[0.18em] text-[#D77A61]">
+                        <p className="text-xs font-black uppercase tracking-[0.18em] text-akin-accent">
                             Dashboard Comercial
                         </p>
-                        <h1 className="truncate text-xl font-black text-[#2B221E] sm:text-2xl dark:text-[#FDF6F0]">
+                        <h1 className="truncate text-xl font-black text-akin-text sm:text-2xl">
                             Control multicanal AKINOMASS
                         </h1>
                     </div>
@@ -31,11 +31,11 @@ export default function Header({ user, onMenuClick, safeRoute }) {
 
                 <div className="hidden min-w-0 flex-1 justify-center px-6 md:flex">
                     <div className="relative w-full max-w-md">
-                        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-[#2B221E]/35 dark:text-[#FDF6F0]/35" />
+                        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-akin-muted" />
                         <input
                             type="search"
                             placeholder="Buscar cliente, pedido, producto..."
-                            className="h-11 w-full rounded-xl border-[#EADFD6] bg-white/80 pl-11 pr-4 text-sm text-[#2B221E] shadow-sm placeholder:text-[#2B221E]/35 focus:border-[#D77A61] focus:ring-[#D77A61]/25 dark:border-white/10 dark:bg-[#24211D] dark:text-[#FDF6F0] dark:placeholder:text-[#FDF6F0]/35"
+                            className="akin-input h-11 w-full pl-11 pr-4 text-sm shadow-sm"
                         />
                     </div>
                 </div>
@@ -45,45 +45,45 @@ export default function Header({ user, onMenuClick, safeRoute }) {
 
                     <button
                         type="button"
-                        className="relative hidden h-11 w-11 items-center justify-center rounded-xl border border-[#EADFD6] bg-white text-[#3C473A] shadow-sm transition hover:border-[#D77A61]/40 hover:text-[#D77A61] sm:flex dark:border-white/10 dark:bg-[#24211D] dark:text-[#FDF6F0]"
+                        className="akin-btn-secondary relative hidden h-11 w-11 shadow-sm sm:flex"
                         aria-label="Notificaciones"
                     >
                         <BellIcon className="h-5 w-5" />
-                        <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#D77A61] ring-2 ring-white dark:ring-[#24211D]" />
+                        <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-akin-accent ring-2 ring-akin-surface" />
                     </button>
 
                     <div className="relative">
                         <button
                             type="button"
                             onClick={() => setOpen((value) => !value)}
-                            className="flex items-center gap-3 rounded-xl border border-[#EADFD6] bg-white px-2 py-2 shadow-sm transition hover:border-[#D77A61]/40 dark:border-white/10 dark:bg-[#24211D]"
+                            className="akin-btn-secondary flex items-center gap-3 px-2 py-2 shadow-sm"
                         >
                             <span className="hidden text-right sm:block">
-                                <span className="block text-sm font-black text-[#2B221E] dark:text-[#FDF6F0]">
+                                <span className="block text-sm font-black text-akin-text">
                                     {user?.name || 'Usuario'}
                                 </span>
-                                <span className="block max-w-44 truncate text-xs text-[#2B221E]/55 dark:text-[#FDF6F0]/50">
+                                <span className="akin-muted block max-w-44 truncate text-xs">
                                     {user?.email || user?.role || 'Panel comercial'}
                                 </span>
                             </span>
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#3C473A] text-sm font-black text-white shadow-sm dark:bg-[#D77A61] dark:text-[#171512]">
+                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-akin-primary text-sm font-black text-white shadow-sm dark:text-akin-bg">
                                 {initials}
                             </span>
                         </button>
 
                         {open && (
-                            <div className="absolute right-0 mt-2 w-60 rounded-2xl border border-[#EADFD6] bg-white p-2 shadow-xl shadow-[#3C473A]/10 dark:border-white/10 dark:bg-[#211E1A] dark:shadow-black/30">
-                                <div className="border-b border-[#EADFD6] px-3 py-3 dark:border-white/10">
-                                    <p className="truncate text-sm font-black text-[#2B221E] dark:text-[#FDF6F0]">
+                            <div className="akin-card absolute right-0 mt-2 w-60 p-2 shadow-xl dark:shadow-black/30">
+                                <div className="akin-divider border-b px-3 py-3">
+                                    <p className="truncate text-sm font-black text-akin-text">
                                         {user?.name || 'Usuario AKINOMASS'}
                                     </p>
-                                    <p className="truncate text-xs text-[#2B221E]/55 dark:text-[#FDF6F0]/50">
+                                    <p className="akin-muted truncate text-xs">
                                         {user?.email || 'Sesion activa'}
                                     </p>
                                 </div>
                                 <Link
                                     href={safeRoute('profile.edit', '/profile')}
-                                    className="mt-2 block rounded-xl px-3 py-2 text-sm font-bold text-[#2B221E]/70 transition hover:bg-[#FDF6F0] hover:text-[#2B221E] dark:text-[#FDF6F0]/70 dark:hover:bg-white/5 dark:hover:text-[#FDF6F0]"
+                                    className="mt-2 block rounded-xl px-3 py-2 text-sm font-bold text-akin-muted transition hover:bg-akin-surface-soft hover:text-akin-text"
                                 >
                                     Perfil
                                 </Link>

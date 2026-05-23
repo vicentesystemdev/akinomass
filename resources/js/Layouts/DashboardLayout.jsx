@@ -56,7 +56,7 @@ export default function DashboardLayout({ user, children }) {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDF6F0] text-[#2B221E] transition-colors duration-300 dark:bg-[#171512] dark:text-[#FDF6F0]">
+        <div className="akin-page transition-colors duration-300">
             <Sidebar
                 open={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}

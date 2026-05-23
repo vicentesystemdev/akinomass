@@ -7,6 +7,23 @@ import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+const initializeTheme = () => {
+    try {
+        const savedTheme = localStorage.getItem('akinomass-theme');
+
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            return;
+        }
+
+        document.documentElement.classList.remove('dark');
+    } catch (error) {
+        document.documentElement.classList.remove('dark');
+    }
+};
+
+initializeTheme();
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
@@ -20,6 +37,6 @@ createInertiaApp({
         root.render(<App {...props} />);
     },
     progress: {
-        color: '#4B5563',
+        color: 'var(--color-accent)',
     },
 });

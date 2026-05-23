@@ -32,7 +32,7 @@ export default function ThemeToggle() {
         <button
             type="button"
             onClick={toggleTheme}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#EADFD6] bg-white text-[#3C473A] shadow-sm transition hover:border-[#D77A61]/40 hover:text-[#D77A61] dark:border-white/10 dark:bg-[#24211D] dark:text-[#FDF6F0] dark:hover:border-[#D77A61]/50 dark:hover:text-[#F2B39F]"
+            className="akin-btn-secondary h-11 w-11 shadow-sm"
             aria-label={theme === 'dark' ? 'Activar modo dia' : 'Activar modo oscuro'}
             title={theme === 'dark' ? 'Modo dia' : 'Modo oscuro'}
         >

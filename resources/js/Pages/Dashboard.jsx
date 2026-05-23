@@ -178,19 +178,19 @@ export default function Dashboard({
             <Head title="Dashboard" />
 
             <div className="space-y-6">
-                <section className="relative overflow-hidden rounded-3xl bg-[#3C473A] p-6 text-white shadow-xl shadow-[#3C473A]/20 dark:bg-[#252D24] dark:shadow-black/30 sm:p-8">
-                    <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-[#D77A61]/30 to-transparent lg:block" />
-                    <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#D77A61]/20 blur-3xl" />
+                <section className="relative overflow-hidden rounded-3xl bg-akin-primary p-6 text-white shadow-xl shadow-black/20 dark:bg-akin-surfaceSoft dark:text-akin-text dark:shadow-black/30 sm:p-8">
+                    <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-akin-accent to-transparent opacity-30 lg:block" />
+                    <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-akin-accent opacity-20 blur-3xl" />
 
                     <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-3xl">
-                            <p className="text-sm font-black uppercase tracking-[0.22em] text-[#F2B39F]">
+                            <p className="text-sm font-black uppercase tracking-[0.22em] text-akin-accentSoft">
                                 AKINOMASS CRM ecommerce
                             </p>
                             <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
                                 Operacion comercial multicanal
                             </h1>
-                            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#FDF6F0]/70">
+                            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70 dark:text-akin-muted">
                                 Gestiona clientes, leads, pedidos, inventario y pagos desde TikTok LIVE,
                                 WhatsApp, Instagram, Facebook y ventas manuales con una vista preparada
                                 para datos reales de Laravel/Inertia.
@@ -200,7 +200,7 @@ export default function Dashboard({
                         <div className="flex flex-col gap-3 sm:flex-row">
                             <Link
                                 href={safeHref('leads.create', '#')}
-                                className="inline-flex h-11 items-center justify-center rounded-xl bg-[#D77A61] px-5 text-sm font-black text-white shadow-lg shadow-black/10 transition hover:bg-[#c96f58]"
+                                className="akin-btn-primary h-11 px-5 text-sm shadow-lg shadow-black/10"
                             >
                                 Registrar lead
                             </Link>
@@ -243,17 +243,17 @@ export default function Dashboard({
 
                 <section className="grid gap-6 lg:grid-cols-2">
                     <SectionCard title="Resumen por canal" description="Lectura comercial de captacion y conversion.">
-                        <div className="divide-y divide-[#EADFD6]/70 dark:divide-white/10">
+                        <div className="divide-y divide-akin-border">
                             {channelSummary.map((channel) => (
                                 <div key={channel.label} className="grid grid-cols-4 items-center gap-3 px-5 py-4">
                                     <div className="col-span-4 sm:col-span-1">
-                                        <p className="font-black text-[#2B221E] dark:text-[#FDF6F0]">{channel.label}</p>
+                                        <p className="font-black text-akin-text">{channel.label}</p>
                                     </div>
-                                    <p className="text-sm text-[#2B221E]/60 dark:text-[#FDF6F0]/55">
-                                        <span className="font-black text-[#2B221E] dark:text-[#FDF6F0]">{channel.leads}</span> leads
+                                    <p className="akin-muted text-sm">
+                                        <span className="font-black text-akin-text">{channel.leads}</span> leads
                                     </p>
-                                    <p className="text-sm text-[#2B221E]/60 dark:text-[#FDF6F0]/55">
-                                        <span className="font-black text-[#2B221E] dark:text-[#FDF6F0]">{channel.orders}</span> pedidos
+                                    <p className="akin-muted text-sm">
+                                        <span className="font-black text-akin-text">{channel.orders}</span> pedidos
                                     </p>
                                     <StatusBadge tone={channel.tone}>{channel.conversion}</StatusBadge>
                                 </div>
@@ -266,12 +266,12 @@ export default function Dashboard({
                             {funnel.map((step) => (
                                 <div key={step.label}>
                                     <div className="mb-2 flex items-center justify-between text-sm">
-                                        <span className="font-bold text-[#2B221E]/70 dark:text-[#FDF6F0]/65">{step.label}</span>
-                                        <span className="font-black text-[#2B221E] dark:text-[#FDF6F0]">{step.value}</span>
+                                        <span className="akin-muted font-bold">{step.label}</span>
+                                        <span className="font-black text-akin-text">{step.value}</span>
                                     </div>
-                                    <div className="h-10 rounded-2xl bg-[#FDF6F0] ring-1 ring-[#EADFD6]/80 dark:bg-white/[0.03] dark:ring-white/10">
+                                    <div className="h-10 rounded-2xl bg-akin-surface-soft ring-1 ring-akin-border">
                                         <div
-                                            className="flex h-10 items-center justify-end rounded-2xl bg-[#D77A61] px-3 text-xs font-black text-white shadow-sm"
+                                            className="flex h-10 items-center justify-end rounded-2xl bg-akin-accent px-3 text-xs font-black text-white shadow-sm"
                                             style={{ width: step.width }}
                                         >
                                             {step.width}

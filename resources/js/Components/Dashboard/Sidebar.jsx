@@ -52,7 +52,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
             {open && (
                 <button
                     type="button"
-                    className="fixed inset-0 z-30 bg-[#2B221E]/55 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
                     onClick={onClose}
                     aria-label="Cerrar menu"
                 />
@@ -60,18 +60,18 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
 
             <aside
                 className={[
-                    'fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/10 bg-[#3C473A] text-white shadow-2xl shadow-[#2B221E]/20 transition-transform duration-300 dark:bg-[#252D24]',
+                    'fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/10 bg-akin-primary text-white shadow-2xl shadow-black/20 transition-transform duration-300 dark:bg-akin-surfaceSoft dark:text-akin-text',
                     open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
                 ].join(' ')}
             >
                 <div className="flex h-24 items-center border-b border-white/10 px-5">
                     <Link href={safeRoute('dashboard', '/dashboard')} className="group flex items-center gap-3">
-                        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#D77A61] text-sm font-black text-white shadow-lg shadow-black/15 transition group-hover:scale-105">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-akin-accent text-sm font-black text-white shadow-lg shadow-black/15 transition group-hover:scale-105 dark:text-akin-bg">
                             AK
                         </span>
                         <span>
                             <span className="block text-xl font-black tracking-wide">AKINOMASS</span>
-                            <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#FDF6F0]/55">
+                            <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-white/60 dark:text-akin-muted">
                                 Panel Comercial
                             </span>
                         </span>
@@ -82,7 +82,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
                     <div className="space-y-6">
                         {navigationGroups.map((group) => (
                             <div key={group.label}>
-                                <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.18em] text-[#FDF6F0]/40">
+                                <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.18em] text-white/45 dark:text-akin-muted">
                                     {group.label}
                                 </p>
 
@@ -101,8 +101,8 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
                                                 className={[
                                                     'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition',
                                                     active
-                                                        ? 'bg-[#D77A61] text-white shadow-lg shadow-black/15'
-                                                        : 'text-[#FDF6F0]/70 hover:bg-white/10 hover:text-white',
+                                                        ? 'bg-akin-accent text-white shadow-lg shadow-black/15 dark:text-akin-bg'
+                                                        : 'text-white/75 hover:bg-white/10 hover:text-white dark:text-akin-muted dark:hover:text-akin-text',
                                                     pending ? 'cursor-default' : '',
                                                 ].join(' ')}
                                             >
@@ -116,7 +116,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
                                                 </span>
                                                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
                                                 {pending && (
-                                                    <span className="rounded-full bg-[#FDF6F0]/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-[#FDF6F0]/55">
+                                                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white/60 dark:text-akin-muted">
                                                         Pronto
                                                     </span>
                                                 )}
@@ -130,14 +130,14 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
                 </nav>
 
                 <div className="border-t border-white/10 p-4">
-                    <div className="rounded-2xl bg-[#FDF6F0]/10 p-4 ring-1 ring-white/10">
+                    <div className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10 dark:bg-white/5">
                         <div className="flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FDF6F0] text-sm font-black text-[#3C473A]">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-akin-bg text-sm font-black text-akin-primary">
                                 CRM
                             </span>
                             <div>
                                 <p className="text-sm font-black text-white">Multicanal activo</p>
-                                <p className="text-xs text-[#FDF6F0]/55">TikTok, WhatsApp, Instagram</p>
+                                <p className="text-xs text-white/60 dark:text-akin-muted">TikTok, WhatsApp, Instagram</p>
                             </div>
                         </div>
                     </div>

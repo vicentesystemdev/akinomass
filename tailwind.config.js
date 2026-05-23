@@ -14,6 +14,20 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                akin: {
+                    primary: 'var(--color-primary)',
+                    primarySoft: 'var(--color-primary-soft)',
+                    accent: 'var(--color-accent)',
+                    accentSoft: 'var(--color-accent-soft)',
+                    bg: 'var(--color-bg)',
+                    surface: 'var(--color-surface)',
+                    surfaceSoft: 'var(--color-surface-soft)',
+                    text: 'var(--color-text)',
+                    muted: 'var(--color-text-muted)',
+                    border: 'var(--color-border)',
+                },
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
