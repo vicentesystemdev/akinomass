@@ -2,17 +2,167 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
+@layer base {
+    :root {
+        --color-primary: #3C473A;
+        --color-primary-soft: #4F5D4C;
+
+        --color-accent: #D77A61;
+        --color-accent-soft: #E6A08E;
+
+        --color-bg: #FDF6F0;
+        --color-surface: #FFFFFF;
+        --color-surface-soft: #FFF8F3;
+
+        --color-text: #2B221E;
+        --color-text-muted: #6F625B;
+
+        --color-border: #E7D8CC;
+
+        color-scheme: light;
     }
-    .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+
+    html.dark {
+        --color-bg: #171512;
+        --color-surface: #211D19;
+        --color-surface-soft: #2A241F;
+
+        --color-text: #FDF6F0;
+        --color-text-muted: #CDBFB6;
+
+        --color-border: #3A312B;
+
+        --color-primary: #9AAA8D;
+        --color-primary-soft: #6F8067;
+
+        --color-accent: #D77A61;
+        --color-accent-soft: #B9614C;
+
+        color-scheme: dark;
+    }
+
+    body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        transition:
+            background-color 180ms ease,
+            color 180ms ease;
     }
 }
 
-body {
-    @apply bg-[#FDF6F0] text-[#2B221E];
-}
+@layer components {
+    .akin-page {
+        min-height: 100vh;
+        background-color: var(--color-bg);
+        color: var(--color-text);
+    }
 
+    .akin-card {
+        border: 1px solid var(--color-border);
+        border-radius: 1rem;
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        box-shadow: 0 1px 2px rgb(60 71 58 / 0.06);
+    }
+
+    .akin-card-soft {
+        border: 1px solid var(--color-border);
+        border-radius: 1rem;
+        background-color: var(--color-surface-soft);
+        color: var(--color-text);
+        box-shadow: 0 1px 2px rgb(60 71 58 / 0.05);
+    }
+
+    .akin-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        background-color: var(--color-accent);
+        color: white;
+        font-weight: 800;
+        transition:
+            background-color 180ms ease,
+            opacity 180ms ease,
+            transform 180ms ease;
+    }
+
+    .akin-btn-primary:hover {
+        background-color: var(--color-accent-soft);
+    }
+
+    .akin-btn-primary:disabled,
+    .akin-btn-primary[aria-disabled='true'] {
+        cursor: not-allowed;
+        opacity: 0.55;
+    }
+
+    .akin-btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--color-border);
+        border-radius: 0.75rem;
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        font-weight: 800;
+        transition:
+            border-color 180ms ease,
+            background-color 180ms ease,
+            color 180ms ease;
+    }
+
+    .akin-btn-secondary:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+    }
+
+    .akin-input {
+        border-color: var(--color-border);
+        border-radius: 0.75rem;
+        background-color: var(--color-surface);
+        color: var(--color-text);
+    }
+
+    .akin-input::placeholder {
+        color: var(--color-text-muted);
+        opacity: 0.65;
+    }
+
+    .akin-input:focus {
+        border-color: var(--color-accent);
+        --tw-ring-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
+    }
+
+    .akin-table {
+        width: 100%;
+        border-color: var(--color-border);
+        background-color: var(--color-surface);
+        color: var(--color-text);
+    }
+
+    .akin-muted {
+        color: var(--color-text-muted);
+    }
+
+    .akin-divider {
+        border-color: var(--color-border);
+    }
+
+    .akin-badge {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--color-border);
+        border-radius: 9999px;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        line-height: 1rem;
+    }
+
+    .akin-section-title {
+        color: var(--color-text);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+}
