@@ -1,12 +1,21 @@
 import Header from '@/Components/Dashboard/Header';
 import Sidebar from '@/Components/Dashboard/Sidebar';
 import { usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function DashboardLayout({ user, children }) {
     const page = usePage();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const currentUser = user || page.props?.auth?.user;
+
+    useEffect(() => {
+        try {
+            const savedTheme = window.localStorage.getItem('akinomass-theme') || 'light';
+            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        } catch (error) {
+            document.documentElement.classList.remove('dark');
+        }
+    }, []);
 
     const safeRoute = (routeName, fallback = '#') => {
         try {
@@ -47,7 +56,7 @@ export default function DashboardLayout({ user, children }) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900">
+        <div className="min-h-screen bg-[#FDF6F0] text-[#2B221E] transition-colors duration-300 dark:bg-[#171512] dark:text-[#FDF6F0]">
             <Sidebar
                 open={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
@@ -62,7 +71,7 @@ export default function DashboardLayout({ user, children }) {
                     safeRoute={safeRoute}
                 />
 
-                <main className="px-4 py-6 sm:px-6 lg:px-8">
+                <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                     <div className="mx-auto max-w-7xl">{children}</div>
                 </main>
             </div>

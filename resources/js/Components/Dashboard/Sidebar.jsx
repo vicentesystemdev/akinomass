@@ -1,15 +1,49 @@
 import { Link } from '@inertiajs/react';
 
-const items = [
-    { label: 'Dashboard', routeName: 'dashboard', path: '/dashboard', icon: HomeIcon },
-    { label: 'Clientes', routeName: 'clientes.index', path: '/clientes', icon: UsersIcon },
-    { label: 'Leads', routeName: 'leads.index', path: '/leads', icon: SparkIcon },
-    { label: 'Pedidos', routeName: 'pedidos.index', path: '#', icon: ReceiptIcon },
-    { label: 'Productos', routeName: 'productos.index', path: '/productos', icon: BoxIcon },
-    { label: 'Inventario', routeName: 'inventario.index', path: '#', icon: InventoryIcon },
-    { label: 'Canales', routeName: 'canales.index', path: '#', icon: ChannelIcon },
-    { label: 'Reportes', routeName: 'reportes.index', path: '#', icon: ChartIcon },
-    { label: 'Configuracion', routeName: 'configuracion.index', path: '#', icon: SettingsIcon },
+const navigationGroups = [
+    {
+        label: 'Principal',
+        items: [
+            { label: 'Dashboard', routeName: 'dashboard', path: '/dashboard', icon: HomeIcon },
+        ],
+    },
+    {
+        label: 'CRM',
+        items: [
+            { label: 'Clientes', routeName: 'clientes.index', path: '/clientes', icon: UsersIcon },
+            { label: 'Leads', routeName: 'leads.index', path: '/leads', icon: SparkIcon },
+            { label: 'Plantillas', routeName: 'plantillas.index', path: '#', icon: TemplateIcon },
+        ],
+    },
+    {
+        label: 'Catalogo',
+        items: [
+            { label: 'Categorias', routeName: 'categorias-producto.index', path: '/categorias-producto', icon: TagIcon },
+            { label: 'Productos', routeName: 'productos.index', path: '/productos', icon: BoxIcon },
+            { label: 'Inventario', routeName: 'inventario.index', path: '#', icon: InventoryIcon },
+            { label: 'Movimientos', routeName: 'inventario.movimientos', path: '#', icon: MovementIcon },
+        ],
+    },
+    {
+        label: 'Comercial',
+        items: [
+            { label: 'Pedidos', routeName: 'pedidos.index', path: '#', icon: ReceiptIcon },
+            { label: 'Pagos', routeName: 'pagos.index', path: '#', icon: PaymentIcon },
+            { label: 'LiveSales', routeName: 'livesales.index', path: '#', icon: LiveIcon },
+        ],
+    },
+    {
+        label: 'Analisis',
+        items: [
+            { label: 'Reportes', routeName: 'reportes.index', path: '#', icon: ChartIcon },
+        ],
+    },
+    {
+        label: 'Sistema',
+        items: [
+            { label: 'Configuracion', routeName: 'configuracion.index', path: '#', icon: SettingsIcon },
+        ],
+    },
 ];
 
 export default function Sidebar({ open, onClose, safeRoute, isActive }) {
@@ -18,7 +52,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
             {open && (
                 <button
                     type="button"
-                    className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden"
+                    className="fixed inset-0 z-30 bg-[#2B221E]/55 backdrop-blur-sm lg:hidden"
                     onClick={onClose}
                     aria-label="Cerrar menu"
                 />
@@ -26,73 +60,86 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
 
             <aside
                 className={[
-                    'fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0',
-                    open ? 'translate-x-0' : '-translate-x-full',
+                    'fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/10 bg-[#3C473A] text-white shadow-2xl shadow-[#2B221E]/20 transition-transform duration-300 dark:bg-[#252D24]',
+                    open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
                 ].join(' ')}
             >
-                <div className="flex h-20 items-center gap-3 border-b border-slate-200 px-5">
-                    <Link href={safeRoute('dashboard', '/dashboard')} className="flex items-center gap-3">
-                        <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold text-white shadow-sm">
+                <div className="flex h-24 items-center border-b border-white/10 px-5">
+                    <Link href={safeRoute('dashboard', '/dashboard')} className="group flex items-center gap-3">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#D77A61] text-sm font-black text-white shadow-lg shadow-black/15 transition group-hover:scale-105">
                             AK
                         </span>
                         <span>
-                            <span className="block text-lg font-bold text-slate-900">AKINOMASS</span>
-                            <span className="block text-xs font-medium text-slate-500">CRM multicanal</span>
+                            <span className="block text-xl font-black tracking-wide">AKINOMASS</span>
+                            <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-[#FDF6F0]/55">
+                                Panel Comercial
+                            </span>
                         </span>
                     </Link>
                 </div>
 
                 <nav className="flex-1 overflow-y-auto px-4 py-5">
-                    <p className="mb-3 px-3 text-xs font-semibold uppercase text-slate-400">
-                        Menu
-                    </p>
+                    <div className="space-y-6">
+                        {navigationGroups.map((group) => (
+                            <div key={group.label}>
+                                <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.18em] text-[#FDF6F0]/40">
+                                    {group.label}
+                                </p>
 
-                    <div className="space-y-1">
-                        {items.map((item) => {
-                            const Icon = item.icon;
-                            const href = safeRoute(item.routeName, item.path);
-                            const active = isActive(item.routeName, item.path);
-                            const pending = href === '#';
+                                <div className="space-y-1">
+                                    {group.items.map((item) => {
+                                        const Icon = item.icon;
+                                        const href = safeRoute(item.routeName, item.path);
+                                        const active = isActive(item.routeName, item.path);
+                                        const pending = href === '#';
 
-                            return (
-                                <Link
-                                    key={item.label}
-                                    href={href}
-                                    onClick={onClose}
-                                    className={[
-                                        'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition',
-                                        active
-                                            ? 'bg-blue-50 text-blue-700'
-                                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-                                        pending ? 'cursor-default opacity-70' : '',
-                                    ].join(' ')}
-                                >
-                                    <span
-                                        className={[
-                                            'flex h-9 w-9 items-center justify-center rounded-lg',
-                                            active ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:text-slate-700',
-                                        ].join(' ')}
-                                    >
-                                        <Icon className="h-5 w-5" />
-                                    </span>
-                                    <span className="flex-1 truncate">{item.label}</span>
-                                    {pending && (
-                                        <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
-                                            pronto
-                                        </span>
-                                    )}
-                                </Link>
-                            );
-                        })}
+                                        return (
+                                            <Link
+                                                key={item.label}
+                                                href={href}
+                                                onClick={onClose}
+                                                className={[
+                                                    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition',
+                                                    active
+                                                        ? 'bg-[#D77A61] text-white shadow-lg shadow-black/15'
+                                                        : 'text-[#FDF6F0]/70 hover:bg-white/10 hover:text-white',
+                                                    pending ? 'cursor-default' : '',
+                                                ].join(' ')}
+                                            >
+                                                <span
+                                                    className={[
+                                                        'flex h-9 w-9 items-center justify-center rounded-xl transition',
+                                                        active ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15',
+                                                    ].join(' ')}
+                                                >
+                                                    <Icon className="h-5 w-5" />
+                                                </span>
+                                                <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                                                {pending && (
+                                                    <span className="rounded-full bg-[#FDF6F0]/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-[#FDF6F0]/55">
+                                                        Pronto
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </nav>
 
-                <div className="border-t border-slate-200 p-4">
-                    <div className="rounded-lg bg-slate-50 p-4">
-                        <p className="text-sm font-semibold text-slate-900">Demo comercial</p>
-                        <p className="mt-1 text-xs leading-5 text-slate-500">
-                            Ventas, leads y pedidos desde redes sociales en un solo panel.
-                        </p>
+                <div className="border-t border-white/10 p-4">
+                    <div className="rounded-2xl bg-[#FDF6F0]/10 p-4 ring-1 ring-white/10">
+                        <div className="flex items-center gap-3">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FDF6F0] text-sm font-black text-[#3C473A]">
+                                CRM
+                            </span>
+                            <div>
+                                <p className="text-sm font-black text-white">Multicanal activo</p>
+                                <p className="text-xs text-[#FDF6F0]/55">TikTok, WhatsApp, Instagram</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -101,11 +148,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
 }
 
 function IconBase({ className, children }) {
-    return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            {children}
-        </svg>
-    );
+    return <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">{children}</svg>;
 }
 
 function HomeIcon({ className = '' }) {
@@ -120,8 +163,12 @@ function SparkIcon({ className = '' }) {
     return <IconBase className={className}><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3ZM6 15l.9 2.1L9 18l-2.1.9L6 21l-.9-2.1L3 18l2.1-.9L6 15Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></IconBase>;
 }
 
-function ReceiptIcon({ className = '' }) {
-    return <IconBase className={className}><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
+function TemplateIcon({ className = '' }) {
+    return <IconBase className={className}><path d="M5 5h14v14H5V5Z" stroke="currentColor" strokeWidth="1.8" /><path d="M8 9h8M8 13h5M8 17h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
+}
+
+function TagIcon({ className = '' }) {
+    return <IconBase className={className}><path d="M4 11.5V5h6.5l9 9a2.1 2.1 0 0 1 0 3l-2.5 2.5a2.1 2.1 0 0 1-3 0l-10-8Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M8 8h.01" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></IconBase>;
 }
 
 function BoxIcon({ className = '' }) {
@@ -132,8 +179,20 @@ function InventoryIcon({ className = '' }) {
     return <IconBase className={className}><path d="M4 8h16M6 8v11h12V8M8 5h8l2 3H6l2-3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 12h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
 }
 
-function ChannelIcon({ className = '' }) {
-    return <IconBase className={className}><path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM18 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.6 6.7l6.8 4.6M15.4 12.7l-6.8 4.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
+function MovementIcon({ className = '' }) {
+    return <IconBase className={className}><path d="M7 7h10l-3-3M17 17H7l3 3M6 12h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
+}
+
+function ReceiptIcon({ className = '' }) {
+    return <IconBase className={className}><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
+}
+
+function PaymentIcon({ className = '' }) {
+    return <IconBase className={className}><path d="M4 7h16v10H4V7Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M4 10h16M7 15h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
+}
+
+function LiveIcon({ className = '' }) {
+    return <IconBase className={className}><path d="M7 18h10M8 6h8a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Z" stroke="currentColor" strokeWidth="1.8" /><path d="m11 9 4 2-4 2V9Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></IconBase>;
 }
 
 function ChartIcon({ className = '' }) {
