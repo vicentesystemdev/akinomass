@@ -72,8 +72,16 @@ export default function DashboardLayout({ user, children }) {
                 />
 
                 <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                    <div className="mx-auto max-w-7xl">{children}</div>
+                    <div className="mx-auto max-w-7xl akin-animate-in">{children}</div>
                 </main>
+
+                <footer className="border-t border-akin-border px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-7xl text-center">
+                        <p className="text-xs font-bold uppercase tracking-widest text-akin-muted/50">
+                            AKINOMASS System v1.0 &bull; Plataforma Comercial Multicanal
+                        </p>
+                    </div>
+                </footer>
             </div>
         </div>
     );

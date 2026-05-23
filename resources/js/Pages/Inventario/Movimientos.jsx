@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Movimientos({ movimientos = [] }) {
@@ -25,22 +25,22 @@ export default function Movimientos({ movimientos = [] }) {
     ).length;
 
     return (
-        <AuthenticatedLayout>
+        <DashboardLayout>
             <Head title="Movimientos de inventario" />
 
             <div className="space-y-6">
-                <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+                <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
                         Trazabilidad operativa
                     </p>
 
                     <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <h1 className="text-3xl font-black text-[#2B221E]">
+                            <h1 className="text-3xl font-black text-akin-text">
                                 Movimientos de inventario
                             </h1>
 
-                            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#2B221E]/65">
+                            <p className="mt-2 max-w-3xl text-sm leading-6 text-akin-muted">
                                 Consulta el historial de entradas, salidas y ajustes.
                                 Esta vista funciona como bitácora comercial para auditar
                                 cambios de stock, responsables y motivos de cada operación.
@@ -123,20 +123,20 @@ export default function Movimientos({ movimientos = [] }) {
                     </section>
                 )}
 
-                <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-                    <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 md:flex-row md:items-center md:justify-between">
+                <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+                    <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h2 className="text-lg font-black text-[#2B221E]">
+                            <h2 className="text-lg font-black text-akin-text">
                                 Historial detallado
                             </h2>
 
-                            <p className="mt-1 text-sm text-[#2B221E]/60">
+                            <p className="mt-1 text-sm text-akin-muted">
                                 Revisa fecha, producto, tipo, cantidad, cambio de stock,
                                 responsable y justificación del movimiento.
                             </p>
                         </div>
 
-                        <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+                        <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
                             {totalMovimientos} registros
                         </span>
                     </div>
@@ -145,8 +145,8 @@ export default function Movimientos({ movimientos = [] }) {
                         <EmptyState />
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-[#eadfd6]">
-                                <thead className="bg-[#FDF6F0]">
+                            <table className="min-w-full divide-y divide-akin-border">
+                                <thead className="bg-akin-bg">
                                     <tr>
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Producto</TableHead>
@@ -159,7 +159,7 @@ export default function Movimientos({ movimientos = [] }) {
                                     </tr>
                                 </thead>
 
-                                <tbody className="divide-y divide-[#eadfd6] bg-white">
+                                <tbody className="divide-y divide-akin-border bg-akin-surface">
                                     {listaMovimientos.map((movimiento) => {
                                         const tipo = normalizarTipo(
                                             movimiento.tipo_movimiento_mov,
@@ -179,15 +179,15 @@ export default function Movimientos({ movimientos = [] }) {
                                                 key={
                                                     movimiento.cod_movimiento_inventario
                                                 }
-                                                className="transition hover:bg-[#FDF6F0]/70"
+                                                className="transition hover:bg-akin-bg/70"
                                             >
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <p className="text-sm font-bold text-[#2B221E]">
+                                                    <p className="text-sm font-bold text-akin-text">
                                                         {formatearFecha(
                                                             movimiento.created_at,
                                                         )}
                                                     </p>
-                                                    <p className="text-xs text-[#2B221E]/45">
+                                                    <p className="text-xs text-akin-text/45">
                                                         {formatearHora(
                                                             movimiento.created_at,
                                                         )}
@@ -196,7 +196,7 @@ export default function Movimientos({ movimientos = [] }) {
 
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDF6F0] text-sm font-black text-[#D77A61]">
+                                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-akin-bg text-sm font-black text-akin-accent">
                                                             {obtenerInicial(
                                                                 movimiento.producto
                                                                     ?.nombre_pro,
@@ -204,13 +204,13 @@ export default function Movimientos({ movimientos = [] }) {
                                                         </div>
 
                                                         <div>
-                                                            <p className="font-bold text-[#2B221E]">
+                                                            <p className="font-bold text-akin-text">
                                                                 {movimiento.producto
                                                                     ?.nombre_pro ||
                                                                     'Producto no disponible'}
                                                             </p>
 
-                                                            <p className="text-xs text-[#2B221E]/50">
+                                                            <p className="text-xs text-akin-muted">
                                                                 Movimiento:{' '}
                                                                 {movimiento.cod_movimiento_inventario ||
                                                                     'N/D'}
@@ -231,7 +231,7 @@ export default function Movimientos({ movimientos = [] }) {
                                                                 ? 'text-red-600'
                                                                 : tipo.includes('entrada')
                                                                     ? 'text-green-700'
-                                                                    : 'text-[#D77A61]',
+                                                                    : 'text-akin-accent',
                                                         ].join(' ')}
                                                     >
                                                         {tipo.includes('salida')
@@ -241,18 +241,18 @@ export default function Movimientos({ movimientos = [] }) {
                                                                 : cantidad}
                                                     </p>
 
-                                                    <p className="text-xs font-semibold text-[#2B221E]/45">
+                                                    <p className="text-xs font-semibold text-akin-text/45">
                                                         unidades
                                                     </p>
                                                 </td>
 
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <div className="rounded-2xl bg-[#FDF6F0] px-4 py-3">
-                                                        <p className="text-sm font-black text-[#2B221E]">
+                                                    <div className="rounded-2xl bg-akin-bg px-4 py-3">
+                                                        <p className="text-sm font-black text-akin-text">
                                                             {stockAnterior} → {stockNuevo}
                                                         </p>
 
-                                                        <p className="mt-1 text-xs font-semibold text-[#2B221E]/45">
+                                                        <p className="mt-1 text-xs font-semibold text-akin-text/45">
                                                             Cambio final:{' '}
                                                             {calcularDiferencia(
                                                                 stockAnterior,
@@ -263,24 +263,24 @@ export default function Movimientos({ movimientos = [] }) {
                                                 </td>
 
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <p className="text-sm font-bold text-[#2B221E]">
+                                                    <p className="text-sm font-bold text-akin-text">
                                                         {movimiento.usuario_responsable
                                                             ?.name || 'N/A'}
                                                     </p>
 
-                                                    <p className="text-xs text-[#2B221E]/45">
+                                                    <p className="text-xs text-akin-text/45">
                                                         Usuario responsable
                                                     </p>
                                                 </td>
 
                                                 <td className="px-6 py-4">
-                                                    <p className="max-w-xs text-sm font-bold text-[#2B221E]">
+                                                    <p className="max-w-xs text-sm font-bold text-akin-text">
                                                         {movimiento.motivo_mov ||
                                                             'Sin motivo'}
                                                     </p>
 
                                                     {movimiento.observacion_mov && (
-                                                        <p className="mt-1 max-w-xs text-xs leading-5 text-[#2B221E]/55">
+                                                        <p className="mt-1 max-w-xs text-xs leading-5 text-akin-text/55">
                                                             {
                                                                 movimiento.observacion_mov
                                                             }
@@ -289,7 +289,7 @@ export default function Movimientos({ movimientos = [] }) {
                                                 </td>
 
                                                 <td className="px-6 py-4">
-                                                    <p className="max-w-sm text-sm leading-6 text-[#2B221E]/65">
+                                                    <p className="max-w-sm text-sm leading-6 text-akin-muted">
                                                         {obtenerLecturaMovimiento(
                                                             tipo,
                                                             stockAnterior,
@@ -306,18 +306,18 @@ export default function Movimientos({ movimientos = [] }) {
                     )}
                 </section>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
 
 function ActionLink({ href, label, variant = 'outline' }) {
     const styles = {
         primary:
-            'bg-[#D77A61] text-white hover:bg-[#c96f58] border-[#D77A61]',
+            'bg-akin-accent text-white hover:bg-akin-accentSoft border-akin-accent',
         outline:
-            'bg-white text-[#D77A61] hover:bg-[#D77A61] hover:text-white border-[#D77A61]/30',
+            'bg-akin-surface text-akin-accent hover:bg-akin-accent hover:text-white border-akin-accent/30',
         soft:
-            'bg-[#FDF6F0] text-[#3C473A] hover:bg-[#3C473A] hover:text-white border-[#eadfd6]',
+            'bg-akin-bg text-akin-primary hover:bg-akin-primary hover:text-white border-akin-border',
     };
 
     return (
@@ -337,12 +337,12 @@ function MetricCard({ title, value, description, alert = false, danger = false }
     return (
         <div
             className={[
-                'rounded-3xl border bg-white p-5 shadow-sm',
+                'rounded-3xl border bg-akin-surface p-5 shadow-sm dark:shadow-black/20',
                 danger
                     ? 'border-red-200'
                     : alert
                         ? 'border-orange-200'
-                        : 'border-[#eadfd6]',
+                        : 'border-akin-border',
             ].join(' ')}
         >
             <p
@@ -352,17 +352,17 @@ function MetricCard({ title, value, description, alert = false, danger = false }
                         ? 'text-red-600'
                         : alert
                             ? 'text-orange-600'
-                            : 'text-[#D77A61]',
+                            : 'text-akin-accent',
                 ].join(' ')}
             >
                 {title}
             </p>
 
-            <p className="mt-3 text-3xl font-black text-[#2B221E]">
+            <p className="mt-3 text-3xl font-black text-akin-text">
                 {value}
             </p>
 
-            <p className="mt-1 text-sm text-[#2B221E]/60">
+            <p className="mt-1 text-sm text-akin-muted">
                 {description}
             </p>
         </div>
@@ -371,7 +371,7 @@ function MetricCard({ title, value, description, alert = false, danger = false }
 
 function TableHead({ children }) {
     return (
-        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60">
+        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.16em] text-akin-muted">
             {children}
         </th>
     );
@@ -380,7 +380,7 @@ function TableHead({ children }) {
 function TipoBadge({ tipo }) {
     if (tipo.includes('entrada')) {
         return (
-            <span className="inline-flex rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-black text-green-700">
+            <span className="inline-flex rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-black text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300">
                 Entrada
             </span>
         );
@@ -388,7 +388,7 @@ function TipoBadge({ tipo }) {
 
     if (tipo.includes('salida')) {
         return (
-            <span className="inline-flex rounded-full border border-red-200 bg-red-100 px-3 py-1 text-xs font-black text-red-700">
+            <span className="inline-flex rounded-full border border-red-200 bg-red-100 px-3 py-1 text-xs font-black text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
                 Salida
             </span>
         );
@@ -396,14 +396,14 @@ function TipoBadge({ tipo }) {
 
     if (tipo.includes('ajuste')) {
         return (
-            <span className="inline-flex rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-black text-orange-700">
+            <span className="inline-flex rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-black text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300">
                 Ajuste
             </span>
         );
     }
 
     return (
-        <span className="inline-flex rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-black text-blue-700">
+        <span className="inline-flex rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-black text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
             {formatearTexto(tipo)}
         </span>
     );
@@ -412,15 +412,15 @@ function TipoBadge({ tipo }) {
 function EmptyState() {
     return (
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
                 M
             </div>
 
-            <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+            <h3 className="mt-5 text-xl font-black text-akin-text">
                 No hay movimientos registrados
             </h3>
 
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+            <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
                 Cuando registres entradas, salidas o ajustes, aparecerán aquí
                 para consulta operativa y auditoría del inventario.
             </p>

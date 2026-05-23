@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Animations ────────────────────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(215, 122, 97, 0.25); }
+    50%      { box-shadow: 0 0 0 8px rgba(215, 122, 97, 0); }
+}
+
 @layer base {
     :root {
         --color-primary: #3C473A;
@@ -45,24 +66,36 @@
         background-color: var(--color-bg);
         color: var(--color-text);
         transition:
-            background-color 180ms ease,
-            color 180ms ease;
+            background-color 250ms ease,
+            color 250ms ease;
+    }
+
+    /* Smooth transition on theme switch for all elements */
+    html.dark *,
+    html:not(.dark) * {
+        transition:
+            background-color 250ms ease,
+            border-color 250ms ease,
+            color 250ms ease,
+            box-shadow 250ms ease;
     }
 }
 
 @layer components {
+    /* ─── Page ──────────────────────────────────── */
     .akin-page {
         min-height: 100vh;
         background-color: var(--color-bg);
         color: var(--color-text);
     }
 
+    /* ─── Cards ─────────────────────────────────── */
     .akin-card {
         border: 1px solid var(--color-border);
         border-radius: 1rem;
         background-color: var(--color-surface);
         color: var(--color-text);
-        box-shadow: 0 1px 2px rgb(60 71 58 / 0.06);
+        box-shadow: 0 1px 3px rgb(60 71 58 / 0.06);
     }
 
     .akin-card-soft {
@@ -73,6 +106,7 @@
         box-shadow: 0 1px 2px rgb(60 71 58 / 0.05);
     }
 
+    /* ─── Buttons ───────────────────────────────── */
     .akin-btn-primary {
         display: inline-flex;
         align-items: center;
@@ -84,17 +118,26 @@
         transition:
             background-color 180ms ease,
             opacity 180ms ease,
-            transform 180ms ease;
+            transform 180ms ease,
+            box-shadow 180ms ease;
     }
 
     .akin-btn-primary:hover {
         background-color: var(--color-accent-soft);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(215, 122, 97, 0.25);
+    }
+
+    .akin-btn-primary:active {
+        transform: translateY(0);
     }
 
     .akin-btn-primary:disabled,
     .akin-btn-primary[aria-disabled='true'] {
         cursor: not-allowed;
         opacity: 0.55;
+        transform: none;
+        box-shadow: none;
     }
 
     .akin-btn-secondary {
@@ -109,7 +152,8 @@
         transition:
             border-color 180ms ease,
             background-color 180ms ease,
-            color 180ms ease;
+            color 180ms ease,
+            transform 180ms ease;
     }
 
     .akin-btn-secondary:hover {
@@ -117,6 +161,7 @@
         color: var(--color-accent);
     }
 
+    /* ─── Inputs ────────────────────────────────── */
     .akin-input {
         border-color: var(--color-border);
         border-radius: 0.75rem;
@@ -134,6 +179,7 @@
         --tw-ring-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
     }
 
+    /* ─── Tables ────────────────────────────────── */
     .akin-table {
         width: 100%;
         border-color: var(--color-border);
@@ -141,6 +187,7 @@
         color: var(--color-text);
     }
 
+    /* ─── Text utilities ────────────────────────── */
     .akin-muted {
         color: var(--color-text-muted);
     }
@@ -149,6 +196,7 @@
         border-color: var(--color-border);
     }
 
+    /* ─── Badge ─────────────────────────────────── */
     .akin-badge {
         display: inline-flex;
         align-items: center;
@@ -164,5 +212,32 @@
         color: var(--color-text);
         font-weight: 800;
         letter-spacing: 0;
+    }
+
+    /* ─── Animation utilities ───────────────────── */
+    .akin-animate-in {
+        animation: slideUp 0.4s ease-out both;
+    }
+
+    .akin-fade-in {
+        animation: fadeIn 0.3s ease-out both;
+    }
+
+    .akin-dropdown-enter {
+        animation: slideDown 0.2s ease-out both;
+    }
+
+    .akin-pulse-glow {
+        animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    /* ─── Scrollbar hidden ──────────────────────── */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
     }
 }

@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import SectionCard from '@/Components/UI/SectionCard';
@@ -63,13 +63,13 @@ export default function Index({ reportes }) {
     };
 
     return (
-        <AuthenticatedLayout header="Reportes Comerciales">
+        <DashboardLayout>
             <Head title="Reportes Comerciales" />
 
             {/* Header Section */}
             <div className="mb-10">
-                <h1 className="text-3xl font-black text-coffee tracking-tight">Reportes comerciales</h1>
-                <p className="text-olive/60 mt-1 font-medium">Analiza ventas, pedidos, pagos, leads e inventario desde una vista consolidada.</p>
+                <h1 className="text-3xl font-black text-akin-text tracking-tight">Reportes comerciales</h1>
+                <p className="text-akin-muted mt-1 font-medium">Analiza ventas, pedidos, pagos, leads e inventario desde una vista consolidada.</p>
             </div>
 
             {/* Filters Section */}
@@ -79,41 +79,41 @@ export default function Index({ reportes }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {/* Dates */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-olive/40 px-1">Fecha Inicio</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-akin-muted px-1">Fecha Inicio</label>
                                 <input 
                                     type="date" 
                                     value={filters.fecha_inicio}
                                     onChange={(e) => setFilters(p => ({ ...p, fecha_inicio: e.target.value }))}
-                                    className="w-full rounded-xl border-olive/5 bg-[#FDF6F0] focus:border-terracotta focus:ring-0 text-sm font-bold text-coffee"
+                                    className="w-full rounded-xl border-akin-border bg-akin-bg focus:border-akin-accent focus:ring-0 text-sm font-bold text-akin-text"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-olive/40 px-1">Fecha Fin</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-akin-muted px-1">Fecha Fin</label>
                                 <input 
                                     type="date" 
                                     value={filters.fecha_fin}
                                     onChange={(e) => setFilters(p => ({ ...p, fecha_fin: e.target.value }))}
-                                    className="w-full rounded-xl border-olive/5 bg-[#FDF6F0] focus:border-terracotta focus:ring-0 text-sm font-bold text-coffee"
+                                    className="w-full rounded-xl border-akin-border bg-akin-bg focus:border-akin-accent focus:ring-0 text-sm font-bold text-akin-text"
                                 />
                             </div>
 
                             {/* Statuses */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-olive/40 px-1">Estado Pedido</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-akin-muted px-1">Estado Pedido</label>
                                 <input 
                                     type="text" 
                                     value={filters.estado_pedido}
                                     placeholder="Ej: Confirmado"
                                     onChange={(e) => setFilters(p => ({ ...p, estado_pedido: e.target.value }))}
-                                    className="w-full rounded-xl border-olive/5 bg-[#FDF6F0] focus:border-terracotta focus:ring-0 text-sm font-bold text-coffee"
+                                    className="w-full rounded-xl border-akin-border bg-akin-bg focus:border-akin-accent focus:ring-0 text-sm font-bold text-akin-text"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-olive/40 px-1">Canal de Venta</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-akin-muted px-1">Canal de Venta</label>
                                 <select 
                                     value={filters.cod_canal_venta} 
                                     onChange={(e) => setFilters(p => ({ ...p, cod_canal_venta: e.target.value }))}
-                                    className="w-full rounded-xl border-olive/5 bg-[#FDF6F0] focus:border-terracotta focus:ring-0 text-sm font-bold text-coffee"
+                                    className="w-full rounded-xl border-akin-border bg-akin-bg focus:border-akin-accent focus:ring-0 text-sm font-bold text-akin-text"
                                 >
                                     <option value="">Todos los canales</option>
                                     {(reportes?.opciones_filtros?.canales_venta || []).map((canal) => (
@@ -123,17 +123,17 @@ export default function Index({ reportes }) {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 pt-4 border-t border-olive/5">
+                        <div className="flex items-center gap-4 pt-4 border-t border-akin-border">
                             <button 
                                 type="submit"
-                                className="px-8 py-3 rounded-xl bg-terracotta text-white font-bold text-sm shadow-lg shadow-terracotta/20 hover:bg-olive transition-all duration-300"
+                                className="px-8 py-3 rounded-xl bg-akin-accent text-white font-bold text-sm shadow-lg shadow-akin-accent/20 hover:bg-akin-primary transition-all duration-300"
                             >
                                 Filtrar Reportes
                             </button>
                             <button 
                                 type="button"
                                 onClick={clearFilters}
-                                className="px-8 py-3 rounded-xl bg-olive/5 text-olive font-bold text-sm hover:bg-olive/10 transition-all duration-300"
+                                className="px-8 py-3 rounded-xl bg-akin-surfaceSoft text-akin-primary font-bold text-sm hover:bg-akin-surfaceSoft transition-all duration-300"
                             >
                                 Limpiar Filtros
                             </button>
@@ -155,23 +155,23 @@ export default function Index({ reportes }) {
                 {/* Ventas por Fecha */}
                 <SectionCard title="Ventas por Fecha" subtitle="Desempeño diario del monto pagado">
                     {(reportes?.ventas_por_fecha?.length > 0) ? (
-                        <div className="overflow-hidden rounded-2xl border border-olive/5">
+                        <div className="overflow-hidden rounded-2xl border border-akin-border">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-olive/5">
+                                <thead className="bg-akin-surfaceSoft">
                                     <tr>
-                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-olive/40">Fecha</th>
-                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-olive/40 text-right">Monto</th>
-                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-olive/40 text-center">Volumen</th>
+                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-akin-muted">Fecha</th>
+                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-akin-muted text-right">Monto</th>
+                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-akin-muted text-center">Volumen</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-olive/5">
+                                <tbody className="divide-y divide-akin-border">
                                     {reportes.ventas_por_fecha.map((row, idx) => (
-                                        <tr key={idx} className="hover:bg-cream/50 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-coffee">{row.fecha}</td>
-                                            <td className="px-6 py-4 font-black text-olive text-right">{amountFormatter.format(row.monto)}</td>
+                                        <tr key={idx} className="hover:bg-akin-bg/50 transition-colors">
+                                            <td className="px-6 py-4 font-bold text-akin-text">{row.fecha}</td>
+                                            <td className="px-6 py-4 font-black text-akin-primary text-right">{amountFormatter.format(row.monto)}</td>
                                             <td className="px-6 py-4">
-                                                <div className="w-full bg-olive/5 rounded-full h-2 max-w-[120px] mx-auto">
-                                                    <div className="bg-terracotta h-2 rounded-full" style={{ width: `${Math.min(100, (row.monto / metrics.totalVentas) * 200)}%` }}></div>
+                                                <div className="w-full bg-akin-surfaceSoft rounded-full h-2 max-w-[120px] mx-auto">
+                                                    <div className="bg-akin-accent h-2 rounded-full" style={{ width: `${Math.min(100, (row.monto / metrics.totalVentas) * 200)}%` }}></div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -187,10 +187,10 @@ export default function Index({ reportes }) {
                     {(reportes?.pedidos_por_estado?.length > 0) ? (
                         <div className="grid grid-cols-2 gap-4">
                             {reportes.pedidos_por_estado.map((row, idx) => (
-                                <div key={idx} className="p-6 rounded-2xl bg-[#FDF6F0] border border-olive/5 flex flex-col items-center text-center">
+                                <div key={idx} className="p-6 rounded-2xl bg-akin-bg border border-akin-border flex flex-col items-center text-center">
                                     <StatusBadge type={getStatusType(row.etiqueta)}>{row.etiqueta}</StatusBadge>
-                                    <span className="text-3xl font-black text-coffee mt-3">{row.total}</span>
-                                    <span className="text-[10px] font-black text-olive/40 uppercase tracking-widest">Pedidos</span>
+                                    <span className="text-3xl font-black text-akin-text mt-3">{row.total}</span>
+                                    <span className="text-[10px] font-black text-akin-muted uppercase tracking-widest">Pedidos</span>
                                 </div>
                             ))}
                         </div>
@@ -202,14 +202,14 @@ export default function Index({ reportes }) {
                     {(reportes?.pagos_por_estado?.length > 0) ? (
                         <div className="space-y-4">
                             {reportes.pagos_por_estado.map((row, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl border border-olive/5 hover:bg-cream/50 transition-all">
+                                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl border border-akin-border hover:bg-akin-bg/50 transition-all">
                                     <div className="flex items-center gap-4">
-                                        <div className={`h-2 w-2 rounded-full ${getStatusType(row.etiqueta) === 'success' ? 'bg-green-500' : 'bg-terracotta'}`}></div>
-                                        <span className="font-bold text-coffee">{row.etiqueta}</span>
+                                        <div className={`h-2 w-2 rounded-full ${getStatusType(row.etiqueta) === 'success' ? 'bg-green-500' : 'bg-akin-accent'}`}></div>
+                                        <span className="font-bold text-akin-text">{row.etiqueta}</span>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <span className="text-xl font-black text-olive">{row.total}</span>
-                                        <span className="text-[10px] font-black text-olive/30 uppercase tracking-widest">Pagos</span>
+                                        <span className="text-xl font-black text-akin-primary">{row.total}</span>
+                                        <span className="text-[10px] font-black text-akin-muted uppercase tracking-widest">Pagos</span>
                                     </div>
                                 </div>
                             ))}
@@ -220,21 +220,21 @@ export default function Index({ reportes }) {
                 {/* Leads por Estado */}
                 <SectionCard title="Leads por Estado" subtitle="Prospección y captación de clientes">
                     {(reportes?.leads_por_estado?.length > 0) ? (
-                        <div className="overflow-hidden rounded-2xl border border-olive/5">
+                        <div className="overflow-hidden rounded-2xl border border-akin-border">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-olive/5">
+                                <thead className="bg-akin-surfaceSoft">
                                     <tr>
-                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-olive/40">Estado</th>
-                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-olive/40 text-right">Cantidad</th>
+                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-akin-muted">Estado</th>
+                                        <th className="px-6 py-4 font-black uppercase tracking-widest text-akin-muted text-right">Cantidad</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-olive/5">
+                                <tbody className="divide-y divide-akin-border">
                                     {reportes.leads_por_estado.map((row, idx) => (
-                                        <tr key={idx} className="hover:bg-cream/50 transition-colors">
+                                        <tr key={idx} className="hover:bg-akin-bg/50 transition-colors">
                                             <td className="px-6 py-4">
                                                 <StatusBadge type={getStatusType(row.etiqueta)}>{row.etiqueta}</StatusBadge>
                                             </td>
-                                            <td className="px-6 py-4 font-black text-coffee text-right">{row.total}</td>
+                                            <td className="px-6 py-4 font-black text-akin-text text-right">{row.total}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -248,12 +248,12 @@ export default function Index({ reportes }) {
                     {(reportes?.ventas_por_canal?.length > 0) ? (
                         <div className="space-y-4">
                             {reportes.ventas_por_canal.map((row, idx) => (
-                                <div key={idx} className="group relative p-6 rounded-2xl bg-olive text-white shadow-xl overflow-hidden">
-                                    <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-white/5 transition-transform group-hover:scale-150 duration-500"></div>
+                                <div key={idx} className="group relative p-6 rounded-2xl bg-akin-primary text-white shadow-xl overflow-hidden">
+                                    <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-akin-surface/5 transition-transform group-hover:scale-150 duration-500"></div>
                                     <div className="relative z-10 flex justify-between items-center">
                                         <div>
                                             <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">{row.etiqueta}</span>
-                                            <h4 className="text-xl font-bold mt-1 uppercase tracking-tighter">AKINOMASS <span className="text-terracotta">DIRECT</span></h4>
+                                            <h4 className="text-xl font-bold mt-1 uppercase tracking-tighter">AKINOMASS <span className="text-akin-accent">DIRECT</span></h4>
                                         </div>
                                         <div className="text-right">
                                             <span className="text-3xl font-black">{row.total}</span>
@@ -271,17 +271,17 @@ export default function Index({ reportes }) {
                     {(reportes?.productos_mas_vendidos?.length > 0) ? (
                         <div className="space-y-3">
                             {reportes.productos_mas_vendidos.map((row, idx) => (
-                                <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-olive/5 hover:shadow-md transition-all">
-                                    <div className="h-10 w-10 rounded-xl bg-terracotta/10 flex items-center justify-center font-black text-terracotta">
+                                <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-akin-surface border border-akin-border hover:shadow-md transition-all">
+                                    <div className="h-10 w-10 rounded-xl bg-akin-accent/10 flex items-center justify-center font-black text-akin-accent">
                                         #{idx + 1}
                                     </div>
                                     <div className="flex-1">
-                                        <h5 className="font-bold text-coffee uppercase text-xs tracking-tight">{row.etiqueta}</h5>
-                                        <p className="text-[10px] text-olive/40 font-bold uppercase tracking-widest">Catálogo Akinomass</p>
+                                        <h5 className="font-bold text-akin-text uppercase text-xs tracking-tight">{row.etiqueta}</h5>
+                                        <p className="text-[10px] text-akin-muted font-bold uppercase tracking-widest">Catálogo Akinomass</p>
                                     </div>
                                     <div className="text-right">
-                                        <span className="font-black text-olive">{row.total}</span>
-                                        <span className="text-[10px] ml-1 font-bold text-olive/30 uppercase">uds</span>
+                                        <span className="font-black text-akin-primary">{row.total}</span>
+                                        <span className="text-[10px] ml-1 font-bold text-akin-muted uppercase">uds</span>
                                     </div>
                                 </div>
                             ))}
@@ -315,7 +315,7 @@ export default function Index({ reportes }) {
                     ) : <EmptyState message="¡Excelente! Todo el stock está en niveles óptimos." />}
                 </SectionCard>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
 

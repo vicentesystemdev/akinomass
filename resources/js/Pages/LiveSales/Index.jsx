@@ -1,9 +1,9 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ sesiones = [] }) {
   return (
-    <AuthenticatedLayout header="Live Sales">
+    <DashboardLayout>
       <Head title="Sesiones Live" />
       <div className="p-6">
         <div className="mb-4 flex justify-between">
@@ -21,7 +21,7 @@ export default function Index({ sesiones = [] }) {
           ))}
         </ul>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 

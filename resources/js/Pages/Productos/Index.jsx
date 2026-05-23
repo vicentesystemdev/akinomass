@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ productos = [] }) {
@@ -21,21 +21,21 @@ export default function Index({ productos = [] }) {
   ).length;
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title="Productos" />
 
       <div className="space-y-6">
-        <section className="flex flex-col gap-4 rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <section className="flex flex-col gap-4 rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
               Catálogo comercial
             </p>
 
-            <h1 className="mt-2 text-3xl font-black text-[#2B221E]">
+            <h1 className="mt-2 text-3xl font-black text-akin-text">
               Productos
             </h1>
 
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#2B221E]/65">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-akin-muted">
               Administra las prendas disponibles para la venta, su categoría,
               estado comercial y datos principales del catálogo AKINOMASS.
             </p>
@@ -43,7 +43,7 @@ export default function Index({ productos = [] }) {
 
           <Link
             href={route('productos.create')}
-            className="inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58] focus:outline-none focus:ring-4 focus:ring-[#D77A61]/20"
+            className="inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft focus:outline-none focus:ring-4 focus:ring-akin-accent/20"
           >
             Nuevo producto
           </Link>
@@ -75,19 +75,19 @@ export default function Index({ productos = [] }) {
           />
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 md:flex-row md:items-center md:justify-between">
+        <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+          <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-lg font-black text-[#2B221E]">
+              <h2 className="text-lg font-black text-akin-text">
                 Listado de productos
               </h2>
 
-              <p className="mt-1 text-sm text-[#2B221E]/60">
+              <p className="mt-1 text-sm text-akin-muted">
                 Revisa nombre, categoría, estado y acciones disponibles.
               </p>
             </div>
 
-            <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+            <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
               {totalProductos} registros
             </span>
           </div>
@@ -96,8 +96,8 @@ export default function Index({ productos = [] }) {
             <EmptyState />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-[#eadfd6]">
-                <thead className="bg-[#FDF6F0]">
+              <table className="min-w-full divide-y divide-akin-border">
+                <thead className="bg-akin-bg">
                   <tr>
                     <TableHead>Producto</TableHead>
                     <TableHead>Categoría</TableHead>
@@ -106,24 +106,24 @@ export default function Index({ productos = [] }) {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-[#eadfd6] bg-white">
+                <tbody className="divide-y divide-akin-border bg-akin-surface">
                   {listaProductos.map((producto) => (
                     <tr
                       key={producto.cod_producto}
-                      className="transition hover:bg-[#FDF6F0]/70"
+                      className="transition hover:bg-akin-bg/70"
                     >
                       <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDF6F0] text-sm font-black text-[#D77A61]">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-akin-bg text-sm font-black text-akin-accent">
                             {obtenerInicial(producto.nombre_pro)}
                           </div>
 
                           <div>
-                            <p className="font-bold text-[#2B221E]">
+                            <p className="font-bold text-akin-text">
                               {producto.nombre_pro || 'Sin nombre'}
                             </p>
 
-                            <p className="text-xs text-[#2B221E]/50">
+                            <p className="text-xs text-akin-muted">
                               Código: {producto.cod_producto || 'N/D'}
                             </p>
                           </div>
@@ -131,7 +131,7 @@ export default function Index({ productos = [] }) {
                       </td>
 
                       <td className="whitespace-nowrap px-6 py-4">
-                        <span className="rounded-full bg-[#FDF6F0] px-3 py-1 text-xs font-bold text-[#3C473A]">
+                        <span className="rounded-full bg-akin-bg px-3 py-1 text-xs font-bold text-akin-primary">
                           {producto.categoria?.nombre_cat || 'Sin categoría'}
                         </span>
                       </td>
@@ -143,7 +143,7 @@ export default function Index({ productos = [] }) {
                       <td className="whitespace-nowrap px-6 py-4 text-right">
                         <Link
                           href={route('productos.edit', producto.cod_producto)}
-                          className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-2 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+                          className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-2 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
                         >
                           Editar
                         </Link>
@@ -156,22 +156,22 @@ export default function Index({ productos = [] }) {
           )}
         </section>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 
 function MetricCard({ title, value, description }) {
   return (
-    <div className="rounded-3xl border border-[#eadfd6] bg-white p-5 shadow-sm">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D77A61]">
+    <div className="rounded-3xl border border-akin-border bg-akin-surface p-5 shadow-sm dark:shadow-black/20">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-akin-accent">
         {title}
       </p>
 
-      <p className="mt-3 text-3xl font-black text-[#2B221E]">
+      <p className="mt-3 text-3xl font-black text-akin-text">
         {value}
       </p>
 
-      <p className="mt-1 text-sm text-[#2B221E]/60">
+      <p className="mt-1 text-sm text-akin-muted">
         {description}
       </p>
     </div>
@@ -182,7 +182,7 @@ function TableHead({ children, align = 'left' }) {
   return (
     <th
       className={[
-        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60',
+        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-akin-muted',
         align === 'right' ? 'text-right' : 'text-left',
       ].join(' ')}
     >
@@ -195,11 +195,11 @@ function StatusBadge({ estado }) {
   const estadoNormalizado = normalizarEstado(estado);
 
   const estilos = {
-    activo: 'bg-green-100 text-green-700 border-green-200',
-    inactivo: 'bg-gray-100 text-gray-700 border-gray-200',
-    agotado: 'bg-red-100 text-red-700 border-red-200',
-    descontinuado: 'bg-gray-100 text-gray-700 border-gray-200',
-    pendiente: 'bg-orange-100 text-orange-700 border-orange-200',
+    activo: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/30',
+    inactivo: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/30',
+    agotado: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/30',
+    descontinuado: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/30',
+    pendiente: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300 border-orange-200',
   };
 
   const clase =
@@ -221,22 +221,22 @@ function StatusBadge({ estado }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
         P
       </div>
 
-      <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+      <h3 className="mt-5 text-xl font-black text-akin-text">
         No hay productos registrados
       </h3>
 
-      <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+      <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
         Cuando registres productos, aparecerán aquí con su categoría,
         estado y acciones administrativas.
       </p>
 
       <Link
         href={route('productos.create')}
-        className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58]"
+        className="mt-6 inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft"
       >
         Crear primer producto
       </Link>

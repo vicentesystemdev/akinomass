@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -100,22 +100,22 @@ export default function Create(props) {
     const canSubmit = validationStatus.isValid && !processing;
 
     return (
-        <AuthenticatedLayout>
+        <DashboardLayout>
             <Head title="Crear cliente" />
 
             <div className="space-y-6">
-                <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+                <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
                         CRM comercial
                     </p>
 
                     <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <h1 className="text-3xl font-black text-[#2B221E]">
+                            <h1 className="text-3xl font-black text-akin-text">
                                 Crear cliente
                             </h1>
 
-                            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#2B221E]/65">
+                            <p className="mt-2 max-w-3xl text-sm leading-6 text-akin-muted">
                                 Registra un cliente con datos de contacto, canal de origen,
                                 flujo comercial y estado. Una ficha completa permite mejorar
                                 seguimiento, segmentación, ventas y atención posterior.
@@ -124,7 +124,7 @@ export default function Create(props) {
 
                         <Link
                             href={route('clientes.index')}
-                            className="inline-flex items-center justify-center rounded-2xl border border-[#D77A61]/30 px-5 py-3 text-sm font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+                            className="inline-flex items-center justify-center rounded-2xl border border-akin-accent/30 px-5 py-3 text-sm font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
                         >
                             Volver al listado
                         </Link>
@@ -390,25 +390,25 @@ export default function Create(props) {
                     </section>
 
                     <aside className="space-y-6">
-                        <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D77A61]">
+                        <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-akin-accent">
                                 Vista previa
                             </p>
 
-                            <h2 className="mt-2 text-xl font-black text-[#2B221E]">
+                            <h2 className="mt-2 text-xl font-black text-akin-text">
                                 Ficha comercial
                             </h2>
 
-                            <div className="mt-6 rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
-                                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-3xl font-black text-[#D77A61] shadow-sm">
+                            <div className="mt-6 rounded-3xl border border-akin-border bg-akin-bg p-5">
+                                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-akin-surface text-3xl font-black text-akin-accent shadow-sm">
                                     {obtenerInicial(data.nombre_cli)}
                                 </div>
 
-                                <h3 className="mt-5 text-lg font-black text-[#2B221E]">
+                                <h3 className="mt-5 text-lg font-black text-akin-text">
                                     {data.nombre_cli || 'Nombre del cliente'}
                                 </h3>
 
-                                <p className="mt-1 text-sm text-[#2B221E]/60">
+                                <p className="mt-1 text-sm text-akin-muted">
                                     {data.telefono_cli || 'Teléfono pendiente'}
                                 </p>
 
@@ -437,24 +437,24 @@ export default function Create(props) {
                                     </Badge>
                                 </div>
 
-                                <div className="mt-5 border-t border-[#eadfd6] pt-5">
-                                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+                                <div className="mt-5 border-t border-akin-border pt-5">
+                                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                                         Lectura comercial
                                     </p>
 
-                                    <p className="mt-2 text-sm leading-6 text-[#2B221E]/65">
+                                    <p className="mt-2 text-sm leading-6 text-akin-muted">
                                         {obtenerLecturaComercial(data)}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-                            <h3 className="text-lg font-black text-[#2B221E]">
+                        <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+                            <h3 className="text-lg font-black text-akin-text">
                                 Control de validación
                             </h3>
 
-                            <p className="mt-2 text-sm leading-6 text-[#2B221E]/60">
+                            <p className="mt-2 text-sm leading-6 text-akin-muted">
                                 El registro se habilita cuando los datos mínimos de cliente
                                 y contacto son correctos.
                             </p>
@@ -490,12 +490,12 @@ export default function Create(props) {
                             </div>
                         </div>
 
-                        <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-                            <h3 className="text-lg font-black text-[#2B221E]">
+                        <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+                            <h3 className="text-lg font-black text-akin-text">
                                 Acciones
                             </h3>
 
-                            <p className="mt-2 text-sm leading-6 text-[#2B221E]/60">
+                            <p className="mt-2 text-sm leading-6 text-akin-muted">
                                 Verifica que el teléfono y nombre correspondan al cliente
                                 antes de guardar.
                             </p>
@@ -507,7 +507,7 @@ export default function Create(props) {
                                     className={[
                                         'w-full rounded-2xl px-5 py-3 text-sm font-bold shadow-sm transition',
                                         canSubmit
-                                            ? 'bg-[#D77A61] text-white hover:bg-[#c96f58]'
+                                            ? 'bg-akin-accent text-white hover:bg-akin-accentSoft'
                                             : 'cursor-not-allowed bg-gray-300 text-gray-500',
                                     ].join(' ')}
                                 >
@@ -519,14 +519,14 @@ export default function Create(props) {
                                 </button>
 
                                 {!validationStatus.isValid && (
-                                    <p className="text-center text-xs font-semibold text-[#2B221E]/50">
+                                    <p className="text-center text-xs font-semibold text-akin-muted">
                                         Completa nombre, teléfono válido y estado.
                                     </p>
                                 )}
 
                                 <Link
                                     href={route('clientes.index')}
-                                    className="flex w-full items-center justify-center rounded-2xl border border-[#eadfd6] px-5 py-3 text-sm font-bold text-[#2B221E] transition hover:border-[#D77A61]/40 hover:text-[#D77A61]"
+                                    className="flex w-full items-center justify-center rounded-2xl border border-akin-border px-5 py-3 text-sm font-bold text-akin-text transition hover:border-akin-accent/40 hover:text-akin-accent"
                                 >
                                     Cancelar
                                 </Link>
@@ -535,7 +535,7 @@ export default function Create(props) {
                     </aside>
                 </form>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
 
@@ -616,12 +616,12 @@ function validarCliente(data, estados, canales, tiposFlujo) {
 
 function FormCard({ title, description, children }) {
     return (
-        <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
             <div className="mb-6">
-                <h2 className="text-xl font-black text-[#2B221E]">{title}</h2>
+                <h2 className="text-xl font-black text-akin-text">{title}</h2>
 
                 {description && (
-                    <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+                    <p className="mt-1 text-sm leading-6 text-akin-muted">
                         {description}
                     </p>
                 )}
@@ -635,9 +635,9 @@ function FormCard({ title, description, children }) {
 function FormField({ label, error, helper, required = false, children }) {
     return (
         <label className="block">
-            <span className="mb-2 block text-sm font-bold text-[#2B221E]">
+            <span className="mb-2 block text-sm font-bold text-akin-text">
                 {label}
-                {required && <span className="ml-1 text-[#D77A61]">*</span>}
+                {required && <span className="ml-1 text-akin-accent">*</span>}
             </span>
 
             {children}
@@ -646,7 +646,7 @@ function FormField({ label, error, helper, required = false, children }) {
                 <p className="mt-2 text-sm font-semibold text-red-600">{error}</p>
             ) : (
                 helper && (
-                    <p className="mt-2 text-xs font-medium text-[#2B221E]/45">
+                    <p className="mt-2 text-xs font-medium text-akin-text/45">
                         {helper}
                     </p>
                 )
@@ -663,7 +663,7 @@ function ValidationItem({ valid, label }) {
                     'flex h-6 w-6 items-center justify-center rounded-full text-xs font-black',
                     valid
                         ? 'bg-green-100 text-green-700'
-                        : 'bg-orange-100 text-orange-700',
+                        : 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
                 ].join(' ')}
             >
                 {valid ? '✓' : '!'}
@@ -672,7 +672,7 @@ function ValidationItem({ valid, label }) {
             <span
                 className={[
                     'text-sm font-semibold',
-                    valid ? 'text-[#2B221E]' : 'text-[#2B221E]/55',
+                    valid ? 'text-akin-text' : 'text-akin-text/55',
                 ].join(' ')}
             >
                 {label}
@@ -683,7 +683,7 @@ function ValidationItem({ valid, label }) {
 
 function Badge({ children }) {
     return (
-        <span className="inline-flex rounded-full border border-[#eadfd6] bg-white px-3 py-1 text-xs font-black text-[#3C473A]">
+        <span className="inline-flex rounded-full border border-akin-border bg-akin-surface px-3 py-1 text-xs font-black text-akin-primary">
             {children}
         </span>
     );
@@ -691,11 +691,11 @@ function Badge({ children }) {
 
 function inputClass(error) {
     return [
-        'w-full rounded-2xl border bg-white px-4 py-3 text-sm text-[#2B221E] shadow-sm outline-none transition',
-        'placeholder:text-[#2B221E]/35 focus:ring-4',
+        'w-full rounded-2xl border bg-akin-surface px-4 py-3 text-sm text-akin-text shadow-sm outline-none transition',
+        'placeholder:text-akin-text/35 focus:ring-4',
         error
             ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-            : 'border-[#eadfd6] focus:border-[#D77A61] focus:ring-[#D77A61]/15',
+            : 'border-akin-border focus:border-akin-accent focus:ring-akin-accent/15',
     ].join(' ');
 }
 

@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -118,22 +118,22 @@ export default function Index({ leads = [], estados = [] }) {
   };
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title="Leads" />
 
       <div className="space-y-6">
-        <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
                 CRM comercial
               </p>
 
-              <h1 className="mt-2 text-3xl font-black text-[#2B221E]">
+              <h1 className="mt-2 text-3xl font-black text-akin-text">
                 Leads
               </h1>
 
-              <p className="mt-2 max-w-4xl text-sm leading-6 text-[#2B221E]/65">
+              <p className="mt-2 max-w-4xl text-sm leading-6 text-akin-muted">
                 Gestiona prospectos, oportunidades de venta y seguimiento
                 comercial. Esta pantalla permite controlar el pipeline:
                 contacto inicial, interés, responsable, canal de captación y
@@ -144,14 +144,14 @@ export default function Index({ leads = [], estados = [] }) {
             <div className="flex flex-wrap gap-2">
               <Link
                 href={route('leads.create')}
-                className="inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58] focus:outline-none focus:ring-4 focus:ring-[#D77A61]/20"
+                className="inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft focus:outline-none focus:ring-4 focus:ring-akin-accent/20"
               >
                 Nuevo lead
               </Link>
 
               <Link
                 href={route('clientes.index')}
-                className="inline-flex items-center justify-center rounded-2xl border border-[#eadfd6] bg-[#FDF6F0] px-5 py-3 text-sm font-bold text-[#3C473A] transition hover:bg-[#3C473A] hover:text-white"
+                className="inline-flex items-center justify-center rounded-2xl border border-akin-border bg-akin-bg px-5 py-3 text-sm font-bold text-akin-primary transition hover:bg-akin-primary hover:text-white"
               >
                 Ver clientes
               </Link>
@@ -219,10 +219,10 @@ export default function Index({ leads = [], estados = [] }) {
           </section>
         )}
 
-        <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
           <div className="grid gap-4 lg:grid-cols-[1fr_260px_180px] lg:items-end">
             <div>
-              <label className="mb-2 block text-sm font-bold text-[#2B221E]">
+              <label className="mb-2 block text-sm font-bold text-akin-text">
                 Buscar lead
               </label>
 
@@ -231,19 +231,19 @@ export default function Index({ leads = [], estados = [] }) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nombre, alias, teléfono, correo, producto, canal o responsable..."
-                className="w-full rounded-2xl border border-[#eadfd6] bg-white px-4 py-3 text-sm text-[#2B221E] shadow-sm outline-none transition placeholder:text-[#2B221E]/35 focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15"
+                className="w-full rounded-2xl border border-akin-border bg-akin-surface px-4 py-3 text-sm text-akin-text shadow-sm outline-none transition placeholder:text-akin-text/35 focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-[#2B221E]">
+              <label className="mb-2 block text-sm font-bold text-akin-text">
                 Filtrar por estado
               </label>
 
               <select
                 value={estadoFiltro}
                 onChange={(e) => setEstadoFiltro(e.target.value)}
-                className="w-full rounded-2xl border border-[#eadfd6] bg-white px-4 py-3 text-sm font-bold text-[#2B221E] shadow-sm outline-none transition focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15"
+                className="w-full rounded-2xl border border-akin-border bg-akin-surface px-4 py-3 text-sm font-bold text-akin-text shadow-sm outline-none transition focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15"
               >
                 <option value="todos">Todos los estados</option>
 
@@ -255,32 +255,32 @@ export default function Index({ leads = [], estados = [] }) {
               </select>
             </div>
 
-            <div className="rounded-2xl bg-[#FDF6F0] px-4 py-3 text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+            <div className="rounded-2xl bg-akin-bg px-4 py-3 text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                 Mostrando
               </p>
 
-              <p className="mt-1 text-xl font-black text-[#2B221E]">
+              <p className="mt-1 text-xl font-black text-akin-text">
                 {leadsFiltrados.length}
               </p>
             </div>
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+        <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+          <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-lg font-black text-[#2B221E]">
+              <h2 className="text-lg font-black text-akin-text">
                 Pipeline comercial
               </h2>
 
-              <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+              <p className="mt-1 text-sm leading-6 text-akin-muted">
                 Cambia estados, revisa origen comercial, asignación y convierte
                 leads calificados en clientes.
               </p>
             </div>
 
-            <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+            <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
               {leadsFiltrados.length} de {totalLeads} registros
             </span>
           </div>
@@ -304,8 +304,8 @@ export default function Index({ leads = [], estados = [] }) {
               </div>
 
               <div className="hidden overflow-x-auto lg:block">
-                <table className="min-w-full divide-y divide-[#eadfd6]">
-                  <thead className="bg-[#FDF6F0]">
+                <table className="min-w-full divide-y divide-akin-border">
+                  <thead className="bg-akin-bg">
                     <tr>
                       <TableHead>Lead</TableHead>
                       <TableHead>Estado y gestión</TableHead>
@@ -317,7 +317,7 @@ export default function Index({ leads = [], estados = [] }) {
                     </tr>
                   </thead>
 
-                  <tbody className="divide-y divide-[#eadfd6] bg-white">
+                  <tbody className="divide-y divide-akin-border bg-akin-surface">
                     {leadsFiltrados.map((lead) => (
                       <LeadTableRow
                         key={lead.cod_lead}
@@ -336,7 +336,7 @@ export default function Index({ leads = [], estados = [] }) {
           )}
         </section>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 
@@ -357,7 +357,7 @@ function LeadTableRow({
   const isConverting = convertingLead === lead.cod_lead;
 
   return (
-    <tr className="transition hover:bg-[#FDF6F0]/70">
+    <tr className="transition hover:bg-akin-bg/70">
       <td className="px-6 py-5 align-top">
         <LeadIdentity lead={lead} />
       </td>
@@ -370,7 +370,7 @@ function LeadTableRow({
             value={lead.estado_lea || ''}
             disabled={isUpdating}
             onChange={(e) => updateEstado(lead, e.target.value)}
-            className="w-full rounded-xl border border-[#eadfd6] bg-white px-3 py-2 text-xs font-bold text-[#2B221E] outline-none transition focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-xl border border-akin-border bg-akin-surface px-3 py-2 text-xs font-bold text-akin-text outline-none transition focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {estadoOptions.map((estadoItem) => (
               <option key={estadoItem} value={estadoItem}>
@@ -380,7 +380,7 @@ function LeadTableRow({
           </select>
 
           {isUpdating && (
-            <p className="text-xs font-semibold text-[#D77A61]">
+            <p className="text-xs font-semibold text-akin-accent">
               Actualizando estado...
             </p>
           )}
@@ -398,31 +398,31 @@ function LeadTableRow({
         <p
           className={[
             'text-sm font-black',
-            responsable ? 'text-[#2B221E]' : 'text-orange-700',
+            responsable ? 'text-akin-text' : 'text-orange-700',
           ].join(' ')}
         >
           {responsable || 'Sin responsable'}
         </p>
 
-        <p className="mt-1 text-xs text-[#2B221E]/45">
+        <p className="mt-1 text-xs text-akin-text/45">
           Encargado comercial
         </p>
       </td>
 
       <td className="px-6 py-5 align-top">
-        <p className="max-w-xs text-sm font-bold text-[#2B221E]">
+        <p className="max-w-xs text-sm font-bold text-akin-text">
           {lead.producto_interes_lea || 'Sin producto de interés'}
         </p>
 
         {lead.fecha_seguimiento_lea && (
-          <p className="mt-2 text-xs font-semibold text-[#D77A61]">
+          <p className="mt-2 text-xs font-semibold text-akin-accent">
             Seguimiento: {formatearFecha(lead.fecha_seguimiento_lea)}
           </p>
         )}
       </td>
 
       <td className="px-6 py-5 align-top">
-        <p className="max-w-sm text-sm leading-6 text-[#2B221E]/65">
+        <p className="max-w-sm text-sm leading-6 text-akin-muted">
           {obtenerLecturaComercial({ estado, canal, flujo, responsable })}
         </p>
       </td>
@@ -431,7 +431,7 @@ function LeadTableRow({
         <div className="flex justify-end gap-2">
           <Link
             href={route('leads.edit', lead.cod_lead)}
-            className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-2 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+            className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-2 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
           >
             Editar
           </Link>
@@ -446,7 +446,7 @@ function LeadTableRow({
                 ? 'cursor-not-allowed bg-gray-200 text-gray-500'
                 : isConverting
                   ? 'cursor-not-allowed bg-gray-300 text-gray-600'
-                  : 'bg-[#3C473A] text-white hover:bg-[#2B221E]',
+                  : 'bg-akin-primary text-white hover:bg-akin-text',
             ].join(' ')}
           >
             {isConverted
@@ -478,7 +478,7 @@ function LeadMobileCard({
   const isConverting = convertingLead === lead.cod_lead;
 
   return (
-    <article className="rounded-3xl border border-[#eadfd6] bg-white p-5 shadow-sm">
+    <article className="rounded-3xl border border-akin-border bg-akin-surface p-5 shadow-sm dark:shadow-black/20">
       <div className="flex items-start justify-between gap-3">
         <LeadIdentity lead={lead} />
         <EstadoBadge estado={estado} original={lead.estado_lea} />
@@ -498,22 +498,22 @@ function LeadMobileCard({
         />
       </div>
 
-      <div className="mt-4 rounded-2xl bg-[#FDF6F0] p-4">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#2B221E]/45">
+      <div className="mt-4 rounded-2xl bg-akin-bg p-4">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-akin-text/45">
           Interés comercial
         </p>
 
-        <p className="mt-1 text-sm font-bold text-[#2B221E]">
+        <p className="mt-1 text-sm font-bold text-akin-text">
           {lead.producto_interes_lea || 'Sin producto de interés'}
         </p>
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-[#2B221E]/65">
+      <p className="mt-4 text-sm leading-6 text-akin-muted">
         {obtenerLecturaComercial({ estado, canal, flujo, responsable })}
       </p>
 
       <div className="mt-4">
-        <label className="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-[#2B221E]/45">
+        <label className="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-akin-text/45">
           Cambiar estado
         </label>
 
@@ -521,7 +521,7 @@ function LeadMobileCard({
           value={lead.estado_lea || ''}
           disabled={isUpdating}
           onChange={(e) => updateEstado(lead, e.target.value)}
-          className="w-full rounded-xl border border-[#eadfd6] bg-white px-3 py-2 text-xs font-bold text-[#2B221E] outline-none transition focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl border border-akin-border bg-akin-surface px-3 py-2 text-xs font-bold text-akin-text outline-none transition focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {estadoOptions.map((estadoItem) => (
             <option key={estadoItem} value={estadoItem}>
@@ -534,7 +534,7 @@ function LeadMobileCard({
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <Link
           href={route('leads.edit', lead.cod_lead)}
-          className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-3 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+          className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-3 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
         >
           Editar
         </Link>
@@ -549,7 +549,7 @@ function LeadMobileCard({
               ? 'cursor-not-allowed bg-gray-200 text-gray-500'
               : isConverting
                 ? 'cursor-not-allowed bg-gray-300 text-gray-600'
-                : 'bg-[#3C473A] text-white hover:bg-[#2B221E]',
+                : 'bg-akin-primary text-white hover:bg-akin-text',
           ].join(' ')}
         >
           {isConverted
@@ -566,20 +566,20 @@ function LeadMobileCard({
 function LeadIdentity({ lead }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#FDF6F0] text-base font-black text-[#D77A61]">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-akin-bg text-base font-black text-akin-accent">
         {obtenerInicial(lead.nombre_lea)}
       </div>
 
       <div>
-        <p className="font-black text-[#2B221E]">
+        <p className="font-black text-akin-text">
           {lead.nombre_lea || 'Lead sin nombre'}
         </p>
 
-        <p className="text-xs text-[#2B221E]/50">
+        <p className="text-xs text-akin-muted">
           {lead.telefono_lea || lead.correo_lea || 'Sin contacto'}
         </p>
 
-        <p className="mt-1 text-xs text-[#2B221E]/40">
+        <p className="mt-1 text-xs text-akin-muted">
           Código: {lead.cod_lead || 'N/D'}
         </p>
       </div>
@@ -591,12 +591,12 @@ function MetricCard({ title, value, description, alert = false, danger = false }
   return (
     <div
       className={[
-        'rounded-3xl border bg-white p-5 shadow-sm',
+        'rounded-3xl border bg-akin-surface p-5 shadow-sm dark:shadow-black/20',
         danger
           ? 'border-red-200'
           : alert
             ? 'border-orange-200'
-            : 'border-[#eadfd6]',
+            : 'border-akin-border',
       ].join(' ')}
     >
       <p
@@ -606,15 +606,15 @@ function MetricCard({ title, value, description, alert = false, danger = false }
             ? 'text-red-600'
             : alert
               ? 'text-orange-600'
-              : 'text-[#D77A61]',
+              : 'text-akin-accent',
         ].join(' ')}
       >
         {title}
       </p>
 
-      <p className="mt-3 text-3xl font-black text-[#2B221E]">{value}</p>
+      <p className="mt-3 text-3xl font-black text-akin-text">{value}</p>
 
-      <p className="mt-1 text-sm text-[#2B221E]/60">{description}</p>
+      <p className="mt-1 text-sm text-akin-muted">{description}</p>
     </div>
   );
 }
@@ -637,7 +637,7 @@ function TableHead({ children, align = 'left' }) {
   return (
     <th
       className={[
-        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60',
+        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-akin-muted',
         align === 'right' ? 'text-right' : 'text-left',
       ].join(' ')}
     >
@@ -675,8 +675,8 @@ function Badge({ children, tone = 'earth' }) {
     green: 'border-green-200 bg-green-100 text-green-700',
     blue: 'border-blue-200 bg-blue-100 text-blue-700',
     gray: 'border-gray-200 bg-gray-100 text-gray-700',
-    orange: 'border-orange-200 bg-orange-100 text-orange-700',
-    earth: 'border-[#eadfd6] bg-[#FDF6F0] text-[#3C473A]',
+    orange: 'border-orange-200 bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
+    earth: 'border-akin-border bg-akin-bg text-akin-primary',
   };
 
   return (
@@ -697,10 +697,10 @@ function DataBadge({ value, warning = false, muted = false }) {
       className={[
         'inline-flex rounded-full border px-3 py-1 text-xs font-black',
         warning
-          ? 'border-orange-200 bg-orange-100 text-orange-700'
+          ? 'border-orange-200 bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300'
           : muted
             ? 'border-gray-200 bg-gray-100 text-gray-700'
-            : 'border-[#eadfd6] bg-[#FDF6F0] text-[#3C473A]',
+            : 'border-akin-border bg-akin-bg text-akin-primary',
       ].join(' ')}
     >
       {value}
@@ -710,12 +710,12 @@ function DataBadge({ value, warning = false, muted = false }) {
 
 function InfoBlock({ label, value }) {
   return (
-    <div className="rounded-2xl bg-[#FDF6F0] p-3">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#2B221E]/40">
+    <div className="rounded-2xl bg-akin-bg p-3">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-akin-muted">
         {label}
       </p>
 
-      <p className="mt-1 text-sm font-black text-[#2B221E]">{value}</p>
+      <p className="mt-1 text-sm font-black text-akin-text">{value}</p>
     </div>
   );
 }
@@ -723,15 +723,15 @@ function InfoBlock({ label, value }) {
 function EmptyState({ hasFilters }) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
         L
       </div>
 
-      <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+      <h3 className="mt-5 text-xl font-black text-akin-text">
         {hasFilters ? 'No se encontraron leads' : 'No hay leads registrados'}
       </h3>
 
-      <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+      <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
         {hasFilters
           ? 'Ajusta la búsqueda o el filtro de estado para ver más resultados.'
           : 'Registra leads para iniciar seguimiento comercial, medir canales de captación y convertir oportunidades en clientes.'}
@@ -740,7 +740,7 @@ function EmptyState({ hasFilters }) {
       {!hasFilters && (
         <Link
           href={route('leads.create')}
-          className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58]"
+          className="mt-6 inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft"
         >
           Crear primer lead
         </Link>

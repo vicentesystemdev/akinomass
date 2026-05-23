@@ -12,7 +12,7 @@ const navigationGroups = [
         items: [
             { label: 'Clientes', routeName: 'clientes.index', path: '/clientes', icon: UsersIcon },
             { label: 'Leads', routeName: 'leads.index', path: '/leads', icon: SparkIcon },
-            { label: 'Plantillas', routeName: 'plantillas.index', path: '#', icon: TemplateIcon },
+            { label: 'Plantillas', routeName: 'plantillas-mensaje.index', path: '/plantillas-mensaje', icon: TemplateIcon },
         ],
     },
     {
@@ -20,28 +20,27 @@ const navigationGroups = [
         items: [
             { label: 'Categorias', routeName: 'categorias-producto.index', path: '/categorias-producto', icon: TagIcon },
             { label: 'Productos', routeName: 'productos.index', path: '/productos', icon: BoxIcon },
-            { label: 'Inventario', routeName: 'inventario.index', path: '#', icon: InventoryIcon },
-            { label: 'Movimientos', routeName: 'inventario.movimientos', path: '#', icon: MovementIcon },
+        ],
+    },
+    {
+        label: 'Inventario',
+        items: [
+            { label: 'Stock', routeName: 'inventario.index', path: '/inventario', icon: InventoryIcon },
+            { label: 'Movimientos', routeName: 'inventario.movimientos', path: '/inventario/movimientos', icon: MovementIcon },
         ],
     },
     {
         label: 'Comercial',
         items: [
-            { label: 'Pedidos', routeName: 'pedidos.index', path: '#', icon: ReceiptIcon },
-            { label: 'Pagos', routeName: 'pagos.index', path: '#', icon: PaymentIcon },
-            { label: 'LiveSales', routeName: 'livesales.index', path: '#', icon: LiveIcon },
+            { label: 'Pedidos', routeName: 'pedidos.index', path: '/pedidos', icon: ReceiptIcon },
+            { label: 'Pagos', routeName: 'pagos.index', path: '/pagos', icon: PaymentIcon },
+            { label: 'LiveSales', routeName: 'live-sales.index', path: '/live-sales', icon: LiveIcon },
         ],
     },
     {
         label: 'Analisis',
         items: [
-            { label: 'Reportes', routeName: 'reportes.index', path: '#', icon: ChartIcon },
-        ],
-    },
-    {
-        label: 'Sistema',
-        items: [
-            { label: 'Configuracion', routeName: 'configuracion.index', path: '#', icon: SettingsIcon },
+            { label: 'Reportes', routeName: 'reportes.index', path: '/reportes', icon: ChartIcon },
         ],
     },
 ];
@@ -52,7 +51,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
             {open && (
                 <button
                     type="button"
-                    className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden akin-fade-in"
                     onClick={onClose}
                     aria-label="Cerrar menu"
                 />
@@ -78,7 +77,7 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
                     </Link>
                 </div>
 
-                <nav className="flex-1 overflow-y-auto px-4 py-5">
+                <nav className="flex-1 overflow-y-auto no-scrollbar px-4 py-5">
                     <div className="space-y-6">
                         {navigationGroups.map((group) => (
                             <div key={group.label}>
@@ -99,22 +98,25 @@ export default function Sidebar({ open, onClose, safeRoute, isActive }) {
                                                 href={href}
                                                 onClick={onClose}
                                                 className={[
-                                                    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition',
+                                                    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-all duration-200',
                                                     active
                                                         ? 'bg-akin-accent text-white shadow-lg shadow-black/15 dark:text-akin-bg'
                                                         : 'text-white/75 hover:bg-white/10 hover:text-white dark:text-akin-muted dark:hover:text-akin-text',
-                                                    pending ? 'cursor-default' : '',
+                                                    pending ? 'cursor-default opacity-60' : '',
                                                 ].join(' ')}
                                             >
                                                 <span
                                                     className={[
-                                                        'flex h-9 w-9 items-center justify-center rounded-xl transition',
-                                                        active ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15',
+                                                        'flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200',
+                                                        active ? 'bg-white/20 scale-105' : 'bg-white/10 group-hover:bg-white/15 group-hover:scale-105',
                                                     ].join(' ')}
                                                 >
                                                     <Icon className="h-5 w-5" />
                                                 </span>
                                                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                                                {active && (
+                                                    <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                                                )}
                                                 {pending && (
                                                     <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white/60 dark:text-akin-muted">
                                                         Pronto
@@ -197,8 +199,4 @@ function LiveIcon({ className = '' }) {
 
 function ChartIcon({ className = '' }) {
     return <IconBase className={className}><path d="M5 19V5h14v14H5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 16v-4M12 16V8M15 16v-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></IconBase>;
-}
-
-function SettingsIcon({ className = '' }) {
-    return <IconBase className={className}><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" strokeWidth="1.8" /><path d="M19 12a7 7 0 0 0-.1-1.1l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.9A7.7 7.7 0 0 0 7.5 7l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.1l-2 1.5 2 3.4 2.4-1c.6.5 1.2.8 1.9 1.1l.3 2.9h4.6l.3-2.9c.7-.3 1.3-.6 1.9-1.1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1.1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /></IconBase>;
 }

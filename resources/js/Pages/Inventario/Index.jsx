@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ inventarios = [], stockBajo = [] }) {
@@ -29,21 +29,21 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
     );
 
     return (
-        <AuthenticatedLayout>
+        <DashboardLayout>
             <Head title="Inventario" />
 
             <div className="space-y-6">
-                <section className="flex flex-col gap-4 rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                <section className="flex flex-col gap-4 rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
                             Control operativo y comercial
                         </p>
 
-                        <h1 className="mt-2 text-3xl font-black text-[#2B221E]">
+                        <h1 className="mt-2 text-3xl font-black text-akin-text">
                             Inventario
                         </h1>
 
-                        <p className="mt-2 max-w-3xl text-sm leading-6 text-[#2B221E]/65">
+                        <p className="mt-2 max-w-3xl text-sm leading-6 text-akin-muted">
                             Supervisa la disponibilidad real de productos, identifica
                             riesgos de quiebre de stock y registra movimientos para
                             mantener trazabilidad comercial y operativa.
@@ -115,38 +115,38 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                     <section className="rounded-3xl border border-orange-200 bg-orange-50 p-6 shadow-sm">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
-                                <h2 className="text-lg font-black text-orange-800">
+                                <h2 className="text-lg font-black text-orange-800 dark:text-orange-300">
                                     Alerta de reposición
                                 </h2>
 
-                                <p className="mt-1 max-w-3xl text-sm leading-6 text-orange-700">
+                                <p className="mt-1 max-w-3xl text-sm leading-6 text-orange-700 dark:text-orange-300">
                                     Hay productos con stock igual o menor al mínimo.
                                     Desde gestión comercial, estos productos deben priorizarse
                                     para reposición, compra, producción o ajuste de publicación.
                                 </p>
                             </div>
 
-                            <span className="inline-flex rounded-full border border-orange-300 bg-white px-4 py-2 text-xs font-black text-orange-700">
+                            <span className="inline-flex rounded-full border border-orange-300 bg-akin-surface px-4 py-2 text-xs font-black text-orange-700">
                                 {listaStockBajo.length} producto(s) en alerta
                             </span>
                         </div>
                     </section>
                 )}
 
-                <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-                    <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 md:flex-row md:items-center md:justify-between">
+                <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+                    <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h2 className="text-lg font-black text-[#2B221E]">
+                            <h2 className="text-lg font-black text-akin-text">
                                 Estado de inventario por producto
                             </h2>
 
-                            <p className="mt-1 text-sm text-[#2B221E]/60">
+                            <p className="mt-1 text-sm text-akin-muted">
                                 Visualiza stock actual, mínimo requerido y nivel operativo
                                 para tomar decisiones de reposición.
                             </p>
                         </div>
 
-                        <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+                        <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
                             {totalProductosInventariados} registros
                         </span>
                     </div>
@@ -155,8 +155,8 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                         <EmptyState />
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-[#eadfd6]">
-                                <thead className="bg-[#FDF6F0]">
+                            <table className="min-w-full divide-y divide-akin-border">
+                                <thead className="bg-akin-bg">
                                     <tr>
                                         <TableHead>Producto</TableHead>
                                         <TableHead>Stock actual</TableHead>
@@ -166,7 +166,7 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                                     </tr>
                                 </thead>
 
-                                <tbody className="divide-y divide-[#eadfd6] bg-white">
+                                <tbody className="divide-y divide-akin-border bg-akin-surface">
                                     {listaInventarios.map((inventario) => {
                                         const stockActual = Number(
                                             inventario.stock_actual_inv || 0,
@@ -182,24 +182,24 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                                         return (
                                             <tr
                                                 key={inventario.cod_inventario}
-                                                className="transition hover:bg-[#FDF6F0]/70"
+                                                className="transition hover:bg-akin-bg/70"
                                             >
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDF6F0] text-sm font-black text-[#D77A61]">
+                                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-akin-bg text-sm font-black text-akin-accent">
                                                             {obtenerInicial(
                                                                 inventario.producto?.nombre_pro,
                                                             )}
                                                         </div>
 
                                                         <div>
-                                                            <p className="font-bold text-[#2B221E]">
+                                                            <p className="font-bold text-akin-text">
                                                                 {inventario.producto
                                                                     ?.nombre_pro ||
                                                                     'Producto sin nombre'}
                                                             </p>
 
-                                                            <p className="text-xs text-[#2B221E]/50">
+                                                            <p className="text-xs text-akin-muted">
                                                                 Código inventario:{' '}
                                                                 {inventario.cod_inventario ||
                                                                     'N/D'}
@@ -209,19 +209,19 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                                                 </td>
 
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <p className="text-2xl font-black text-[#2B221E]">
+                                                    <p className="text-2xl font-black text-akin-text">
                                                         {stockActual}
                                                     </p>
-                                                    <p className="text-xs font-semibold text-[#2B221E]/45">
+                                                    <p className="text-xs font-semibold text-akin-text/45">
                                                         unidades disponibles
                                                     </p>
                                                 </td>
 
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <p className="text-lg font-black text-[#3C473A]">
+                                                    <p className="text-lg font-black text-akin-primary">
                                                         {stockMinimo}
                                                     </p>
-                                                    <p className="text-xs font-semibold text-[#2B221E]/45">
+                                                    <p className="text-xs font-semibold text-akin-text/45">
                                                         mínimo operativo
                                                     </p>
                                                 </td>
@@ -231,7 +231,7 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                                                 </td>
 
                                                 <td className="px-6 py-4">
-                                                    <p className="max-w-md text-sm leading-6 text-[#2B221E]/65">
+                                                    <p className="max-w-md text-sm leading-6 text-akin-muted">
                                                         {obtenerLecturaComercial(
                                                             estado,
                                                             stockActual,
@@ -248,18 +248,18 @@ export default function Index({ inventarios = [], stockBajo = [] }) {
                     )}
                 </section>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
 
 function ActionLink({ href, label, variant = 'outline' }) {
     const styles = {
         primary:
-            'bg-[#D77A61] text-white hover:bg-[#c96f58] border-[#D77A61]',
+            'bg-akin-accent text-white hover:bg-akin-accentSoft border-akin-accent',
         outline:
-            'bg-white text-[#D77A61] hover:bg-[#D77A61] hover:text-white border-[#D77A61]/30',
+            'bg-akin-surface text-akin-accent hover:bg-akin-accent hover:text-white border-akin-accent/30',
         soft:
-            'bg-[#FDF6F0] text-[#3C473A] hover:bg-[#3C473A] hover:text-white border-[#eadfd6]',
+            'bg-akin-bg text-akin-primary hover:bg-akin-primary hover:text-white border-akin-border',
     };
 
     return (
@@ -279,12 +279,12 @@ function MetricCard({ title, value, description, alert = false, danger = false }
     return (
         <div
             className={[
-                'rounded-3xl border bg-white p-5 shadow-sm',
+                'rounded-3xl border bg-akin-surface p-5 shadow-sm dark:shadow-black/20',
                 danger
                     ? 'border-red-200'
                     : alert
                         ? 'border-orange-200'
-                        : 'border-[#eadfd6]',
+                        : 'border-akin-border',
             ].join(' ')}
         >
             <p
@@ -294,17 +294,17 @@ function MetricCard({ title, value, description, alert = false, danger = false }
                         ? 'text-red-600'
                         : alert
                             ? 'text-orange-600'
-                            : 'text-[#D77A61]',
+                            : 'text-akin-accent',
                 ].join(' ')}
             >
                 {title}
             </p>
 
-            <p className="mt-3 text-3xl font-black text-[#2B221E]">
+            <p className="mt-3 text-3xl font-black text-akin-text">
                 {value}
             </p>
 
-            <p className="mt-1 text-sm text-[#2B221E]/60">
+            <p className="mt-1 text-sm text-akin-muted">
                 {description}
             </p>
         </div>
@@ -313,7 +313,7 @@ function MetricCard({ title, value, description, alert = false, danger = false }
 
 function TableHead({ children }) {
     return (
-        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60">
+        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.16em] text-akin-muted">
             {children}
         </th>
     );
@@ -322,7 +322,7 @@ function TableHead({ children }) {
 function StockBadge({ estado }) {
     const styles = {
         sin_stock: 'border-red-200 bg-red-100 text-red-700',
-        bajo: 'border-orange-200 bg-orange-100 text-orange-700',
+        bajo: 'border-orange-200 bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
         saludable: 'border-green-200 bg-green-100 text-green-700',
     };
 
@@ -347,15 +347,15 @@ function StockBadge({ estado }) {
 function EmptyState() {
     return (
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
                 I
             </div>
 
-            <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+            <h3 className="mt-5 text-xl font-black text-akin-text">
                 No hay inventario registrado
             </h3>
 
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+            <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
                 Registra una entrada inicial o un ajuste de stock para comenzar
                 a controlar disponibilidad, reposición y trazabilidad comercial.
             </p>

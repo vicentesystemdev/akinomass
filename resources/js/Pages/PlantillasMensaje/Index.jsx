@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -90,22 +90,22 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
   };
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title="Plantillas de mensaje" />
 
       <div className="space-y-6">
-        <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
                 Comunicación comercial
               </p>
 
-              <h1 className="mt-2 text-3xl font-black text-[#2B221E]">
+              <h1 className="mt-2 text-3xl font-black text-akin-text">
                 Plantillas de mensaje
               </h1>
 
-              <p className="mt-2 max-w-4xl text-sm leading-6 text-[#2B221E]/65">
+              <p className="mt-2 max-w-4xl text-sm leading-6 text-akin-muted">
                 Administra mensajes reutilizables para responder leads,
                 clientes y oportunidades comerciales con mayor rapidez,
                 coherencia y calidad de atención.
@@ -114,7 +114,7 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
 
             <Link
               href={route('plantillas-mensaje.create')}
-              className="inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58] focus:outline-none focus:ring-4 focus:ring-[#D77A61]/20"
+              className="inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft focus:outline-none focus:ring-4 focus:ring-akin-accent/20"
             >
               Nueva plantilla
             </Link>
@@ -156,24 +156,24 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
         </section>
 
         {listaActivas.length > 0 && (
-          <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+          <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D77A61]">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-akin-accent">
                   Sugeridas para uso rápido
                 </p>
 
-                <h2 className="mt-2 text-xl font-black text-[#2B221E]">
+                <h2 className="mt-2 text-xl font-black text-akin-text">
                   Plantillas activas
                 </h2>
 
-                <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+                <p className="mt-1 text-sm leading-6 text-akin-muted">
                   Estas plantillas están disponibles para responder o adaptar
                   mensajes comerciales de forma inmediata.
                 </p>
               </div>
 
-              <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+              <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
                 {listaActivas.length} activa(s)
               </span>
             </div>
@@ -191,10 +191,10 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
           </section>
         )}
 
-        <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
           <div className="grid gap-4 xl:grid-cols-[1fr_240px_220px_160px] xl:items-end">
             <div>
-              <label className="mb-2 block text-sm font-bold text-[#2B221E]">
+              <label className="mb-2 block text-sm font-bold text-akin-text">
                 Buscar plantilla
               </label>
 
@@ -203,19 +203,19 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nombre, tipo o contenido..."
-                className="w-full rounded-2xl border border-[#eadfd6] bg-white px-4 py-3 text-sm text-[#2B221E] shadow-sm outline-none transition placeholder:text-[#2B221E]/35 focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15"
+                className="w-full rounded-2xl border border-akin-border bg-akin-surface px-4 py-3 text-sm text-akin-text shadow-sm outline-none transition placeholder:text-akin-text/35 focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-[#2B221E]">
+              <label className="mb-2 block text-sm font-bold text-akin-text">
                 Tipo de mensaje
               </label>
 
               <select
                 value={tipoFiltro}
                 onChange={(e) => setTipoFiltro(e.target.value)}
-                className="w-full rounded-2xl border border-[#eadfd6] bg-white px-4 py-3 text-sm font-bold text-[#2B221E] shadow-sm outline-none transition focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15"
+                className="w-full rounded-2xl border border-akin-border bg-akin-surface px-4 py-3 text-sm font-bold text-akin-text shadow-sm outline-none transition focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15"
               >
                 <option value="todos">Todos los tipos</option>
 
@@ -228,14 +228,14 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-[#2B221E]">
+              <label className="mb-2 block text-sm font-bold text-akin-text">
                 Estado
               </label>
 
               <select
                 value={estadoFiltro}
                 onChange={(e) => setEstadoFiltro(e.target.value)}
-                className="w-full rounded-2xl border border-[#eadfd6] bg-white px-4 py-3 text-sm font-bold text-[#2B221E] shadow-sm outline-none transition focus:border-[#D77A61] focus:ring-4 focus:ring-[#D77A61]/15"
+                className="w-full rounded-2xl border border-akin-border bg-akin-surface px-4 py-3 text-sm font-bold text-akin-text shadow-sm outline-none transition focus:border-akin-accent focus:ring-4 focus:ring-akin-accent/15"
               >
                 <option value="todos">Todas</option>
                 <option value="activas">Solo activas</option>
@@ -243,32 +243,32 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
               </select>
             </div>
 
-            <div className="rounded-2xl bg-[#FDF6F0] px-4 py-3 text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+            <div className="rounded-2xl bg-akin-bg px-4 py-3 text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                 Mostrando
               </p>
 
-              <p className="mt-1 text-xl font-black text-[#2B221E]">
+              <p className="mt-1 text-xl font-black text-akin-text">
                 {plantillasFiltradas.length}
               </p>
             </div>
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+        <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+          <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-lg font-black text-[#2B221E]">
+              <h2 className="text-lg font-black text-akin-text">
                 Biblioteca de plantillas
               </h2>
 
-              <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+              <p className="mt-1 text-sm leading-6 text-akin-muted">
                 Revisa, copia, activa, desactiva o edita mensajes según su
                 uso comercial.
               </p>
             </div>
 
-            <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+            <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
               {plantillasFiltradas.length} de {totalPlantillas} registros
             </span>
           </div>
@@ -291,8 +291,8 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
               </div>
 
               <div className="hidden overflow-x-auto lg:block">
-                <table className="min-w-full divide-y divide-[#eadfd6]">
-                  <thead className="bg-[#FDF6F0]">
+                <table className="min-w-full divide-y divide-akin-border">
+                  <thead className="bg-akin-bg">
                     <tr>
                       <TableHead>Plantilla</TableHead>
                       <TableHead>Tipo</TableHead>
@@ -303,7 +303,7 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
                     </tr>
                   </thead>
 
-                  <tbody className="divide-y divide-[#eadfd6] bg-white">
+                  <tbody className="divide-y divide-akin-border bg-akin-surface">
                     {plantillasFiltradas.map((plantilla) => (
                       <TemplateTableRow
                         key={plantilla.cod_plantilla_mensaje}
@@ -327,13 +327,13 @@ export default function Index({ plantillas = [], plantillasActivas = [] }) {
           )}
         </section>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 
 function TemplateTableRow({ plantilla, copied, toggling, onCopy, onToggle }) {
   return (
-    <tr className="transition hover:bg-[#FDF6F0]/70">
+    <tr className="transition hover:bg-akin-bg/70">
       <td className="px-6 py-5 align-top">
         <TemplateIdentity plantilla={plantilla} />
       </td>
@@ -351,7 +351,7 @@ function TemplateTableRow({ plantilla, copied, toggling, onCopy, onToggle }) {
       </td>
 
       <td className="px-6 py-5 align-top">
-        <p className="max-w-sm text-sm leading-6 text-[#2B221E]/65">
+        <p className="max-w-sm text-sm leading-6 text-akin-muted">
           {obtenerLecturaComercial(plantilla)}
         </p>
       </td>
@@ -361,7 +361,7 @@ function TemplateTableRow({ plantilla, copied, toggling, onCopy, onToggle }) {
           <button
             type="button"
             onClick={onCopy}
-            className="inline-flex items-center justify-center rounded-xl border border-[#eadfd6] bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A] transition hover:bg-[#3C473A] hover:text-white"
+            className="inline-flex items-center justify-center rounded-xl border border-akin-border bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary transition hover:bg-akin-primary hover:text-white"
           >
             {copied ? 'Copiado' : 'Copiar'}
           </button>
@@ -371,7 +371,7 @@ function TemplateTableRow({ plantilla, copied, toggling, onCopy, onToggle }) {
               'plantillas-mensaje.edit',
               plantilla.cod_plantilla_mensaje,
             )}
-            className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-2 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+            className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-2 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
           >
             Editar
           </Link>
@@ -384,7 +384,7 @@ function TemplateTableRow({ plantilla, copied, toggling, onCopy, onToggle }) {
               'inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-bold transition',
               plantilla.activo_pla
                 ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                : 'bg-[#3C473A] text-white hover:bg-[#2B221E]',
+                : 'bg-akin-primary text-white hover:bg-akin-text',
               toggling ? 'cursor-not-allowed opacity-60' : '',
             ].join(' ')}
           >
@@ -402,7 +402,7 @@ function TemplateTableRow({ plantilla, copied, toggling, onCopy, onToggle }) {
 
 function TemplateMobileCard({ plantilla, copied, toggling, onCopy, onToggle }) {
   return (
-    <article className="rounded-3xl border border-[#eadfd6] bg-white p-5 shadow-sm">
+    <article className="rounded-3xl border border-akin-border bg-akin-surface p-5 shadow-sm dark:shadow-black/20">
       <div className="flex items-start justify-between gap-3">
         <TemplateIdentity plantilla={plantilla} />
         <EstadoBadge active={plantilla.activo_pla} />
@@ -416,7 +416,7 @@ function TemplateMobileCard({ plantilla, copied, toggling, onCopy, onToggle }) {
         <MessagePreview contenido={plantilla.contenido_pla} />
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-[#2B221E]/65">
+      <p className="mt-4 text-sm leading-6 text-akin-muted">
         {obtenerLecturaComercial(plantilla)}
       </p>
 
@@ -424,7 +424,7 @@ function TemplateMobileCard({ plantilla, copied, toggling, onCopy, onToggle }) {
         <button
           type="button"
           onClick={onCopy}
-          className="inline-flex items-center justify-center rounded-xl border border-[#eadfd6] bg-[#FDF6F0] px-4 py-3 text-xs font-bold text-[#3C473A] transition hover:bg-[#3C473A] hover:text-white"
+          className="inline-flex items-center justify-center rounded-xl border border-akin-border bg-akin-bg px-4 py-3 text-xs font-bold text-akin-primary transition hover:bg-akin-primary hover:text-white"
         >
           {copied ? 'Copiado' : 'Copiar'}
         </button>
@@ -434,7 +434,7 @@ function TemplateMobileCard({ plantilla, copied, toggling, onCopy, onToggle }) {
             'plantillas-mensaje.edit',
             plantilla.cod_plantilla_mensaje,
           )}
-          className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-3 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+          className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-3 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
         >
           Editar
         </Link>
@@ -447,7 +447,7 @@ function TemplateMobileCard({ plantilla, copied, toggling, onCopy, onToggle }) {
             'inline-flex items-center justify-center rounded-xl px-4 py-3 text-xs font-bold transition',
             plantilla.activo_pla
               ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              : 'bg-[#3C473A] text-white hover:bg-[#2B221E]',
+              : 'bg-akin-primary text-white hover:bg-akin-text',
             toggling ? 'cursor-not-allowed opacity-60' : '',
           ].join(' ')}
         >
@@ -464,14 +464,14 @@ function TemplateMobileCard({ plantilla, copied, toggling, onCopy, onToggle }) {
 
 function ActiveTemplateCard({ plantilla, copied, onCopy }) {
   return (
-    <article className="rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
+    <article className="rounded-3xl border border-akin-border bg-akin-bg p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-black text-[#2B221E]">
+          <h3 className="font-black text-akin-text">
             {plantilla.nombre_pla || 'Plantilla sin nombre'}
           </h3>
 
-          <p className="mt-1 text-xs font-semibold text-[#2B221E]/50">
+          <p className="mt-1 text-xs font-semibold text-akin-muted">
             {formatearTexto(plantilla.tipo_pla || 'general')}
           </p>
         </div>
@@ -479,14 +479,14 @@ function ActiveTemplateCard({ plantilla, copied, onCopy }) {
         <EstadoBadge active />
       </div>
 
-      <p className="mt-4 line-clamp-4 whitespace-pre-wrap text-sm leading-6 text-[#2B221E]/65">
+      <p className="mt-4 line-clamp-4 whitespace-pre-wrap text-sm leading-6 text-akin-muted">
         {plantilla.contenido_pla || 'Sin contenido'}
       </p>
 
       <button
         type="button"
         onClick={onCopy}
-        className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-4 py-3 text-xs font-bold text-[#3C473A] transition hover:bg-[#3C473A] hover:text-white"
+        className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-akin-surface px-4 py-3 text-xs font-bold text-akin-primary transition hover:bg-akin-primary hover:text-white"
       >
         {copied ? 'Contenido copiado' : 'Copiar mensaje'}
       </button>
@@ -497,20 +497,20 @@ function ActiveTemplateCard({ plantilla, copied, onCopy }) {
 function TemplateIdentity({ plantilla }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#FDF6F0] text-base font-black text-[#D77A61]">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-akin-bg text-base font-black text-akin-accent">
         {obtenerInicial(plantilla.nombre_pla)}
       </div>
 
       <div>
-        <p className="font-black text-[#2B221E]">
+        <p className="font-black text-akin-text">
           {plantilla.nombre_pla || 'Plantilla sin nombre'}
         </p>
 
-        <p className="mt-1 text-xs text-[#2B221E]/50">
+        <p className="mt-1 text-xs text-akin-muted">
           Código: {plantilla.cod_plantilla_mensaje || 'N/D'}
         </p>
 
-        <p className="mt-1 text-xs text-[#2B221E]/40">
+        <p className="mt-1 text-xs text-akin-muted">
           {String(plantilla.contenido_pla || '').length} caracteres
         </p>
       </div>
@@ -520,12 +520,12 @@ function TemplateIdentity({ plantilla }) {
 
 function MessagePreview({ contenido }) {
   return (
-    <div className="max-w-xl rounded-2xl border border-[#eadfd6] bg-[#FDF6F0] p-4">
-      <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#2B221E]/40">
+    <div className="max-w-xl rounded-2xl border border-akin-border bg-akin-bg p-4">
+      <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-akin-muted">
         Contenido
       </p>
 
-      <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-6 text-[#2B221E]/70">
+      <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-6 text-akin-text/70">
         {contenido || 'Sin contenido registrado'}
       </pre>
     </div>
@@ -536,12 +536,12 @@ function MetricCard({ title, value, description, alert = false, danger = false }
   return (
     <div
       className={[
-        'rounded-3xl border bg-white p-5 shadow-sm',
+        'rounded-3xl border bg-akin-surface p-5 shadow-sm dark:shadow-black/20',
         danger
           ? 'border-red-200'
           : alert
             ? 'border-orange-200'
-            : 'border-[#eadfd6]',
+            : 'border-akin-border',
       ].join(' ')}
     >
       <p
@@ -551,15 +551,15 @@ function MetricCard({ title, value, description, alert = false, danger = false }
             ? 'text-red-600'
             : alert
               ? 'text-orange-600'
-              : 'text-[#D77A61]',
+              : 'text-akin-accent',
         ].join(' ')}
       >
         {title}
       </p>
 
-      <p className="mt-3 text-3xl font-black text-[#2B221E]">{value}</p>
+      <p className="mt-3 text-3xl font-black text-akin-text">{value}</p>
 
-      <p className="mt-1 text-sm text-[#2B221E]/60">{description}</p>
+      <p className="mt-1 text-sm text-akin-muted">{description}</p>
     </div>
   );
 }
@@ -568,7 +568,7 @@ function TableHead({ children, align = 'left' }) {
   return (
     <th
       className={[
-        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60',
+        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-akin-muted',
         align === 'right' ? 'text-right' : 'text-left',
       ].join(' ')}
     >
@@ -634,8 +634,8 @@ function Badge({ children, tone = 'earth' }) {
     green: 'border-green-200 bg-green-100 text-green-700',
     blue: 'border-blue-200 bg-blue-100 text-blue-700',
     gray: 'border-gray-200 bg-gray-100 text-gray-700',
-    orange: 'border-orange-200 bg-orange-100 text-orange-700',
-    earth: 'border-[#eadfd6] bg-[#FDF6F0] text-[#3C473A]',
+    orange: 'border-orange-200 bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
+    earth: 'border-akin-border bg-akin-bg text-akin-primary',
   };
 
   return (
@@ -653,17 +653,17 @@ function Badge({ children, tone = 'earth' }) {
 function EmptyState({ hasFilters }) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
         P
       </div>
 
-      <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+      <h3 className="mt-5 text-xl font-black text-akin-text">
         {hasFilters
           ? 'No se encontraron plantillas'
           : 'No hay plantillas registradas'}
       </h3>
 
-      <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+      <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
         {hasFilters
           ? 'Ajusta la búsqueda, el tipo o el estado para ver más resultados.'
           : 'Crea plantillas para responder más rápido a clientes y leads sin improvisar mensajes comerciales.'}
@@ -672,7 +672,7 @@ function EmptyState({ hasFilters }) {
       {!hasFilters && (
         <Link
           href={route('plantillas-mensaje.create')}
-          className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58]"
+          className="mt-6 inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft"
         >
           Crear primera plantilla
         </Link>

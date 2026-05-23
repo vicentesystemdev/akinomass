@@ -1,9 +1,9 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ pagos }) {
   return (
-    <AuthenticatedLayout header="Gestión de Pagos">
+    <DashboardLayout>
       <Head title="Pagos" />
       <div className="p-6">
         <div className="mb-4 flex justify-between">
@@ -22,7 +22,7 @@ export default function Index({ pagos }) {
           </tbody>
         </table>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 

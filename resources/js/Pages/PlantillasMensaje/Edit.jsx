@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -90,22 +90,22 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
   const canSubmit = validationStatus.isValid && hasChanges && !processing;
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title="Editar plantilla" />
 
       <div className="space-y-6">
-        <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+        <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
             Comunicación comercial
           </p>
 
           <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-3xl font-black text-[#2B221E]">
+              <h1 className="text-3xl font-black text-akin-text">
                 Editar plantilla
               </h1>
 
-              <p className="mt-2 max-w-4xl text-sm leading-6 text-[#2B221E]/65">
+              <p className="mt-2 max-w-4xl text-sm leading-6 text-akin-muted">
                 Actualiza una plantilla de mensaje para mantener respuestas
                 comerciales claras, reutilizables y coherentes. Una plantilla
                 bien redactada mejora el seguimiento de leads, clientes y ventas.
@@ -114,7 +114,7 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
 
             <Link
               href={route('plantillas-mensaje.index')}
-              className="inline-flex items-center justify-center rounded-2xl border border-[#D77A61]/30 px-5 py-3 text-sm font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+              className="inline-flex items-center justify-center rounded-2xl border border-akin-accent/30 px-5 py-3 text-sm font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
             >
               Volver al listado
             </Link>
@@ -134,12 +134,12 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
         )}
 
         {!hasChanges && validationStatus.isValid && (
-          <section className="rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5 shadow-sm">
-            <h2 className="text-base font-black text-[#3C473A]">
+          <section className="rounded-3xl border border-akin-border bg-akin-bg p-5 shadow-sm">
+            <h2 className="text-base font-black text-akin-primary">
               Sin cambios pendientes
             </h2>
 
-            <p className="mt-1 text-sm leading-6 text-[#2B221E]/65">
+            <p className="mt-1 text-sm leading-6 text-akin-muted">
               Modifica el nombre, tipo, contenido o estado para habilitar la actualización.
             </p>
           </section>
@@ -199,12 +199,12 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                 </FormField>
               </div>
 
-              <div className="rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+              <div className="rounded-3xl border border-akin-border bg-akin-bg p-5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                   Código interno
                 </p>
 
-                <p className="mt-1 text-sm font-black text-[#2B221E]">
+                <p className="mt-1 text-sm font-black text-akin-text">
                   {plantilla.cod_plantilla_mensaje || 'N/D'}
                 </p>
               </div>
@@ -232,12 +232,12 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                 />
               </FormField>
 
-              <div className="rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
-                <h3 className="text-base font-black text-[#2B221E]">
+              <div className="rounded-3xl border border-akin-border bg-akin-bg p-5">
+                <h3 className="text-base font-black text-akin-text">
                   Variables sugeridas
                 </h3>
 
-                <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+                <p className="mt-1 text-sm leading-6 text-akin-muted">
                   Inserta variables para personalizar el mensaje antes de enviarlo.
                 </p>
 
@@ -247,7 +247,7 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                       key={variable}
                       type="button"
                       onClick={() => insertVariable(variable)}
-                      className="rounded-xl border border-[#eadfd6] bg-white px-3 py-2 text-xs font-black text-[#3C473A] transition hover:bg-[#3C473A] hover:text-white"
+                      className="rounded-xl border border-akin-border bg-akin-surface px-3 py-2 text-xs font-black text-akin-primary transition hover:bg-akin-primary hover:text-white"
                     >
                       {copiedVariable === variable
                         ? 'Insertada'
@@ -262,14 +262,14 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
               title="Estado de uso"
               description="Controla si esta plantilla se mostrará como disponible para uso comercial."
             >
-              <div className="rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
+              <div className="rounded-3xl border border-akin-border bg-akin-bg p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 className="text-base font-black text-[#2B221E]">
+                    <h3 className="text-base font-black text-akin-text">
                       Plantilla activa
                     </h3>
 
-                    <p className="mt-1 max-w-2xl text-sm leading-6 text-[#2B221E]/65">
+                    <p className="mt-1 max-w-2xl text-sm leading-6 text-akin-muted">
                       Si está activa, puede usarse en respuestas rápidas.
                       Si está inactiva, queda guardada como referencia,
                       borrador o plantilla histórica.
@@ -291,7 +291,7 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                   >
                     <span
                       className={[
-                        'inline-block h-6 w-6 transform rounded-full bg-white shadow transition',
+                        'inline-block h-6 w-6 transform rounded-full bg-akin-surface shadow transition',
                         data.activo_pla
                           ? 'translate-x-9'
                           : 'translate-x-1',
@@ -305,7 +305,7 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
 
                   {Boolean(data.activo_pla) !==
                     Boolean(plantilla.activo_pla) && (
-                      <span className="inline-flex rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-black text-orange-700">
+                      <span className="inline-flex rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-black text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300">
                         Estado modificado
                       </span>
                     )}
@@ -314,12 +314,12 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
             </FormCard>
 
             {!data.activo_pla && (
-              <section className="rounded-3xl border border-orange-200 bg-orange-50 p-5 shadow-sm">
-                <h3 className="text-base font-black text-orange-800">
+              <section className="rounded-3xl border border-orange-200 bg-orange-50 p-5 dark:border-orange-500/30 dark:bg-orange-500/10 shadow-sm">
+                <h3 className="text-base font-black text-orange-800 dark:text-orange-300">
                   Plantilla inactiva
                 </h3>
 
-                <p className="mt-1 text-sm leading-6 text-orange-700">
+                <p className="mt-1 text-sm leading-6 text-orange-700 dark:text-orange-300">
                   Al dejar esta plantilla inactiva, se conserva el contenido,
                   pero no debería usarse como mensaje sugerido. Es útil para
                   plantillas antiguas, mensajes en revisión o respuestas que ya
@@ -342,21 +342,21 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
           </section>
 
           <aside className="space-y-6">
-            <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D77A61]">
+            <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-akin-accent">
                 Vista previa
               </p>
 
-              <h2 className="mt-2 text-xl font-black text-[#2B221E]">
+              <h2 className="mt-2 text-xl font-black text-akin-text">
                 Mensaje comercial
               </h2>
 
-              <div className="mt-6 rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
-                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-3xl font-black text-[#D77A61] shadow-sm">
+              <div className="mt-6 rounded-3xl border border-akin-border bg-akin-bg p-5">
+                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-akin-surface text-3xl font-black text-akin-accent shadow-sm">
                   {obtenerInicial(data.nombre_pla)}
                 </div>
 
-                <h3 className="mt-5 text-lg font-black text-[#2B221E]">
+                <h3 className="mt-5 text-lg font-black text-akin-text">
                   {data.nombre_pla || 'Nombre de la plantilla'}
                 </h3>
 
@@ -365,35 +365,35 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                   <EstadoBadge active={data.activo_pla} />
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-white p-4">
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+                <div className="mt-5 rounded-2xl bg-akin-surface p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                     Contenido
                   </p>
 
-                  <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-6 text-[#2B221E]/70">
+                  <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-6 text-akin-text/70">
                     {data.contenido_pla ||
                       'Aquí aparecerá el mensaje de la plantilla.'}
                   </pre>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-white p-4">
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+                <div className="mt-5 rounded-2xl bg-akin-surface p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                     Lectura comercial
                   </p>
 
-                  <p className="mt-2 text-sm leading-6 text-[#2B221E]/65">
+                  <p className="mt-2 text-sm leading-6 text-akin-muted">
                     {obtenerLecturaComercial(data)}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-black text-[#2B221E]">
+            <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+              <h3 className="text-lg font-black text-akin-text">
                 Control de actualización
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-[#2B221E]/60">
+              <p className="mt-2 text-sm leading-6 text-akin-muted">
                 El botón se habilita solo si hay cambios y la plantilla cumple
                 todas las validaciones.
               </p>
@@ -431,12 +431,12 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-black text-[#2B221E]">
+            <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+              <h3 className="text-lg font-black text-akin-text">
                 Acciones
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-[#2B221E]/60">
+              <p className="mt-2 text-sm leading-6 text-akin-muted">
                 Guarda solo si el mensaje actualizado sigue siendo claro,
                 reutilizable y alineado al proceso comercial.
               </p>
@@ -448,7 +448,7 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                   className={[
                     'w-full rounded-2xl px-5 py-3 text-sm font-bold shadow-sm transition',
                     canSubmit
-                      ? 'bg-[#D77A61] text-white hover:bg-[#c96f58]'
+                      ? 'bg-akin-accent text-white hover:bg-akin-accentSoft'
                       : 'cursor-not-allowed bg-gray-300 text-gray-500',
                   ].join(' ')}
                 >
@@ -462,20 +462,20 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
                 </button>
 
                 {!validationStatus.isValid && (
-                  <p className="text-center text-xs font-semibold text-[#2B221E]/50">
+                  <p className="text-center text-xs font-semibold text-akin-muted">
                     Completa nombre, tipo y contenido mínimo.
                   </p>
                 )}
 
                 {!hasChanges && validationStatus.isValid && (
-                  <p className="text-center text-xs font-semibold text-[#2B221E]/50">
+                  <p className="text-center text-xs font-semibold text-akin-muted">
                     Modifica al menos un dato para habilitar la actualización.
                   </p>
                 )}
 
                 <Link
                   href={route('plantillas-mensaje.index')}
-                  className="flex w-full items-center justify-center rounded-2xl border border-[#eadfd6] px-5 py-3 text-sm font-bold text-[#2B221E] transition hover:border-[#D77A61]/40 hover:text-[#D77A61]"
+                  className="flex w-full items-center justify-center rounded-2xl border border-akin-border px-5 py-3 text-sm font-bold text-akin-text transition hover:border-akin-accent/40 hover:text-akin-accent"
                 >
                   Cancelar
                 </Link>
@@ -484,7 +484,7 @@ export default function Edit({ plantilla = {}, tipos = [] }) {
           </aside>
         </form>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 
@@ -535,14 +535,14 @@ function validarPlantilla(data, tipos) {
 
 function FormCard({ title, description, children }) {
   return (
-    <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
       <div className="mb-6">
-        <h2 className="text-xl font-black text-[#2B221E]">
+        <h2 className="text-xl font-black text-akin-text">
           {title}
         </h2>
 
         {description && (
-          <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+          <p className="mt-1 text-sm leading-6 text-akin-muted">
             {description}
           </p>
         )}
@@ -556,9 +556,9 @@ function FormCard({ title, description, children }) {
 function FormField({ label, error, helper, required = false, children }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-bold text-[#2B221E]">
+      <span className="mb-2 block text-sm font-bold text-akin-text">
         {label}
-        {required && <span className="ml-1 text-[#D77A61]">*</span>}
+        {required && <span className="ml-1 text-akin-accent">*</span>}
       </span>
 
       {children}
@@ -569,7 +569,7 @@ function FormField({ label, error, helper, required = false, children }) {
         </p>
       ) : (
         helper && (
-          <p className="mt-2 text-xs font-medium text-[#2B221E]/45">
+          <p className="mt-2 text-xs font-medium text-akin-text/45">
             {helper}
           </p>
         )
@@ -586,7 +586,7 @@ function ValidationItem({ valid, label }) {
           'flex h-6 w-6 items-center justify-center rounded-full text-xs font-black',
           valid
             ? 'bg-green-100 text-green-700'
-            : 'bg-orange-100 text-orange-700',
+            : 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
         ].join(' ')}
       >
         {valid ? '✓' : '!'}
@@ -595,7 +595,7 @@ function ValidationItem({ valid, label }) {
       <span
         className={[
           'text-sm font-semibold',
-          valid ? 'text-[#2B221E]' : 'text-[#2B221E]/55',
+          valid ? 'text-akin-text' : 'text-akin-text/55',
         ].join(' ')}
       >
         {label}
@@ -645,8 +645,8 @@ function Badge({ children, tone = 'earth' }) {
     green: 'border-green-200 bg-green-100 text-green-700',
     blue: 'border-blue-200 bg-blue-100 text-blue-700',
     gray: 'border-gray-200 bg-gray-100 text-gray-700',
-    orange: 'border-orange-200 bg-orange-100 text-orange-700',
-    earth: 'border-[#eadfd6] bg-[#FDF6F0] text-[#3C473A]',
+    orange: 'border-orange-200 bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
+    earth: 'border-akin-border bg-akin-bg text-akin-primary',
   };
 
   return (
@@ -663,11 +663,11 @@ function Badge({ children, tone = 'earth' }) {
 
 function inputClass(error) {
   return [
-    'w-full rounded-2xl border bg-white px-4 py-3 text-sm text-[#2B221E] shadow-sm outline-none transition',
-    'placeholder:text-[#2B221E]/35 focus:ring-4',
+    'w-full rounded-2xl border bg-akin-surface px-4 py-3 text-sm text-akin-text shadow-sm outline-none transition',
+    'placeholder:text-akin-text/35 focus:ring-4',
     error
       ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-      : 'border-[#eadfd6] focus:border-[#D77A61] focus:ring-[#D77A61]/15',
+      : 'border-akin-border focus:border-akin-accent focus:ring-akin-accent/15',
   ].join(' ');
 }
 

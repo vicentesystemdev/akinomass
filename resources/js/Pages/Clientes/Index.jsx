@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ clientes = [] }) {
@@ -25,21 +25,21 @@ export default function Index({ clientes = [] }) {
     ).length;
 
     return (
-        <AuthenticatedLayout>
+        <DashboardLayout>
             <Head title="Clientes" />
 
             <div className="space-y-6">
-                <section className="flex flex-col gap-4 rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                <section className="flex flex-col gap-4 rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
                             CRM comercial
                         </p>
 
-                        <h1 className="mt-2 text-3xl font-black text-[#2B221E]">
+                        <h1 className="mt-2 text-3xl font-black text-akin-text">
                             Clientes
                         </h1>
 
-                        <p className="mt-2 max-w-3xl text-sm leading-6 text-[#2B221E]/65">
+                        <p className="mt-2 max-w-3xl text-sm leading-6 text-akin-muted">
                             Administra clientes registrados, canal de adquisición,
                             estado comercial y flujo de atención. Esta vista permite
                             identificar clientes activos, oportunidades de seguimiento y
@@ -49,7 +49,7 @@ export default function Index({ clientes = [] }) {
 
                     <Link
                         href={route('clientes.create')}
-                        className="inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58] focus:outline-none focus:ring-4 focus:ring-[#D77A61]/20"
+                        className="inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft focus:outline-none focus:ring-4 focus:ring-akin-accent/20"
                     >
                         Nuevo cliente
                     </Link>
@@ -90,12 +90,12 @@ export default function Index({ clientes = [] }) {
                 </section>
 
                 {clientesSinCanal > 0 && (
-                    <section className="rounded-3xl border border-orange-200 bg-orange-50 p-5 shadow-sm">
-                        <h2 className="text-base font-black text-orange-800">
+                    <section className="rounded-3xl border border-orange-200 bg-orange-50 p-5 dark:border-orange-500/30 dark:bg-orange-500/10 shadow-sm">
+                        <h2 className="text-base font-black text-orange-800 dark:text-orange-300">
                             Datos comerciales incompletos
                         </h2>
 
-                        <p className="mt-1 text-sm leading-6 text-orange-700">
+                        <p className="mt-1 text-sm leading-6 text-orange-700 dark:text-orange-300">
                             Hay clientes sin canal de venta registrado. Completar este dato
                             ayuda a medir qué medios atraen más clientes y dónde conviene
                             invertir esfuerzo comercial.
@@ -103,20 +103,20 @@ export default function Index({ clientes = [] }) {
                     </section>
                 )}
 
-                <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-                    <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 md:flex-row md:items-center md:justify-between">
+                <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+                    <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h2 className="text-lg font-black text-[#2B221E]">
+                            <h2 className="text-lg font-black text-akin-text">
                                 Listado de clientes
                             </h2>
 
-                            <p className="mt-1 text-sm text-[#2B221E]/60">
+                            <p className="mt-1 text-sm text-akin-muted">
                                 Consulta datos comerciales clave y edita registros cuando
                                 falte información de seguimiento.
                             </p>
                         </div>
 
-                        <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+                        <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
                             {totalClientes} registros
                         </span>
                     </div>
@@ -125,8 +125,8 @@ export default function Index({ clientes = [] }) {
                         <EmptyState />
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-[#eadfd6]">
-                                <thead className="bg-[#FDF6F0]">
+                            <table className="min-w-full divide-y divide-akin-border">
+                                <thead className="bg-akin-bg">
                                     <tr>
                                         <TableHead>Cliente</TableHead>
                                         <TableHead>Estado</TableHead>
@@ -137,7 +137,7 @@ export default function Index({ clientes = [] }) {
                                     </tr>
                                 </thead>
 
-                                <tbody className="divide-y divide-[#eadfd6] bg-white">
+                                <tbody className="divide-y divide-akin-border bg-akin-surface">
                                     {listaClientes.map((cliente) => {
                                         const estado = normalizarEstado(cliente.estado_cli);
                                         const canal = cliente.canal_venta?.nombre_can;
@@ -147,21 +147,21 @@ export default function Index({ clientes = [] }) {
                                         return (
                                             <tr
                                                 key={cliente.cod_cliente}
-                                                className="transition hover:bg-[#FDF6F0]/70"
+                                                className="transition hover:bg-akin-bg/70"
                                             >
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDF6F0] text-sm font-black text-[#D77A61]">
+                                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-akin-bg text-sm font-black text-akin-accent">
                                                             {obtenerInicial(cliente.nombre_cli)}
                                                         </div>
 
                                                         <div>
-                                                            <p className="font-bold text-[#2B221E]">
+                                                            <p className="font-bold text-akin-text">
                                                                 {cliente.nombre_cli ||
                                                                     'Cliente sin nombre'}
                                                             </p>
 
-                                                            <p className="text-xs text-[#2B221E]/50">
+                                                            <p className="text-xs text-akin-muted">
                                                                 Código:{' '}
                                                                 {cliente.cod_cliente || 'N/D'}
                                                             </p>
@@ -178,8 +178,8 @@ export default function Index({ clientes = [] }) {
                                                         className={[
                                                             'inline-flex rounded-full border px-3 py-1 text-xs font-black',
                                                             canal
-                                                                ? 'border-[#eadfd6] bg-[#FDF6F0] text-[#3C473A]'
-                                                                : 'border-orange-200 bg-orange-100 text-orange-700',
+                                                                ? 'border-akin-border bg-akin-bg text-akin-primary'
+                                                                : 'border-orange-200 bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
                                                         ].join(' ')}
                                                     >
                                                         {canal || 'Sin canal'}
@@ -200,7 +200,7 @@ export default function Index({ clientes = [] }) {
                                                 </td>
 
                                                 <td className="px-6 py-4">
-                                                    <p className="max-w-md text-sm leading-6 text-[#2B221E]/65">
+                                                    <p className="max-w-md text-sm leading-6 text-akin-muted">
                                                         {obtenerLecturaComercial({
                                                             estado,
                                                             canal,
@@ -215,7 +215,7 @@ export default function Index({ clientes = [] }) {
                                                             'clientes.edit',
                                                             cliente.cod_cliente,
                                                         )}
-                                                        className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-2 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+                                                        className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-2 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
                                                     >
                                                         Editar
                                                     </Link>
@@ -229,7 +229,7 @@ export default function Index({ clientes = [] }) {
                     )}
                 </section>
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }
 
@@ -237,12 +237,12 @@ function MetricCard({ title, value, description, alert = false, danger = false }
     return (
         <div
             className={[
-                'rounded-3xl border bg-white p-5 shadow-sm',
+                'rounded-3xl border bg-akin-surface p-5 shadow-sm dark:shadow-black/20',
                 danger
                     ? 'border-red-200'
                     : alert
                         ? 'border-orange-200'
-                        : 'border-[#eadfd6]',
+                        : 'border-akin-border',
             ].join(' ')}
         >
             <p
@@ -252,17 +252,17 @@ function MetricCard({ title, value, description, alert = false, danger = false }
                         ? 'text-red-600'
                         : alert
                             ? 'text-orange-600'
-                            : 'text-[#D77A61]',
+                            : 'text-akin-accent',
                 ].join(' ')}
             >
                 {title}
             </p>
 
-            <p className="mt-3 text-3xl font-black text-[#2B221E]">
+            <p className="mt-3 text-3xl font-black text-akin-text">
                 {value}
             </p>
 
-            <p className="mt-1 text-sm text-[#2B221E]/60">
+            <p className="mt-1 text-sm text-akin-muted">
                 {description}
             </p>
         </div>
@@ -273,7 +273,7 @@ function TableHead({ children, align = 'left' }) {
     return (
         <th
             className={[
-                'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60',
+                'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-akin-muted',
                 align === 'right' ? 'text-right' : 'text-left',
             ].join(' ')}
         >
@@ -285,7 +285,7 @@ function TableHead({ children, align = 'left' }) {
 function EstadoBadge({ estado, original }) {
     if (estado.includes('activo')) {
         return (
-            <span className="inline-flex rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-black text-green-700">
+            <span className="inline-flex rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-black text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300">
                 {formatearTexto(original || 'Activo')}
             </span>
         );
@@ -293,7 +293,7 @@ function EstadoBadge({ estado, original }) {
 
     if (estado.includes('inactivo')) {
         return (
-            <span className="inline-flex rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-black text-gray-700">
+            <span className="inline-flex rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-black text-gray-700 dark:border-gray-500/30 dark:bg-gray-500/10 dark:text-gray-300">
                 {formatearTexto(original || 'Inactivo')}
             </span>
         );
@@ -301,14 +301,14 @@ function EstadoBadge({ estado, original }) {
 
     if (estado.includes('potencial') || estado.includes('prospecto')) {
         return (
-            <span className="inline-flex rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-black text-blue-700">
+            <span className="inline-flex rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-black text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
                 {formatearTexto(original || 'Potencial')}
             </span>
         );
     }
 
     return (
-        <span className="inline-flex rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-black text-orange-700">
+        <span className="inline-flex rounded-full border border-orange-200 bg-orange-100 px-3 py-1 text-xs font-black text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300">
             {formatearTexto(original || 'Sin estado')}
         </span>
     );
@@ -317,22 +317,22 @@ function EstadoBadge({ estado, original }) {
 function EmptyState() {
     return (
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
                 C
             </div>
 
-            <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+            <h3 className="mt-5 text-xl font-black text-akin-text">
                 No hay clientes registrados
             </h3>
 
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+            <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
                 Cuando registres clientes, aparecerán aquí con su canal,
                 estado y flujo comercial para seguimiento.
             </p>
 
             <Link
                 href={route('clientes.create')}
-                className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58]"
+                className="mt-6 inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft"
             >
                 Crear primer cliente
             </Link>

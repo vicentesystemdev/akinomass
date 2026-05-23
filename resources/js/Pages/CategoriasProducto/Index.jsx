@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ categorias = [] }) {
@@ -15,21 +15,21 @@ export default function Index({ categorias = [] }) {
   const categoriasInactivas = totalCategorias - categoriasActivas;
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title="Categorías de producto" />
 
       <div className="space-y-6">
-        <section className="flex flex-col gap-4 rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <section className="flex flex-col gap-4 rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
               Organización del catálogo
             </p>
 
-            <h1 className="mt-2 text-3xl font-black text-[#2B221E]">
+            <h1 className="mt-2 text-3xl font-black text-akin-text">
               Categorías de producto
             </h1>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#2B221E]/65">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-akin-muted">
               Administra las categorías comerciales que ordenan el catálogo
               de prendas. Una buena categorización mejora la búsqueda,
               presentación de productos y control del inventario.
@@ -38,7 +38,7 @@ export default function Index({ categorias = [] }) {
 
           <Link
             href={route('categorias-producto.create')}
-            className="inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58] focus:outline-none focus:ring-4 focus:ring-[#D77A61]/20"
+            className="inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft focus:outline-none focus:ring-4 focus:ring-akin-accent/20"
           >
             Nueva categoría
           </Link>
@@ -64,19 +64,19 @@ export default function Index({ categorias = [] }) {
           />
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-[#eadfd6] bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-[#eadfd6] px-6 py-5 md:flex-row md:items-center md:justify-between">
+        <section className="overflow-hidden rounded-3xl border border-akin-border bg-akin-surface shadow-sm dark:shadow-black/20">
+          <div className="flex flex-col gap-3 border-b border-akin-border px-6 py-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-lg font-black text-[#2B221E]">
+              <h2 className="text-lg font-black text-akin-text">
                 Listado de categorías
               </h2>
 
-              <p className="mt-1 text-sm text-[#2B221E]/60">
+              <p className="mt-1 text-sm text-akin-muted">
                 Revisa qué categorías están activas para organizar productos.
               </p>
             </div>
 
-            <span className="rounded-full bg-[#FDF6F0] px-4 py-2 text-xs font-bold text-[#3C473A]">
+            <span className="rounded-full bg-akin-bg px-4 py-2 text-xs font-bold text-akin-primary">
               {totalCategorias} registros
             </span>
           </div>
@@ -85,8 +85,8 @@ export default function Index({ categorias = [] }) {
             <EmptyState />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-[#eadfd6]">
-                <thead className="bg-[#FDF6F0]">
+              <table className="min-w-full divide-y divide-akin-border">
+                <thead className="bg-akin-bg">
                   <tr>
                     <TableHead>Categoría</TableHead>
                     <TableHead>Estado comercial</TableHead>
@@ -95,24 +95,24 @@ export default function Index({ categorias = [] }) {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-[#eadfd6] bg-white">
+                <tbody className="divide-y divide-akin-border bg-akin-surface">
                   {listaCategorias.map((categoria) => (
                     <tr
                       key={categoria.cod_categoria_producto}
-                      className="transition hover:bg-[#FDF6F0]/70"
+                      className="transition hover:bg-akin-bg/70"
                     >
                       <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDF6F0] text-sm font-black text-[#D77A61]">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-akin-bg text-sm font-black text-akin-accent">
                             {obtenerInicial(categoria.nombre_cat)}
                           </div>
 
                           <div>
-                            <p className="font-bold text-[#2B221E]">
+                            <p className="font-bold text-akin-text">
                               {categoria.nombre_cat || 'Sin nombre'}
                             </p>
 
-                            <p className="text-xs text-[#2B221E]/50">
+                            <p className="text-xs text-akin-muted">
                               Código:{' '}
                               {categoria.cod_categoria_producto ||
                                 'N/D'}
@@ -126,7 +126,7 @@ export default function Index({ categorias = [] }) {
                       </td>
 
                       <td className="px-6 py-4">
-                        <p className="max-w-md text-sm leading-6 text-[#2B221E]/65">
+                        <p className="max-w-md text-sm leading-6 text-akin-muted">
                           {categoria.activo_cat
                             ? 'Puede utilizarse para clasificar productos visibles dentro del catálogo.'
                             : 'No debería asignarse a nuevos productos hasta ser reactivada.'}
@@ -139,7 +139,7 @@ export default function Index({ categorias = [] }) {
                             'categorias-producto.edit',
                             categoria.cod_categoria_producto,
                           )}
-                          className="inline-flex items-center justify-center rounded-xl border border-[#D77A61]/30 px-4 py-2 text-xs font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+                          className="inline-flex items-center justify-center rounded-xl border border-akin-accent/30 px-4 py-2 text-xs font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
                         >
                           Editar
                         </Link>
@@ -152,22 +152,22 @@ export default function Index({ categorias = [] }) {
           )}
         </section>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 
 function MetricCard({ title, value, description }) {
   return (
-    <div className="rounded-3xl border border-[#eadfd6] bg-white p-5 shadow-sm">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D77A61]">
+    <div className="rounded-3xl border border-akin-border bg-akin-surface p-5 shadow-sm dark:shadow-black/20">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-akin-accent">
         {title}
       </p>
 
-      <p className="mt-3 text-3xl font-black text-[#2B221E]">
+      <p className="mt-3 text-3xl font-black text-akin-text">
         {value}
       </p>
 
-      <p className="mt-1 text-sm text-[#2B221E]/60">
+      <p className="mt-1 text-sm text-akin-muted">
         {description}
       </p>
     </div>
@@ -178,7 +178,7 @@ function TableHead({ children, align = 'left' }) {
   return (
     <th
       className={[
-        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#2B221E]/60',
+        'px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-akin-muted',
         align === 'right' ? 'text-right' : 'text-left',
       ].join(' ')}
     >
@@ -190,14 +190,14 @@ function TableHead({ children, align = 'left' }) {
 function StatusBadge({ active }) {
   if (active) {
     return (
-      <span className="inline-flex rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-black text-green-700">
+      <span className="inline-flex rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-black text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300">
         Activa
       </span>
     );
   }
 
   return (
-    <span className="inline-flex rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-black text-gray-700">
+    <span className="inline-flex rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-black text-gray-700 dark:border-gray-500/30 dark:bg-gray-500/10 dark:text-gray-300">
       Inactiva
     </span>
   );
@@ -206,22 +206,22 @@ function StatusBadge({ active }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FDF6F0] text-2xl font-black text-[#D77A61]">
+      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-akin-bg text-2xl font-black text-akin-accent">
         C
       </div>
 
-      <h3 className="mt-5 text-xl font-black text-[#2B221E]">
+      <h3 className="mt-5 text-xl font-black text-akin-text">
         No hay categorías registradas
       </h3>
 
-      <p className="mt-2 max-w-md text-sm leading-6 text-[#2B221E]/60">
+      <p className="mt-2 max-w-md text-sm leading-6 text-akin-muted">
         Crea categorías para ordenar productos por tipo, línea comercial,
         temporada o estilo de prenda.
       </p>
 
       <Link
         href={route('categorias-producto.create')}
-        className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#D77A61] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#c96f58]"
+        className="mt-6 inline-flex items-center justify-center rounded-2xl bg-akin-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-akin-accentSoft"
       >
         Crear primera categoría
       </Link>

@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -87,22 +87,22 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
   const canSubmit = validationStatus.isValid && hasChanges && !processing;
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title="Editar producto" />
 
       <div className="space-y-6">
-        <section className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D77A61]">
+        <section className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-akin-accent">
             Gestión de catálogo
           </p>
 
           <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-3xl font-black text-[#2B221E]">
+              <h1 className="text-3xl font-black text-akin-text">
                 Editar producto
               </h1>
 
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-[#2B221E]/65">
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-akin-muted">
                 Actualiza la información comercial del producto. Mantén precios,
                 categoría, SKU y estado coherentes para evitar errores en ventas,
                 inventario y seguimiento comercial.
@@ -111,7 +111,7 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
 
             <Link
               href={route('productos.index')}
-              className="inline-flex items-center justify-center rounded-2xl border border-[#D77A61]/30 px-5 py-3 text-sm font-bold text-[#D77A61] transition hover:bg-[#D77A61] hover:text-white"
+              className="inline-flex items-center justify-center rounded-2xl border border-akin-accent/30 px-5 py-3 text-sm font-bold text-akin-accent transition hover:bg-akin-accent hover:text-white"
             >
               Volver al listado
             </Link>
@@ -208,7 +208,7 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
                   required
                 >
                   <div className="relative">
-                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[#2B221E]/40">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-akin-muted">
                       Bs
                     </span>
 
@@ -232,7 +232,7 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
                   helper="Opcional. No debe superar el precio de venta."
                 >
                   <div className="relative">
-                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[#2B221E]/40">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-akin-muted">
                       Bs
                     </span>
 
@@ -309,47 +309,47 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
           </section>
 
           <aside className="space-y-6">
-            <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D77A61]">
+            <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-akin-accent">
                 Producto actual
               </p>
 
-              <h2 className="mt-2 text-xl font-black text-[#2B221E]">
+              <h2 className="mt-2 text-xl font-black text-akin-text">
                 Vista comercial
               </h2>
 
-              <div className="mt-6 rounded-3xl border border-[#eadfd6] bg-[#FDF6F0] p-5">
-                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-3xl font-black text-[#D77A61] shadow-sm">
+              <div className="mt-6 rounded-3xl border border-akin-border bg-akin-bg p-5">
+                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-akin-surface text-3xl font-black text-akin-accent shadow-sm">
                   {obtenerInicial(data.nombre_pro)}
                 </div>
 
-                <h3 className="mt-5 text-lg font-black text-[#2B221E]">
+                <h3 className="mt-5 text-lg font-black text-akin-text">
                   {data.nombre_pro || 'Nombre del producto'}
                 </h3>
 
-                <p className="mt-1 text-sm text-[#2B221E]/60">
+                <p className="mt-1 text-sm text-akin-muted">
                   {selectedCategoriaName}
                 </p>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#3C473A]">
+                  <span className="rounded-full bg-akin-surface px-3 py-1 text-xs font-bold text-akin-primary">
                     {data.sku_pro || 'Sin SKU'}
                   </span>
 
                   <StatusBadge estado={data.estado_pro} />
                 </div>
 
-                <div className="mt-5 border-t border-[#eadfd6] pt-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#2B221E]/45">
+                <div className="mt-5 border-t border-akin-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-akin-text/45">
                     Precio de venta
                   </p>
 
-                  <p className="mt-1 text-2xl font-black text-[#2B221E]">
+                  <p className="mt-1 text-2xl font-black text-akin-text">
                     Bs {data.precio_venta_pro || '0.00'}
                   </p>
 
                   {data.precio_costo_pro && (
-                    <p className="mt-1 text-sm text-[#2B221E]/55">
+                    <p className="mt-1 text-sm text-akin-text/55">
                       Costo registrado: Bs {data.precio_costo_pro}
                     </p>
                   )}
@@ -357,8 +357,8 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-black text-[#2B221E]">
+            <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+              <h3 className="text-lg font-black text-akin-text">
                 Control de actualización
               </h3>
 
@@ -390,12 +390,12 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-black text-[#2B221E]">
+            <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
+              <h3 className="text-lg font-black text-akin-text">
                 Acciones
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-[#2B221E]/60">
+              <p className="mt-2 text-sm leading-6 text-akin-muted">
                 Solo se habilita la actualización cuando existen cambios y
                 todos los datos son válidos.
               </p>
@@ -407,7 +407,7 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
                   className={[
                     'w-full rounded-2xl px-5 py-3 text-sm font-bold shadow-sm transition',
                     canSubmit
-                      ? 'bg-[#D77A61] text-white hover:bg-[#c96f58]'
+                      ? 'bg-akin-accent text-white hover:bg-akin-accentSoft'
                       : 'cursor-not-allowed bg-gray-300 text-gray-500',
                   ].join(' ')}
                 >
@@ -421,20 +421,20 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
                 </button>
 
                 {!validationStatus.isValid && (
-                  <p className="text-center text-xs font-semibold text-[#2B221E]/50">
+                  <p className="text-center text-xs font-semibold text-akin-muted">
                     Completa categoría, nombre válido y precio de venta mayor a 0.
                   </p>
                 )}
 
                 {!hasChanges && validationStatus.isValid && (
-                  <p className="text-center text-xs font-semibold text-[#2B221E]/50">
+                  <p className="text-center text-xs font-semibold text-akin-muted">
                     Modifica al menos un dato para habilitar la actualización.
                   </p>
                 )}
 
                 <Link
                   href={route('productos.index')}
-                  className="flex w-full items-center justify-center rounded-2xl border border-[#eadfd6] px-5 py-3 text-sm font-bold text-[#2B221E] transition hover:border-[#D77A61]/40 hover:text-[#D77A61]"
+                  className="flex w-full items-center justify-center rounded-2xl border border-akin-border px-5 py-3 text-sm font-bold text-akin-text transition hover:border-akin-accent/40 hover:text-akin-accent"
                 >
                   Cancelar
                 </Link>
@@ -443,7 +443,7 @@ export default function Edit({ producto, categorias = [], estados = [] }) {
           </aside>
         </form>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 
@@ -533,11 +533,11 @@ function StatusBadge({ estado }) {
   const estadoNormalizado = String(estado || '').trim().toLowerCase();
 
   const estilos = {
-    activo: 'bg-green-100 text-green-700 border-green-200',
-    inactivo: 'bg-gray-100 text-gray-700 border-gray-200',
-    agotado: 'bg-red-100 text-red-700 border-red-200',
-    descontinuado: 'bg-gray-100 text-gray-700 border-gray-200',
-    pendiente: 'bg-orange-100 text-orange-700 border-orange-200',
+    activo: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/30',
+    inactivo: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/30',
+    agotado: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/30',
+    descontinuado: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/30',
+    pendiente: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300 border-orange-200',
   };
 
   const clase =
@@ -564,7 +564,7 @@ function ValidationItem({ valid, label }) {
           'flex h-6 w-6 items-center justify-center rounded-full text-xs font-black',
           valid
             ? 'bg-green-100 text-green-700'
-            : 'bg-orange-100 text-orange-700',
+            : 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
         ].join(' ')}
       >
         {valid ? '✓' : '!'}
@@ -573,7 +573,7 @@ function ValidationItem({ valid, label }) {
       <span
         className={[
           'text-sm font-semibold',
-          valid ? 'text-[#2B221E]' : 'text-[#2B221E]/55',
+          valid ? 'text-akin-text' : 'text-akin-text/55',
         ].join(' ')}
       >
         {label}
@@ -584,14 +584,14 @@ function ValidationItem({ valid, label }) {
 
 function FormCard({ title, description, children }) {
   return (
-    <div className="rounded-3xl border border-[#eadfd6] bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-akin-border bg-akin-surface p-6 shadow-sm">
       <div className="mb-6">
-        <h2 className="text-xl font-black text-[#2B221E]">
+        <h2 className="text-xl font-black text-akin-text">
           {title}
         </h2>
 
         {description && (
-          <p className="mt-1 text-sm leading-6 text-[#2B221E]/60">
+          <p className="mt-1 text-sm leading-6 text-akin-muted">
             {description}
           </p>
         )}
@@ -605,9 +605,9 @@ function FormCard({ title, description, children }) {
 function FormField({ label, error, helper, required = false, children }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-bold text-[#2B221E]">
+      <span className="mb-2 block text-sm font-bold text-akin-text">
         {label}
-        {required && <span className="ml-1 text-[#D77A61]">*</span>}
+        {required && <span className="ml-1 text-akin-accent">*</span>}
       </span>
 
       {children}
@@ -618,7 +618,7 @@ function FormField({ label, error, helper, required = false, children }) {
         </p>
       ) : (
         helper && (
-          <p className="mt-2 text-xs font-medium text-[#2B221E]/45">
+          <p className="mt-2 text-xs font-medium text-akin-text/45">
             {helper}
           </p>
         )
@@ -629,11 +629,11 @@ function FormField({ label, error, helper, required = false, children }) {
 
 function inputClass(error) {
   return [
-    'w-full rounded-2xl border bg-white px-4 py-3 text-sm text-[#2B221E] shadow-sm outline-none transition',
-    'placeholder:text-[#2B221E]/35 focus:ring-4',
+    'w-full rounded-2xl border bg-akin-surface px-4 py-3 text-sm text-akin-text shadow-sm outline-none transition',
+    'placeholder:text-akin-text/35 focus:ring-4',
     error
       ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-      : 'border-[#eadfd6] focus:border-[#D77A61] focus:ring-[#D77A61]/15',
+      : 'border-akin-border focus:border-akin-accent focus:ring-akin-accent/15',
   ].join(' ');
 }
 

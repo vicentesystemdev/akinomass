@@ -1,13 +1,40 @@
 import ThemeToggle from '@/Components/UI/ThemeToggle';
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Header({ user, onMenuClick, safeRoute }) {
     const [open, setOpen] = useState(false);
+    const dropdownRef = useRef(null);
     const initials = getInitials(user?.name || user?.email || 'A');
 
+    // Close dropdown on click outside
+    useEffect(() => {
+        if (!open) return;
+
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [open]);
+
+    // Close dropdown on Escape key
+    useEffect(() => {
+        if (!open) return;
+
+        const handleEscape = (event) => {
+            if (event.key === 'Escape') setOpen(false);
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [open]);
+
     return (
-        <header className="sticky top-0 z-20 border-b border-akin-border bg-akin-bg backdrop-blur-xl transition-colors">
+        <header className="sticky top-0 z-20 border-b border-akin-border bg-akin-bg/80 backdrop-blur-xl transition-colors">
             <div className="flex min-h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
                 <div className="flex min-w-0 items-center gap-3">
                     <button
@@ -30,12 +57,12 @@ export default function Header({ user, onMenuClick, safeRoute }) {
                 </div>
 
                 <div className="hidden min-w-0 flex-1 justify-center px-6 md:flex">
-                    <div className="relative w-full max-w-md">
-                        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-akin-muted" />
+                    <div className="relative w-full max-w-md group">
+                        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-akin-muted transition-colors group-focus-within:text-akin-accent" />
                         <input
                             type="search"
                             placeholder="Buscar cliente, pedido, producto..."
-                            className="akin-input h-11 w-full pl-11 pr-4 text-sm shadow-sm"
+                            className="akin-input h-11 w-full pl-11 pr-4 text-sm shadow-sm transition-shadow focus:shadow-md"
                         />
                     </div>
                 </div>
@@ -49,10 +76,10 @@ export default function Header({ user, onMenuClick, safeRoute }) {
                         aria-label="Notificaciones"
                     >
                         <BellIcon className="h-5 w-5" />
-                        <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-akin-accent ring-2 ring-akin-surface" />
+                        <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-akin-accent ring-2 ring-akin-surface akin-pulse-glow" />
                     </button>
 
-                    <div className="relative">
+                    <div className="relative" ref={dropdownRef}>
                         <button
                             type="button"
                             onClick={() => setOpen((value) => !value)}
@@ -72,7 +99,7 @@ export default function Header({ user, onMenuClick, safeRoute }) {
                         </button>
 
                         {open && (
-                            <div className="akin-card absolute right-0 mt-2 w-60 p-2 shadow-xl dark:shadow-black/30">
+                            <div className="akin-card absolute right-0 mt-2 w-60 p-2 shadow-xl dark:shadow-black/30 akin-dropdown-enter">
                                 <div className="akin-divider border-b px-3 py-3">
                                     <p className="truncate text-sm font-black text-akin-text">
                                         {user?.name || 'Usuario AKINOMASS'}
@@ -83,7 +110,8 @@ export default function Header({ user, onMenuClick, safeRoute }) {
                                 </div>
                                 <Link
                                     href={safeRoute('profile.edit', '/profile')}
-                                    className="mt-2 block rounded-xl px-3 py-2 text-sm font-bold text-akin-muted transition hover:bg-akin-surface-soft hover:text-akin-text"
+                                    className="mt-2 block rounded-xl px-3 py-2 text-sm font-bold text-akin-muted transition hover:bg-akin-surfaceSoft hover:text-akin-text"
+                                    onClick={() => setOpen(false)}
                                 >
                                     Perfil
                                 </Link>
@@ -92,6 +120,7 @@ export default function Header({ user, onMenuClick, safeRoute }) {
                                     method="post"
                                     as="button"
                                     className="block w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-red-600 transition hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-500/10"
+                                    onClick={() => setOpen(false)}
                                 >
                                     Cerrar sesion
                                 </Link>
