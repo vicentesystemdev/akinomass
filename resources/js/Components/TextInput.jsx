@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 export default forwardRef(function TextInput(
-    { type = 'text', className = '', isFocused = false, ...props },
+    { type = 'text', className = '', isFocused = false, invalid = false, ...props },
     ref,
 ) {
     const localRef = useRef(null);
@@ -21,9 +21,10 @@ export default forwardRef(function TextInput(
             {...props}
             type={type}
             className={
-                'rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ' +
+                'akin-input shadow-sm focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60 ' +
                 className
             }
+            aria-invalid={invalid || props['aria-invalid'] ? 'true' : undefined}
             ref={localRef}
         />
     );

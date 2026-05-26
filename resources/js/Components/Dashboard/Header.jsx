@@ -1,3 +1,4 @@
+import GlobalSearch from '@/Components/UI/GlobalSearch';
 import ThemeToggle from '@/Components/UI/ThemeToggle';
 import { Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
@@ -57,14 +58,7 @@ export default function Header({ user, onMenuClick, safeRoute }) {
                 </div>
 
                 <div className="hidden min-w-0 flex-1 justify-center px-6 md:flex">
-                    <div className="relative w-full max-w-md group">
-                        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-akin-muted transition-colors group-focus-within:text-akin-accent" />
-                        <input
-                            type="search"
-                            placeholder="Buscar cliente, pedido, producto..."
-                            className="akin-input h-11 w-full pl-11 pr-4 text-sm shadow-sm transition-shadow focus:shadow-md"
-                        />
-                    </div>
+                    <GlobalSearch safeRoute={safeRoute} />
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -144,10 +138,6 @@ function getInitials(value) {
 
 function MenuIcon({ className = '' }) {
     return <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
-}
-
-function SearchIcon({ className = '' }) {
-    return <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m20 20-4.5-4.5M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
 }
 
 function BellIcon({ className = '' }) {

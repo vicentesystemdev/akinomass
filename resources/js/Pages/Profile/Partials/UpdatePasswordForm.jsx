@@ -4,32 +4,38 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
-export default function UpdatePasswordForm({ className = '' }) {
+export default function UpdatePasswordForm() {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
+    const [touched, setTouched] = useState({});
 
-    const {
-        data,
-        setData,
-        errors,
-        put,
-        reset,
-        processing,
-        recentlySuccessful,
-    } = useForm({
+    const { data, setData, errors, put, reset, processing, recentlySuccessful } = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
     });
 
+    const clientErrors = useMemo(() => ({
+        current_password: !data.current_password ? 'La contrasena actual es obligatoria.' : '',
+        password: !data.password ? 'La nueva contrasena es obligatoria.' : data.password.length < 8 ? 'Debe tener al menos 8 caracteres.' : '',
+        password_confirmation: data.password_confirmation !== data.password ? 'La confirmacion no coincide.' : '',
+    }), [data]);
+
+    const isInvalid = Object.values(clientErrors).some(Boolean);
+
     const updatePassword = (e) => {
         e.preventDefault();
+        setTouched({ current_password: true, password: true, password_confirmation: true });
+        if (isInvalid) return;
 
         put(route('password.update'), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                setTouched({});
+            },
             onError: (errors) => {
                 if (errors.password) {
                     reset('password', 'password_confirmation');
@@ -45,98 +51,40 @@ export default function UpdatePasswordForm({ className = '' }) {
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Update Password
-                </h2>
+        <form onSubmit={updatePassword} className="space-y-5" noValidate>
+            <PasswordInput id="current_password" label="Contrasena actual" refValue={currentPasswordInput} value={data.current_password} error={(touched.current_password && clientErrors.current_password) || errors.current_password} onChange={(value) => setData('current_password', value)} onBlur={() => setTouched((value) => ({ ...value, current_password: true }))} autoComplete="current-password" />
+            <PasswordInput id="password" label="Nueva contrasena" refValue={passwordInput} value={data.password} error={(touched.password && clientErrors.password) || errors.password} onChange={(value) => setData('password', value)} onBlur={() => setTouched((value) => ({ ...value, password: true }))} autoComplete="new-password" />
+            <PasswordInput id="password_confirmation" label="Confirmar contrasena" value={data.password_confirmation} error={(touched.password_confirmation && clientErrors.password_confirmation) || errors.password_confirmation} onChange={(value) => setData('password_confirmation', value)} onBlur={() => setTouched((value) => ({ ...value, password_confirmation: true }))} autoComplete="new-password" />
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay
-                    secure.
-                </p>
-            </header>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <PrimaryButton disabled={processing || isInvalid}>
+                    {processing ? 'Actualizando...' : 'Actualizar contrasena'}
+                </PrimaryButton>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel
-                        htmlFor="current_password"
-                        value="Current Password"
-                    />
+                <Transition show={recentlySuccessful} enter="transition ease-in-out" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in-out" leaveTo="opacity-0">
+                    <p className="text-sm font-semibold text-akin-success">Contrasena actualizada.</p>
+                </Transition>
+            </div>
+        </form>
+    );
+}
 
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) =>
-                            setData('current_password', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
-
-                    <InputError
-                        message={errors.current_password}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
-
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
-                    </Transition>
-                </div>
-            </form>
-        </section>
+function PasswordInput({ id, label, value, error, onChange, onBlur, autoComplete, refValue }) {
+    return (
+        <div>
+            <InputLabel htmlFor={id} value={label} required />
+            <TextInput
+                id={id}
+                ref={refValue}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                onBlur={onBlur}
+                invalid={Boolean(error)}
+                type="password"
+                className="mt-1 block w-full px-4 py-3"
+                autoComplete={autoComplete}
+            />
+            <InputError message={error} className="mt-2" />
+        </div>
     );
 }
