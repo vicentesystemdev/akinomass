@@ -4,6 +4,7 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import { Head, Link } from '@inertiajs/react';
 
@@ -84,10 +85,11 @@ const QuickAccessCard = ({ links }) => {
     );
 };
 
-export default function Index({ inventarios, stockBajo }) {
-    const totalStock = inventarios.reduce((sum, inv) => sum + (parseInt(inv.stock_actual_inv) || 0), 0);
-    const totalProductos = inventarios.length;
-    const inventariosActivos = inventarios.filter((inv) => inv.activo_inv !== false);
+export default function Index({ inventarios = { data: [] }, stockBajo = [], kpis = {} }) {
+    const inventariosData = inventarios.data || [];
+    const totalStock = kpis.stock_total ?? 0;
+    const totalProductos = kpis.total_productos ?? 0;
+    const inventariosActivosCount = kpis.inventarios_activos ?? 0;
 
     const quickLinks = [
         {
@@ -188,7 +190,7 @@ export default function Index({ inventarios, stockBajo }) {
                     />
                     <KpiCard
                         title="Inventarios Activos"
-                        value={inventariosActivos.length}
+                        value={inventariosActivosCount}
                         variant="cyan"
                         subtitle="Actualmente en seguimiento"
                         icon={
@@ -240,7 +242,7 @@ export default function Index({ inventarios, stockBajo }) {
 
                 {/* Tabla principal de inventario */}
                 <SectionCard noPadding>
-                    {inventarios.length > 0 ? (
+                    {inventariosData.length > 0 ? (
                         <TableWrapper>
                             <TableWrapper.Header>
                                 <TableWrapper.HeaderCell>Producto</TableWrapper.HeaderCell>
@@ -250,7 +252,7 @@ export default function Index({ inventarios, stockBajo }) {
                                 <TableWrapper.HeaderCell>Estado</TableWrapper.HeaderCell>
                             </TableWrapper.Header>
                             <TableWrapper.Body>
-                                {inventarios.map((inv) => {
+                                {inventariosData.map((inv) => {
                                     const stockBajoItem = inv.stock_actual_inv <= inv.stock_minimo_inv;
                                     return (
                                         <TableWrapper.Row
@@ -329,6 +331,8 @@ export default function Index({ inventarios, stockBajo }) {
                             }
                         />
                     )}
+
+                    <Pagination links={inventarios.links} meta={inventarios.meta} />
                 </SectionCard>
             </div>
         </AuthenticatedLayout>

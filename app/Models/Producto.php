@@ -6,6 +6,7 @@ use App\Domains\Catalogo\Productos\Enums\EstadoProductoEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Producto extends Model
 {
@@ -35,5 +36,10 @@ class Producto extends Model
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(CategoriaProducto::class, 'cod_categoria_producto', 'cod_categoria_producto');
+    }
+
+    public function inventario(): HasOne
+    {
+        return $this->hasOne(Inventario::class, 'cod_producto', 'cod_producto');
     }
 }

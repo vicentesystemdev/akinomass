@@ -4,13 +4,14 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import FilterBar from '@/Components/FilterBar';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Index({ leads, estados }) {
+export default function Index({ leads = { data: [] }, estados }) {
     const [filters, setFilters] = useState({ estado: '', canal: '', flujo: '' });
     const [showConvertModal, setShowConvertModal] = useState(false);
     const [leadToConvert, setLeadToConvert] = useState(null);
@@ -19,7 +20,9 @@ export default function Index({ leads, estados }) {
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
 
-    const filteredLeads = leads.filter((lead) => {
+    const leadsData = leads.data || [];
+
+    const filteredLeads = leadsData.filter((lead) => {
         if (filters.estado && lead.estado_lea?.toLowerCase() !== filters.estado.toLowerCase()) return false;
         return true;
     });
@@ -202,6 +205,8 @@ export default function Index({ leads, estados }) {
                             }
                         />
                     )}
+
+                    <Pagination links={leads.links} meta={leads.meta} />
                 </SectionCard>
             </div>
 

@@ -20,6 +20,7 @@ class TiposFlujoComercialSeeder extends Seeder
             ['nombre_tip' => 'Referido', 'codigo_tip' => 'referido'],
             ['nombre_tip' => 'Venta directa', 'codigo_tip' => 'venta_directa'],
             ['nombre_tip' => 'Otro', 'codigo_tip' => 'otro'],
+            ['nombre_tip' => 'Compra web', 'codigo_tip' => 'compra_web'],
         ];
 
         foreach ($tiposFlujo as $tipoFlujo) {

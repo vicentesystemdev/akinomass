@@ -3,6 +3,7 @@ import PageHeader from '@/Components/UI/PageHeader';
 import SectionCard from '@/Components/UI/SectionCard';
 import Badge from '@/Components/Badge';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, router } from '@inertiajs/react';
@@ -32,7 +33,7 @@ const tipoBadgeVariants = {
     respuesta_rapida_live: 'terracota',
 };
 
-export default function Index({ plantillas, plantillasActivas }) {
+export default function Index({ plantillas = { data: [] }, plantillasActivas = { data: [] } }) {
     const [copiedId, setCopiedId] = useState(null);
     const [filterTipo, setFilterTipo] = useState('');
 
@@ -50,11 +51,13 @@ export default function Index({ plantillas, plantillasActivas }) {
         router.patch(route('plantillas-mensaje.toggle', plantilla.cod_plantilla_mensaje));
     };
 
-    const allTipos = [...new Set(plantillas.map((p) => p.tipo_pla))];
+    const plantillasData = plantillas.data || [];
+
+    const allTipos = [...new Set(plantillasData.map((p) => p.tipo_pla))];
 
     const filteredPlantillas = filterTipo
-        ? plantillas.filter((p) => p.tipo_pla === filterTipo)
-        : plantillas;
+        ? plantillasData.filter((p) => p.tipo_pla === filterTipo)
+        : plantillasData;
 
     return (
         <AuthenticatedLayout
@@ -237,6 +240,8 @@ export default function Index({ plantillas, plantillasActivas }) {
                         }
                     />
                 )}
+
+                <Pagination links={plantillas.links} meta={plantillas.meta} />
             </div>
         </AuthenticatedLayout>
     );

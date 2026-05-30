@@ -4,6 +4,7 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
@@ -53,17 +54,19 @@ const metodoOptions = [
     { value: 'otro', label: 'Otro' },
 ];
 
-export default function Index({ pagos }) {
+export default function Index({ pagos = { data: [] } }) {
     const [filterEstado, setFilterEstado] = useState('');
     const [filterMetodo, setFilterMetodo] = useState('');
 
+    const pagosData = pagos.data || [];
+
     const filteredPagos = useMemo(() => {
-        return pagos.filter((p) => {
+        return pagosData.filter((p) => {
             if (filterEstado && p.estado_pago_pag !== filterEstado) return false;
             if (filterMetodo && p.metodo_pago_pag !== filterMetodo) return false;
             return true;
         });
-    }, [pagos, filterEstado, filterMetodo]);
+    }, [pagosData, filterEstado, filterMetodo]);
 
     return (
         <AuthenticatedLayout
@@ -227,6 +230,8 @@ export default function Index({ pagos }) {
                             }
                         />
                     )}
+
+                    <Pagination links={pagos.links} meta={pagos.meta} />
                 </SectionCard>
             </div>
         </AuthenticatedLayout>

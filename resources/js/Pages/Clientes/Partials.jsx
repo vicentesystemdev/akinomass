@@ -3,7 +3,9 @@ import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Link } from '@inertiajs/react';
 
-export default function ClienteForm({ form, submit, canales, tiposFlujo, estados, isEdit = false }) {
+export default function ClienteForm({ form, submit, canales = [], tiposFlujo = [], estados = [], isEdit = false }) {
+    const canalesArray = Array.isArray(canales) ? canales : [];
+    const tiposFlujoArray = Array.isArray(tiposFlujo) ? tiposFlujo : [];
     const onChange = (e) => form.setData(e.target.name, e.target.value);
 
     const inputClass = "w-full rounded-xl border-gray-300 shadow-sm focus:border-terracota-500 focus:ring-terracota-500 py-2.5 px-3 text-sm text-cafe-700 transition-all duration-200";
@@ -136,7 +138,7 @@ export default function ClienteForm({ form, submit, canales, tiposFlujo, estados
                             className={`${inputClass} ${form.errors.cod_canal_venta ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                         >
                             <option value="">Seleccionar canal</option>
-                            {canales.map((c) => (
+                            {canalesArray.map((c) => (
                                 <option key={c.cod_canal_venta} value={c.cod_canal_venta}>
                                     {c.nombre_can}
                                 </option>
@@ -159,7 +161,7 @@ export default function ClienteForm({ form, submit, canales, tiposFlujo, estados
                         className={`${inputClass} ${form.errors.cod_tipo_flujo_comercial ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                     >
                         <option value="">Seleccionar flujo</option>
-                        {tiposFlujo.map((t) => (
+                        {tiposFlujoArray.map((t) => (
                             <option key={t.cod_tipo_flujo_comercial} value={t.cod_tipo_flujo_comercial}>
                                 {t.nombre_tip}
                             </option>

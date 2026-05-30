@@ -3,6 +3,7 @@ import PageHeader from '@/Components/UI/PageHeader';
 import SectionCard from '@/Components/UI/SectionCard';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import { Head, Link } from '@inertiajs/react';
 
 const tipoMovimientoConfig = {
@@ -72,7 +73,8 @@ const formatDate = (dateString) => {
     });
 };
 
-export default function Movimientos({ movimientos }) {
+export default function Movimientos({ movimientos = { data: [] } }) {
+    const movimientosData = movimientos.data || [];
     return (
         <AuthenticatedLayout
             header={
@@ -102,7 +104,7 @@ export default function Movimientos({ movimientos }) {
 
                 {/* Tabla de movimientos */}
                 <SectionCard noPadding>
-                    {movimientos.length > 0 ? (
+                    {movimientosData.length > 0 ? (
                         <TableWrapper>
                             <TableWrapper.Header>
                                 <TableWrapper.HeaderCell>Fecha</TableWrapper.HeaderCell>
@@ -114,7 +116,7 @@ export default function Movimientos({ movimientos }) {
                                 <TableWrapper.HeaderCell>Responsable</TableWrapper.HeaderCell>
                             </TableWrapper.Header>
                             <TableWrapper.Body>
-                                {movimientos.map((mov) => (
+                                {movimientosData.map((mov) => (
                                     <TableWrapper.Row key={mov.cod_movimiento_inventario}>
                                         <TableWrapper.Cell>
                                             <p className="text-sm text-cafe-700 whitespace-nowrap">
@@ -186,6 +188,8 @@ export default function Movimientos({ movimientos }) {
                             }
                         />
                     )}
+
+                    <Pagination links={movimientos.links} meta={movimientos.meta} />
                 </SectionCard>
             </div>
         </AuthenticatedLayout>

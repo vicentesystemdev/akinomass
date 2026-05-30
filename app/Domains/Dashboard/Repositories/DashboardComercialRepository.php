@@ -16,73 +16,102 @@ class DashboardComercialRepository
         return DB::table('clientes')->count();
     }
 
-    public function totalLeads(): int
+    public function getLeadsStats(): array
     {
-        return DB::table('leads')->count();
+        $row = DB::table('leads')
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(*) FILTER (WHERE estado_lea = ?) as nuevos,
+                COUNT(*) FILTER (WHERE estado_lea = ?) as convertidos
+            ", [EstadoLeadEnum::NUEVO->value, EstadoLeadEnum::CONVERTIDO->value])
+            ->first();
+
+        return [
+            'total' => (int) ($row->total ?? 0),
+            'nuevos' => (int) ($row->nuevos ?? 0),
+            'convertidos' => (int) ($row->convertidos ?? 0),
+        ];
     }
 
-    public function leadsNuevos(): int
+    public function getProductosStats(): array
     {
-        return DB::table('leads')
-            ->where('estado_lea', EstadoLeadEnum::NUEVO->value)
-            ->count();
-    }
-
-    public function leadsConvertidos(): int
-    {
-        return DB::table('leads')
-            ->where('estado_lea', EstadoLeadEnum::CONVERTIDO->value)
-            ->count();
-    }
-
-    public function totalProductos(): int
-    {
-        return DB::table('productos')->count();
-    }
-
-    public function productosActivos(): int
-    {
-        return DB::table('productos')
+        $total = DB::table('productos')->count();
+        $activos = DB::table('productos')
             ->where('estado_pro', EstadoProductoEnum::ACTIVO->value)
             ->count();
-    }
-
-    public function productosConStockBajo(): int
-    {
-        return DB::table('inventarios')
+        $stockBajo = DB::table('inventarios')
             ->whereColumn('stock_actual_inv', '<=', 'stock_minimo_inv')
             ->count();
+
+        return [
+            'total' => $total,
+            'activos' => $activos,
+            'stock_bajo' => $stockBajo,
+        ];
     }
 
-    public function totalPedidos(): int
+    public function getPedidosStats(): array
     {
-        return DB::table('pedidos')->count();
+        $row = DB::table('pedidos')
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(*) FILTER (WHERE estado_ped = ?) as borrador,
+                COUNT(*) FILTER (WHERE estado_ped = ?) as confirmado,
+                COUNT(*) FILTER (WHERE estado_ped = ?) as cancelado
+            ", [
+                EstadoPedidoEnum::BORRADOR->value,
+                EstadoPedidoEnum::CONFIRMADO->value,
+                EstadoPedidoEnum::CANCELADO->value,
+            ])
+            ->first();
+
+        return [
+            'total' => (int) ($row->total ?? 0),
+            'borrador' => (int) ($row->borrador ?? 0),
+            'confirmado' => (int) ($row->confirmado ?? 0),
+            'cancelado' => (int) ($row->cancelado ?? 0),
+        ];
     }
 
-    public function pedidosPorEstado(string $estado): int
+    public function getPagosStats(): array
     {
-        return DB::table('pedidos')
-            ->where('estado_ped', $estado)
-            ->count();
+        $row = DB::table('pagos')
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(*) FILTER (WHERE estado_pago_pag = ?) as pendiente,
+                COUNT(*) FILTER (WHERE estado_pago_pag = ?) as pagado,
+                COALESCE(SUM(monto_pag) FILTER (WHERE estado_pago_pag = ?), 0) as monto_total_pagado
+            ", [
+                EstadoPagoEnum::PENDIENTE->value,
+                EstadoPagoEnum::PAGADO->value,
+                EstadoPagoEnum::PAGADO->value,
+            ])
+            ->first();
+
+        return [
+            'total' => (int) ($row->total ?? 0),
+            'pendiente' => (int) ($row->pendiente ?? 0),
+            'pagado' => (int) ($row->pagado ?? 0),
+            'monto_total_pagado' => (float) ($row->monto_total_pagado ?? 0),
+        ];
     }
 
-    public function totalPagos(): int
+    public function getLiveStats(): array
     {
-        return DB::table('pagos')->count();
-    }
+        $sesiones = DB::table('sesiones_live')
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(*) FILTER (WHERE estado_ses IN (?, ?)) as activas_programadas
+            ", [EstadoSesionLiveEnum::EN_VIVO->value, EstadoSesionLiveEnum::PROGRAMADA->value])
+            ->first();
 
-    public function pagosPorEstado(string $estado): int
-    {
-        return DB::table('pagos')
-            ->where('estado_pago_pag', $estado)
-            ->count();
-    }
+        $interacciones = DB::table('interacciones_live')->count();
 
-    public function montoTotalPagado(): float
-    {
-        return (float) DB::table('pagos')
-            ->where('estado_pago_pag', EstadoPagoEnum::PAGADO->value)
-            ->sum('monto_pag');
+        return [
+            'sesiones_totales' => (int) ($sesiones->total ?? 0),
+            'sesiones_en_vivo_o_programadas' => (int) ($sesiones->activas_programadas ?? 0),
+            'interacciones_totales' => $interacciones,
+        ];
     }
 
     public function ventasPorCanal(): array
@@ -107,25 +136,5 @@ class DashboardComercialRepository
             ->get()
             ->map(fn ($item) => ['etiqueta' => $item->etiqueta, 'total' => (int) $item->total])
             ->all();
-    }
-
-    public function totalSesionesLive(): int
-    {
-        return DB::table('sesiones_live')->count();
-    }
-
-    public function sesionesLiveActivasOProgramadas(): int
-    {
-        return DB::table('sesiones_live')
-            ->whereIn('estado_ses', [
-                EstadoSesionLiveEnum::EN_VIVO->value,
-                EstadoSesionLiveEnum::PROGRAMADA->value,
-            ])
-            ->count();
-    }
-
-    public function totalInteraccionesLive(): int
-    {
-        return DB::table('interacciones_live')->count();
     }
 }

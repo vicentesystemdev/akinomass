@@ -40,10 +40,31 @@ class PedidoService
         if ($pedido->estado_ped !== EstadoPedidoEnum::BORRADOR) throw new RuntimeException('Solo se puede editar un pedido en borrador.');
 
         $totales = $this->calcularTotales($detalles, $descuento);
+
         return DB::transaction(function () use ($pedido, $totales, $descuento) {
-            $pedido->detalles()->delete();
-            $pedido->detalles()->createMany($totales['detalles']);
-            $pedido->update(['subtotal_ped' => $totales['subtotal'], 'descuento_ped' => $descuento, 'total_ped' => $totales['total']]);
+            $existingIds = $pedido->detalles()->pluck('cod_detalle_pedido')->all();
+            $keptIds = [];
+
+            foreach ($totales['detalles'] as $detalle) {
+                if (!empty($detalle['cod_detalle_pedido']) && in_array($detalle['cod_detalle_pedido'], $existingIds)) {
+                    $pedido->detalles()->where('cod_detalle_pedido', $detalle['cod_detalle_pedido'])->update($detalle);
+                    $keptIds[] = $detalle['cod_detalle_pedido'];
+                } else {
+                    $pedido->detalles()->create($detalle);
+                }
+            }
+
+            $toDelete = array_diff($existingIds, $keptIds);
+            if (!empty($toDelete)) {
+                $pedido->detalles()->whereIn('cod_detalle_pedido', $toDelete)->delete();
+            }
+
+            $pedido->update([
+                'subtotal_ped' => $totales['subtotal'],
+                'descuento_ped' => $descuento,
+                'total_ped' => $totales['total'],
+            ]);
+
             return $pedido->refresh()->load('detalles.producto');
         });
     }
@@ -53,15 +74,37 @@ class PedidoService
         if ($pedido->estado_ped !== EstadoPedidoEnum::BORRADOR) throw new RuntimeException('Solo se puede confirmar un pedido en borrador.');
         $pedido->loadMissing('detalles');
 
-        return DB::transaction(function () use ($pedido, $codUsuario) {
-            foreach ($pedido->detalles as $detalle) {
-                $inventario = \App\Models\Inventario::where('cod_producto', $detalle->cod_producto)->first();
-                $stock = $inventario?->stock_actual_inv ?? 0;
-                if ($stock < $detalle->cantidad_det) throw new RuntimeException('Stock insuficiente para el producto '.$detalle->cod_producto);
+        $detalles = $pedido->detalles;
+        if ($detalles->isEmpty()) throw new RuntimeException('El pedido no tiene productos.');
+
+        $productosIds = $detalles->pluck('cod_producto')->unique()->all();
+
+        return DB::transaction(function () use ($pedido, $codUsuario, $detalles, $productosIds) {
+            $inventarios = \App\Models\Inventario::whereIn('cod_producto', $productosIds)
+                ->get()
+                ->keyBy('cod_producto');
+
+            foreach ($detalles as $detalle) {
+                $stock = $inventarios[$detalle->cod_producto]->stock_actual_inv ?? 0;
+                if ($stock < $detalle->cantidad_det) {
+                    throw new RuntimeException('Stock insuficiente para el producto '.$detalle->cod_producto);
+                }
             }
-            foreach ($pedido->detalles as $detalle) {
-                $this->inventarioService->registrarMovimiento($detalle->cod_producto, TipoMovimientoInventarioEnum::SALIDA, (int) $detalle->cantidad_det, 'confirmacion_pedido', 'Pedido '.$pedido->numero_pedido_ped, $codUsuario);
+
+            $movimientos = [];
+            foreach ($detalles as $detalle) {
+                $movimientos[] = [
+                    'cod_producto' => $detalle->cod_producto,
+                    'tipo' => TipoMovimientoInventarioEnum::SALIDA,
+                    'cantidad' => (int) $detalle->cantidad_det,
+                    'motivo' => 'confirmacion_pedido',
+                    'observacion' => 'Pedido '.$pedido->numero_pedido_ped,
+                    'cod_usuario' => $codUsuario,
+                ];
             }
+
+            $this->inventarioService->registrarMovimientosBatch($movimientos);
+
             $pedido->update(['estado_ped' => EstadoPedidoEnum::CONFIRMADO]);
             return $pedido->refresh();
         });
@@ -73,12 +116,23 @@ class PedidoService
 
         return DB::transaction(function () use ($pedido, $codUsuario) {
             $estabaConfirmado = $pedido->estado_ped === EstadoPedidoEnum::CONFIRMADO;
-            $pedido->loadMissing('detalles');
+
             if ($estabaConfirmado) {
+                $pedido->loadMissing('detalles');
+                $movimientos = [];
                 foreach ($pedido->detalles as $detalle) {
-                    $this->inventarioService->registrarMovimiento($detalle->cod_producto, TipoMovimientoInventarioEnum::CANCELACION, (int) $detalle->cantidad_det, 'cancelacion_pedido', 'Cancelación pedido '.$pedido->numero_pedido_ped, $codUsuario);
+                    $movimientos[] = [
+                        'cod_producto' => $detalle->cod_producto,
+                        'tipo' => TipoMovimientoInventarioEnum::CANCELACION,
+                        'cantidad' => (int) $detalle->cantidad_det,
+                        'motivo' => 'cancelacion_pedido',
+                        'observacion' => 'Cancelación pedido '.$pedido->numero_pedido_ped,
+                        'cod_usuario' => $codUsuario,
+                    ];
                 }
+                $this->inventarioService->registrarMovimientosBatch($movimientos);
             }
+
             $pedido->update(['estado_ped' => EstadoPedidoEnum::CANCELADO]);
             return $pedido->refresh();
         });

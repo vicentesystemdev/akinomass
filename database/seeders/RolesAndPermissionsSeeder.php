@@ -52,6 +52,16 @@ class RolesAndPermissionsSeeder extends Seeder
             'roles.crear',
             'roles.editar',
             'roles.asignar',
+            // Permisos Tienda Online
+            'tienda.ver',
+            'carrito.ver',
+            'carrito.gestionar',
+            'checkout.iniciar',
+            'checkout.completar',
+            'cuenta.ver',
+            'cuenta.ver_pedidos',
+            'cuenta.ver_pedido',
+            'cuenta.gestionar_direcciones',
         ];
 
         foreach ($permissions as $permission) {
@@ -123,6 +133,17 @@ class RolesAndPermissionsSeeder extends Seeder
                 'pagos.ver',
                 'reportes.ver',
                 'dashboard.ver',
+            ],
+            'Cliente' => [
+                'tienda.ver',
+                'carrito.ver',
+                'carrito.gestionar',
+                'checkout.iniciar',
+                'checkout.completar',
+                'cuenta.ver',
+                'cuenta.ver_pedidos',
+                'cuenta.ver_pedido',
+                'cuenta.gestionar_direcciones',
             ],
         ];
 

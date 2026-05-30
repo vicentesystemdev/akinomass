@@ -20,7 +20,8 @@ class ProductoController extends Controller
         $this->authorize('productos.ver');
 
         return Inertia::render('Productos/Index', [
-            'productos' => Producto::with('categoria')->latest()->get(),
+            'productos' => Producto::with('categoria')->latest()->paginate(15)->withQueryString(),
+            'categorias' => CategoriaProducto::where('activo_cat', true)->get(),
         ]);
     }
 

@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Domains\Tienda\PedidosWeb\Actions;
+
+use App\Models\PedidoTienda;
+use Illuminate\Support\Collection;
+
+class ListarPedidosClienteAction
+{
+    public function execute(int $userId): Collection
+    {
+        return PedidoTienda::with(['pedido.cliente', 'pedido.detalles.producto'])
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+}

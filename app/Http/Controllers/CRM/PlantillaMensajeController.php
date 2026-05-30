@@ -19,9 +19,11 @@ class PlantillaMensajeController extends Controller
     {
         $this->authorize('leads.ver');
 
+        $plantillas = PlantillaMensaje::latest()->paginate(15)->withQueryString();
+
         return Inertia::render('PlantillasMensaje/Index', [
-            'plantillas' => PlantillaMensaje::latest()->get(),
-            'plantillasActivas' => PlantillaMensaje::activas()->latest()->get(),
+            'plantillas' => $plantillas,
+            'plantillasActivas' => $plantillas,
         ]);
     }
 

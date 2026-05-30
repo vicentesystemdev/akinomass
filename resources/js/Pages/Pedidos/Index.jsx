@@ -4,6 +4,7 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
@@ -31,13 +32,15 @@ const estadoOptions = [
     { value: 'devuelto', label: 'Devuelto' },
 ];
 
-export default function Index({ pedidos }) {
+export default function Index({ pedidos = { data: [] } }) {
     const [filterEstado, setFilterEstado] = useState('');
 
+    const pedidosData = pedidos.data || [];
+
     const filteredPedidos = useMemo(() => {
-        if (!filterEstado) return pedidos;
-        return pedidos.filter((p) => p.estado_ped === filterEstado);
-    }, [pedidos, filterEstado]);
+        if (!filterEstado) return pedidosData;
+        return pedidosData.filter((p) => p.estado_ped === filterEstado);
+    }, [pedidosData, filterEstado]);
 
     return (
         <AuthenticatedLayout
@@ -186,6 +189,8 @@ export default function Index({ pedidos }) {
                             }
                         />
                     )}
+
+                    <Pagination links={pedidos.links} meta={pedidos.meta} />
                 </SectionCard>
             </div>
         </AuthenticatedLayout>

@@ -3,6 +3,7 @@ import PageHeader from '@/Components/UI/PageHeader';
 import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
@@ -26,13 +27,15 @@ const estadoOptions = [
     { value: 'cancelada', label: 'Cancelada' },
 ];
 
-export default function Index({ sesiones = [] }) {
+export default function Index({ sesiones = { data: [] } }) {
     const [filterEstado, setFilterEstado] = useState('');
 
+    const sesionesData = sesiones.data || [];
+
     const filteredSesiones = useMemo(() => {
-        if (!filterEstado) return sesiones;
-        return sesiones.filter((s) => s.estado_ses === filterEstado);
-    }, [sesiones, filterEstado]);
+        if (!filterEstado) return sesionesData;
+        return sesionesData.filter((s) => s.estado_ses === filterEstado);
+    }, [sesionesData, filterEstado]);
 
     return (
         <AuthenticatedLayout
@@ -192,6 +195,8 @@ export default function Index({ sesiones = [] }) {
                         }
                     />
                 )}
+
+                <Pagination links={sesiones.links} meta={sesiones.meta} />
             </div>
         </AuthenticatedLayout>
     );

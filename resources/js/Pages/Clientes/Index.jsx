@@ -4,19 +4,24 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import FilterBar from '@/Components/FilterBar';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Index({ clientes = [], canales = [], tiposFlujo = [], estados = [] }) {
+export default function Index({ clientes = { data: [] }, canales = [], tiposFlujo = [], estados = [] }) {
     const [filters, setFilters] = useState({ estado: '', canal: '', flujo: '' });
 
     const handleFilterChange = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
 
-    const filteredClientes = clientes.filter((cliente) => {
+    const clientesData = clientes.data || [];
+    const canalesArray = Array.isArray(canales) ? canales : [];
+    const tiposFlujoArray = Array.isArray(tiposFlujo) ? tiposFlujo : [];
+
+    const filteredClientes = clientesData.filter((cliente) => {
         if (filters.estado && cliente.estado_cli?.toLowerCase() !== filters.estado.toLowerCase()) return false;
         if (filters.canal && cliente.cod_canal_venta != filters.canal) return false;
         if (filters.flujo && cliente.cod_tipo_flujo_comercial != filters.flujo) return false;
@@ -36,7 +41,7 @@ export default function Index({ clientes = [], canales = [], tiposFlujo = [], es
             key: 'canal',
             label: 'Canal',
             value: filters.canal,
-            options: canales.map((c) => ({ value: c.cod_canal_venta, label: c.nombre_can })),
+            options: canalesArray.map((c) => ({ value: c.cod_canal_venta, label: c.nombre_can })),
             placeholder: 'Todos los canales',
             className: 'w-48',
         },
@@ -44,7 +49,7 @@ export default function Index({ clientes = [], canales = [], tiposFlujo = [], es
             key: 'flujo',
             label: 'Flujo',
             value: filters.flujo,
-            options: tiposFlujo.map((t) => ({ value: t.cod_tipo_flujo_comercial, label: t.nombre_tip })),
+            options: tiposFlujoArray.map((t) => ({ value: t.cod_tipo_flujo_comercial, label: t.nombre_tip })),
             placeholder: 'Todos los flujos',
             className: 'w-48',
         },
@@ -151,6 +156,8 @@ export default function Index({ clientes = [], canales = [], tiposFlujo = [], es
                             }
                         />
                     )}
+
+                    <Pagination links={clientes.links} meta={clientes.meta} />
                 </SectionCard>
             </div>
         </AuthenticatedLayout>

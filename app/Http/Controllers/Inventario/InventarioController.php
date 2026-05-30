@@ -21,13 +21,24 @@ class InventarioController extends Controller
     public function index(): Response
     {
         $this->authorize('inventario.ver');
-        return Inertia::render('Inventario/Index', ['inventarios' => Inventario::with('producto')->get(), 'stockBajo' => Inventario::with('producto')->whereColumn('stock_actual_inv', '<=', 'stock_minimo_inv')->get()]);
+        $stockBajo = Inventario::with('producto')->whereColumn('stock_actual_inv', '<=', 'stock_minimo_inv')->get();
+        $allInventarios = Inventario::all(['stock_actual_inv', 'activo_inv']);
+        $kpis = [
+            'total_productos' => $allInventarios->count(),
+            'stock_total' => $allInventarios->sum('stock_actual_inv'),
+            'inventarios_activos' => $allInventarios->filter(fn($i) => $i->activo_inv !== false)->count(),
+        ];
+        return Inertia::render('Inventario/Index', [
+            'inventarios' => Inventario::with('producto')->paginate(15)->withQueryString(),
+            'stockBajo' => $stockBajo,
+            'kpis' => $kpis,
+        ]);
     }
 
     public function movimientos(): Response
     {
         $this->authorize('inventario.movimientos');
-        return Inertia::render('Inventario/Movimientos', ['movimientos' => MovimientoInventario::with(['producto', 'usuarioResponsable'])->latest()->get()]);
+        return Inertia::render('Inventario/Movimientos', ['movimientos' => MovimientoInventario::with(['producto', 'usuarioResponsable'])->latest()->paginate(15)->withQueryString()]);
     }
 
     public function entradaForm(): Response { $this->authorize('inventario.ajustar'); return Inertia::render('Inventario/Entrada', ['productos' => Producto::all()]); }

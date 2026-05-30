@@ -3,6 +3,7 @@ import PageHeader from '@/Components/UI/PageHeader';
 import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
@@ -21,13 +22,15 @@ const formatBOB = (value) => {
     return `Bs ${num.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-export default function Index({ productos, categorias = [] }) {
+export default function Index({ productos = { data: [] }, categorias = [] }) {
     const [search, setSearch] = useState('');
     const [filterCategoria, setFilterCategoria] = useState('');
     const [filterEstado, setFilterEstado] = useState('');
 
+    const productosData = productos.data || [];
+
     const filteredProductos = useMemo(() => {
-        return productos.filter((producto) => {
+        return productosData.filter((producto) => {
             if (search) {
                 const q = search.toLowerCase();
                 const matchNombre = producto.nombre_pro?.toLowerCase().includes(q);
@@ -38,13 +41,11 @@ export default function Index({ productos, categorias = [] }) {
             if (filterEstado && producto.estado_pro?.toLowerCase() !== filterEstado.toLowerCase()) return false;
             return true;
         });
-    }, [productos, search, filterCategoria, filterEstado]);
+        }, [productosData, search, filterCategoria, filterEstado]);
 
-    const allCategorias = useMemo(() => {
-        return categorias.length > 0
-            ? categorias
-            : [...new Map(productos.filter(p => p.categoria).map(p => [p.categoria.cod_categoria_producto, p.categoria])).values()];
-    }, [productos, categorias]);
+    const allCategorias = categorias.length > 0
+        ? categorias
+        : [...new Map(productosData.filter(p => p.categoria).map(p => [p.categoria.cod_categoria_producto, p.categoria])).values()];
 
     return (
         <AuthenticatedLayout
@@ -228,10 +229,12 @@ export default function Index({ productos, categorias = [] }) {
                 {filteredProductos.length > 0 && (
                     <div className="text-center">
                         <p className="text-sm text-gray-500">
-                            Mostrando {filteredProductos.length} de {productos.length} productos
+                            Mostrando {filteredProductos.length} de {productos.meta?.total || productosData.length} productos
                         </p>
                     </div>
                 )}
+
+                <Pagination links={productos.links} meta={productos.meta} />
             </div>
         </AuthenticatedLayout>
     );

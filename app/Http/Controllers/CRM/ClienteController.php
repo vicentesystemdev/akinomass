@@ -11,20 +11,25 @@ use App\Http\Requests\Clientes\UpdateClienteRequest;
 use App\Models\CanalVenta;
 use App\Models\Cliente;
 use App\Models\TipoFlujoComercial;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ClienteController extends Controller
 {
+    private function canales() { return Cache::rememberForever('lookup:canales_venta', fn() => CanalVenta::all()->values()->toArray()); }
+    private function tiposFlujo() { return Cache::rememberForever('lookup:tipos_flujo', fn() => TipoFlujoComercial::all()->values()->toArray()); }
+    private function estadosCliente() { return array_column(EstadoClienteEnum::cases(), 'value'); }
+
     public function index(): Response
     {
         $this->authorize('clientes.ver');
 
         return Inertia::render('Clientes/Index', [
-            'clientes' => Cliente::with(['canalVenta', 'tipoFlujoComercial'])->latest()->get(),
-            'canales' => CanalVenta::all(),
-            'tiposFlujo' => TipoFlujoComercial::all(),
-            'estados' => array_column(EstadoClienteEnum::cases(), 'value'),
+            'clientes' => Cliente::with(['canalVenta', 'tipoFlujoComercial'])->latest()->paginate(15)->withQueryString(),
+            'canales' => $this->canales(),
+            'tiposFlujo' => $this->tiposFlujo(),
+            'estados' => $this->estadosCliente(),
         ]);
     }
 
@@ -33,9 +38,9 @@ class ClienteController extends Controller
         $this->authorize('clientes.crear');
 
         return Inertia::render('Clientes/Create', [
-            'canales' => CanalVenta::all(),
-            'tiposFlujo' => TipoFlujoComercial::all(),
-            'estados' => array_column(EstadoClienteEnum::cases(), 'value'),
+            'canales' => $this->canales(),
+            'tiposFlujo' => $this->tiposFlujo(),
+            'estados' => $this->estadosCliente(),
         ]);
     }
 
@@ -52,9 +57,9 @@ class ClienteController extends Controller
 
         return Inertia::render('Clientes/Edit', [
             'cliente' => $cliente,
-            'canales' => CanalVenta::all(),
-            'tiposFlujo' => TipoFlujoComercial::all(),
-            'estados' => array_column(EstadoClienteEnum::cases(), 'value'),
+            'canales' => $this->canales(),
+            'tiposFlujo' => $this->tiposFlujo(),
+            'estados' => $this->estadosCliente(),
         ]);
     }
 

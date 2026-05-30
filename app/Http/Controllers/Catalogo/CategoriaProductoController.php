@@ -18,7 +18,7 @@ class CategoriaProductoController extends Controller
         $this->authorize('productos.ver');
 
         return Inertia::render('CategoriasProducto/Index', [
-            'categorias' => CategoriaProducto::latest()->get(),
+            'categorias' => CategoriaProducto::latest()->paginate(15)->withQueryString(),
         ]);
     }
 

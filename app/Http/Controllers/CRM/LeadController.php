@@ -15,18 +15,24 @@ use App\Models\CanalVenta;
 use App\Models\Lead;
 use App\Models\TipoFlujoComercial;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class LeadController extends Controller
 {
+    private function canales() { return Cache::rememberForever('lookup:canales_venta', fn() => CanalVenta::all()); }
+    private function tiposFlujo() { return Cache::rememberForever('lookup:tipos_flujo', fn() => TipoFlujoComercial::all()); }
+    private function usuarios() { return User::select('id', 'name')->get(); }
+    private function estadosLead() { return array_column(EstadoLeadEnum::cases(), 'value'); }
+
     public function index(): Response
     {
         $this->authorize('leads.ver');
 
         return Inertia::render('Leads/Index', [
-            'leads' => Lead::with(['canalVenta', 'tipoFlujoComercial', 'cliente', 'usuarioResponsable'])->latest()->get(),
-            'estados' => array_column(EstadoLeadEnum::cases(), 'value'),
+            'leads' => Lead::with(['canalVenta', 'tipoFlujoComercial', 'cliente', 'usuarioResponsable'])->latest()->paginate(15)->withQueryString(),
+            'estados' => $this->estadosLead(),
         ]);
     }
 
@@ -35,10 +41,10 @@ class LeadController extends Controller
         $this->authorize('leads.crear');
 
         return Inertia::render('Leads/Create', [
-            'canales' => CanalVenta::all(),
-            'tiposFlujo' => TipoFlujoComercial::all(),
-            'usuarios' => User::select('id', 'name')->get(),
-            'estados' => array_column(EstadoLeadEnum::cases(), 'value'),
+            'canales' => $this->canales(),
+            'tiposFlujo' => $this->tiposFlujo(),
+            'usuarios' => $this->usuarios(),
+            'estados' => $this->estadosLead(),
         ]);
     }
 
@@ -55,10 +61,10 @@ class LeadController extends Controller
 
         return Inertia::render('Leads/Edit', [
             'lead' => $lead,
-            'canales' => CanalVenta::all(),
-            'tiposFlujo' => TipoFlujoComercial::all(),
-            'usuarios' => User::select('id', 'name')->get(),
-            'estados' => array_column(EstadoLeadEnum::cases(), 'value'),
+            'canales' => $this->canales(),
+            'tiposFlujo' => $this->tiposFlujo(),
+            'usuarios' => $this->usuarios(),
+            'estados' => $this->estadosLead(),
         ]);
     }
 

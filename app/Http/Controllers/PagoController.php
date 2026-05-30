@@ -19,7 +19,7 @@ use Inertia\Response;
 
 class PagoController extends Controller
 {
-    public function index(): Response { $this->authorize('pagos.ver'); return Inertia::render('Pagos/Index', ['pagos' => Pago::with('pedido')->latest()->get()]); }
+    public function index(): Response { $this->authorize('pagos.ver'); return Inertia::render('Pagos/Index', ['pagos' => Pago::with('pedido')->latest()->paginate(15)->withQueryString()]); }
     public function create(): Response { $this->authorize('pagos.registrar'); return Inertia::render('Pagos/Create', ['pedidos' => Pedido::select('cod_pedido', 'numero_pedido_ped')->get(), 'metodosPago' => array_map(fn($m) => $m->value, MetodoPagoEnum::cases())]); }
     public function store(StorePagoRequest $request, RegistrarPagoAction $action) { $action->execute($request->validated(), auth()->id()); return redirect()->route('pagos.index'); }
     public function show(Pago $pago): Response { $this->authorize('pagos.ver'); return Inertia::render('Pagos/Show', ['pago' => $pago->load('pedido')]); }

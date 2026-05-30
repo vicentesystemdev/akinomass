@@ -4,10 +4,12 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Index({ categorias }) {
+export default function Index({ categorias = { data: [] } }) {
+    const categoriasData = categorias.data || [];
     return (
         <AuthenticatedLayout
             header={
@@ -38,7 +40,7 @@ export default function Index({ categorias }) {
 
             <div className="space-y-6">
                 <SectionCard noPadding>
-                    {categorias.length > 0 ? (
+                    {categoriasData.length > 0 ? (
                         <TableWrapper>
                             <TableWrapper.Header>
                                 <TableWrapper.HeaderCell>Nombre</TableWrapper.HeaderCell>
@@ -47,7 +49,7 @@ export default function Index({ categorias }) {
                                 <TableWrapper.HeaderCell align="right">Acciones</TableWrapper.HeaderCell>
                             </TableWrapper.Header>
                             <TableWrapper.Body>
-                                {categorias.map((categoria) => (
+                                {categoriasData.map((categoria) => (
                                     <TableWrapper.Row key={categoria.cod_categoria_producto}>
                                         <TableWrapper.Cell>
                                             <p className="font-medium text-cafe-900">{categoria.nombre_cat}</p>
@@ -94,6 +96,8 @@ export default function Index({ categorias }) {
                             }
                         />
                     )}
+
+                    <Pagination links={categorias.links} meta={categorias.meta} />
                 </SectionCard>
             </div>
         </AuthenticatedLayout>
