@@ -19,6 +19,7 @@ class ListarCatalogoRequest extends FormRequest
             'orden' => ['nullable', 'string', 'in:precio_asc,precio_desc,nombre_asc,recientes'],
             'solo_disponibles' => ['nullable', 'boolean'],
             'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:12', 'max:48'],
         ];
     }
 }

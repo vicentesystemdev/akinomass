@@ -19,7 +19,9 @@ export default function CuentaIndex({ auth, cuentaCliente, pedidosCount, direcci
                         <Package size={18} style={{ color: '#D77A61' }} />
                     </div>
                     <p style={{ fontSize: 14, fontWeight: 700, color: '#2B221E' }}>Mis Pedidos</p>
-                    <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>{pedidosCount || 0} pedidos</p>
+                    <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
+                        {pedidosCount ?? 0} {(pedidosCount ?? 0) === 1 ? 'pedido' : 'pedidos'}
+                    </p>
                 </Link>
 
                 <Link

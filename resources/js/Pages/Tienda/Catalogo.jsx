@@ -3,17 +3,16 @@ import { Head, router } from '@inertiajs/react';
 import StorefrontLayout from '@/Layouts/StorefrontLayout';
 import ProductGrid from '@/Components/Tienda/ProductGrid';
 import CatalogFilters from '@/Components/Tienda/CatalogFilters';
-import CartDrawer from '@/Components/Tienda/CartDrawer';
+import Pagination from '@/Components/UI/Pagination';
 import { Search } from 'lucide-react';
 
-export default function Catalogo({ productos, categorias, filtros, auth, carrito }) {
-    const [cartOpen, setCartOpen] = useState(false);
+export default function Catalogo({ productos, categorias, filtros, auth }) {
     const [search, setSearch] = useState(filtros?.q || '');
 
-    const cartCount = carrito?.detalles?.reduce((sum, d) => sum + d.cantidad_dca, 0) || 0;
+    const lista = productos?.data ?? productos ?? [];
 
     const handleFilter = (newFiltros) => {
-        router.get('/tienda/catalogo', newFiltros, { preserveState: true });
+        router.get('/tienda/catalogo', newFiltros, { preserveState: true, preserveScroll: true });
     };
 
     const handleSearch = (e) => {
@@ -22,11 +21,10 @@ export default function Catalogo({ productos, categorias, filtros, auth, carrito
     };
 
     return (
-        <StorefrontLayout auth={auth} cartCount={cartCount}>
+        <StorefrontLayout auth={auth}>
             <Head title="Catálogo - AKINOMASS" />
 
             <section className="max-w-7xl mx-auto px-4 md:px-8 py-10">
-                {/* Mobile search */}
                 <form onSubmit={handleSearch} className="md:hidden relative mb-5">
                     <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
                     <input
@@ -41,10 +39,26 @@ export default function Catalogo({ productos, categorias, filtros, auth, carrito
 
                 <CatalogFilters categorias={categorias} filtros={filtros} onFilter={handleFilter} />
 
-                <ProductGrid productos={productos?.data || productos} auth={auth} />
-            </section>
+                <ProductGrid productos={lista} />
 
-            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} carrito={carrito} auth={auth} />
+                {productos?.last_page > 1 && (
+                    <div className="mt-8">
+                        <Pagination
+                            links={{
+                                prev: productos.prev_page_url,
+                                next: productos.next_page_url,
+                            }}
+                            meta={{
+                                from: productos.from,
+                                to: productos.to,
+                                total: productos.total,
+                                last_page: productos.last_page,
+                                links: productos.links,
+                            }}
+                        />
+                    </div>
+                )}
+            </section>
         </StorefrontLayout>
     );
 }

@@ -32,7 +32,9 @@ class CatalogoPublicoController extends Controller
             ]);
         }
 
-        return Inertia::render('Tienda/Catalogo', [
+        $page = $request->routeIs('tienda.home') ? 'Tienda/Home' : 'Tienda/Catalogo';
+
+        return Inertia::render($page, [
             'productos' => $productos,
             'categorias' => $categorias,
             'filtros' => $filtros,

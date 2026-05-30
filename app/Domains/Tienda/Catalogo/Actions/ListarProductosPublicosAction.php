@@ -19,7 +19,8 @@ class ListarProductosPublicosAction
             codCategoria: $filtros['cod_categoria_producto'] ?? null,
             busqueda: $filtros['q'] ?? null,
             orden: $filtros['orden'] ?? null,
-            soloDisponibles: $filtros['solo_disponibles'] ?? false,
+            soloDisponibles: (bool) ($filtros['solo_disponibles'] ?? false),
+            porPagina: (int) ($filtros['per_page'] ?? 24),
         );
 
         $productos->getCollection()->transform(function ($producto) {

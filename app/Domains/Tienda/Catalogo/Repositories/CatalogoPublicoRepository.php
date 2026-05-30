@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class CatalogoPublicoRepository
 {
-    public function listarPaginado(?int $codCategoria, ?string $busqueda, ?string $orden, bool $soloDisponibles, int $porPagina = 15): LengthAwarePaginator
+    public function listarPaginado(?int $codCategoria, ?string $busqueda, ?string $orden, bool $soloDisponibles, int $porPagina = 24): LengthAwarePaginator
     {
         $query = Producto::with(['categoria', 'inventario'])
             ->where('estado_pro', 'activo');

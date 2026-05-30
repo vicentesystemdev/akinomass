@@ -1,14 +1,12 @@
-import StorefrontHeader from '@/Components/Tienda/StorefrontHeader';
-import StorefrontFooter from '@/Components/Tienda/StorefrontFooter';
+import StorefrontShell from '@/Components/Tienda/StorefrontShell';
+import { usePage } from '@inertiajs/react';
 
-export default function StorefrontLayout({ children, auth, cartCount = 0 }) {
+export default function StorefrontLayout({ children, auth }) {
+    const { carrito, flash } = usePage().props;
+
     return (
-        <div className="min-h-screen flex flex-col" style={{ fontFamily: 'Figtree, sans-serif', background: '#FDF6F0' }}>
-            <StorefrontHeader auth={auth} cartCount={cartCount} />
-            <main className="flex-1">
-                {children}
-            </main>
-            <StorefrontFooter />
-        </div>
+        <StorefrontShell auth={auth} initialCarrito={carrito} openCartOnMount={Boolean(flash?.open_cart)}>
+            {children}
+        </StorefrontShell>
     );
 }

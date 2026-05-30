@@ -103,4 +103,15 @@
     .shadow-sidebar {
         box-shadow: 4px 0 6px -1px rgb(0 0 0 / 0.1);
     }
+
+    @keyframes cartToastIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.96);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
 }

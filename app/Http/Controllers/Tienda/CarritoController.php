@@ -22,7 +22,7 @@ use Inertia\Response;
 
 class CarritoController extends Controller
 {
-    public function index(Request $request, CarritoPersistenciaService $service): Response|JsonResponse
+    public function index(Request $request, CarritoPersistenciaService $service): Response|JsonResponse|RedirectResponse
     {
         $carrito = $this->resolverCarrito($request, $service);
         $carrito = $carrito ? $carrito->load('detalles.producto') : null;
@@ -31,9 +31,7 @@ class CarritoController extends Controller
             return response()->json(['carrito' => $carrito]);
         }
 
-        return Inertia::render('Tienda/Carrito', [
-            'carrito' => $carrito,
-        ]);
+        return redirect()->route('tienda.catalogo')->with('open_cart', true);
     }
 
     public function agregarItem(

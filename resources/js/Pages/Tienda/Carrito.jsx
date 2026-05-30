@@ -29,7 +29,7 @@ export default function Carrito({ carrito, auth }) {
     };
 
     return (
-        <StorefrontLayout auth={auth} cartCount={cartCount}>
+        <StorefrontLayout auth={auth}>
             <Head title="Mi Carrito - AKINOMASS" />
 
             <section className="max-w-4xl mx-auto px-4 md:px-8 py-8">

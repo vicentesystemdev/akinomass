@@ -1,37 +1,33 @@
 import { useState } from 'react';
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import StorefrontLayout from '@/Layouts/StorefrontLayout';
-import CartDrawer from '@/Components/Tienda/CartDrawer';
-import { ShoppingCart, Check, ArrowLeft, Package } from 'lucide-react';
+import { ShoppingCart, Check, ArrowLeft, AlertTriangle, Package } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
 
-export default function ProductoShow({ producto, auth, carrito }) {
-    const [cartOpen, setCartOpen] = useState(false);
+export default function ProductoShow({ producto, auth }) {
+    const { isInCart, addItem, busy, openCart } = useCart();
     const [added, setAdded] = useState(false);
-    const [processing, setProcessing] = useState(false);
     const [cantidad, setCantidad] = useState(1);
 
-    const cartCount = carrito?.detalles?.reduce((sum, d) => sum + d.cantidad_dca, 0) || 0;
-    const isAvailable = producto.disponible && producto.stock_disponible > 0;
+    const inCart = isInCart(producto.cod_producto);
+    const stock = producto.stock_disponible ?? 0;
+    const badge = producto.stock_badge || (stock > 0 ? 'disponible' : 'agotado');
+    const isAvailable = badge === 'disponible' || badge === 'ultimo_stock';
 
-    const handleAddToCart = () => {
-        if (processing) return;
+    const handleAddToCart = async () => {
+        if (busy || !isAvailable) return;
 
-        setProcessing(true);
-        router.post('/tienda/carrito/items', {
-            cod_producto: producto.cod_producto,
-            cantidad: cantidad,
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setAdded(true);
-                setTimeout(() => setAdded(false), 2000);
-            },
-            onFinish: () => setProcessing(false),
-        });
+        try {
+            await addItem(producto.cod_producto, cantidad, { openDrawer: true });
+            setAdded(true);
+            setTimeout(() => setAdded(false), 1500);
+        } catch {
+            // toast en contexto
+        }
     };
 
     return (
-        <StorefrontLayout auth={auth} cartCount={cartCount}>
+        <StorefrontLayout auth={auth}>
             <Head title={`${producto.nombre_pro} - AKINOMASS`} />
 
             <section className="max-w-6xl mx-auto px-4 md:px-8 py-8">
@@ -45,7 +41,6 @@ export default function ProductoShow({ producto, auth, carrito }) {
                 </Link>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Image */}
                     <div className="rounded-2xl overflow-hidden" style={{ background: '#F8F8FA', aspectRatio: '3/4' }}>
                         {producto.imagen_pro ? (
                             <img src={producto.imagen_pro} alt={producto.nombre_pro} className="w-full h-full object-cover" />
@@ -56,10 +51,18 @@ export default function ProductoShow({ producto, auth, carrito }) {
                         )}
                     </div>
 
-                    {/* Info */}
                     <div className="flex flex-col">
                         {producto.categoria && (
-                            <p style={{ fontSize: 12, color: '#D77A61', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            <p
+                                style={{
+                                    fontSize: 12,
+                                    color: '#D77A61',
+                                    fontWeight: 600,
+                                    marginBottom: 4,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                }}
+                            >
                                 {producto.categoria.nombre_cat}
                             </p>
                         )}
@@ -84,13 +87,18 @@ export default function ProductoShow({ producto, auth, carrito }) {
                             </p>
                         )}
 
-                        {/* Stock */}
                         <div className="mb-6">
                             {isAvailable ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full" style={{ background: '#059669' }} />
-                                    <span style={{ fontSize: 13, color: '#059669', fontWeight: 500 }}>
-                                        Disponible ({producto.stock_disponible} en stock)
+                                    <div className="w-2 h-2 rounded-full" style={{ background: badge === 'ultimo_stock' ? '#D97706' : '#059669' }} />
+                                    <span
+                                        style={{
+                                            fontSize: 13,
+                                            color: badge === 'ultimo_stock' ? '#D97706' : '#059669',
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        {badge === 'ultimo_stock' ? `Stock bajo (${stock} disponibles)` : `Disponible (${stock} en stock)`}
                                     </span>
                                 </div>
                             ) : (
@@ -101,12 +109,12 @@ export default function ProductoShow({ producto, auth, carrito }) {
                             )}
                         </div>
 
-                        {/* Quantity */}
                         {isAvailable && (
                             <div className="flex items-center gap-4 mb-6">
                                 <label style={{ fontSize: 13, fontWeight: 600, color: '#544a45' }}>Cantidad:</label>
                                 <div className="flex items-center gap-2 rounded-xl p-1" style={{ background: '#F3F4F6' }}>
                                     <button
+                                        type="button"
                                         onClick={() => setCantidad(Math.max(1, cantidad - 1))}
                                         className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
                                         style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
@@ -117,7 +125,8 @@ export default function ProductoShow({ producto, auth, carrito }) {
                                         {cantidad}
                                     </span>
                                     <button
-                                        onClick={() => setCantidad(Math.min(producto.stock_disponible, cantidad + 1))}
+                                        type="button"
+                                        onClick={() => setCantidad(Math.min(stock, cantidad + 1))}
                                         className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
                                         style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
                                     >
@@ -127,37 +136,67 @@ export default function ProductoShow({ producto, auth, carrito }) {
                             </div>
                         )}
 
-                        {/* Add to cart */}
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={!isAvailable || processing}
-                            className="w-full py-4 rounded-xl flex items-center justify-center gap-2 transition-all"
-                            style={{
-                                background: added
-                                    ? 'linear-gradient(135deg, #059669, #10B981)'
-                                    : isAvailable
-                                    ? 'linear-gradient(135deg, #D77A61, #c56950)'
-                                    : '#9CA3AF',
-                                color: 'white',
-                                fontSize: 15,
-                                fontWeight: 700,
-                                border: 'none',
-                                cursor: isAvailable && !processing ? 'pointer' : 'not-allowed',
-                            }}
-                        >
-                            {added ? (
-                                <><Check size={16} /> Añadido al carrito</>
-                            ) : processing ? (
-                                'Procesando...'
-                            ) : (
-                                <><ShoppingCart size={16} /> Añadir al carrito</>
+                        {badge === 'ultimo_stock' && isAvailable && (
+                            <p
+                                className="flex items-center gap-1.5 mb-3 px-3 py-2 rounded-xl"
+                                style={{ fontSize: 13, fontWeight: 600, background: '#FEF3C7', color: '#B45309' }}
+                            >
+                                <AlertTriangle size={14} />
+                                Stock bajo: quedan {stock} unidades
+                            </p>
+                        )}
+
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                type="button"
+                                onClick={handleAddToCart}
+                                disabled={!isAvailable || busy}
+                                className="flex-1 py-4 rounded-xl flex items-center justify-center gap-2 transition-all"
+                                style={{
+                                    background: added
+                                        ? 'linear-gradient(135deg, #059669, #10B981)'
+                                        : inCart && !added
+                                          ? 'linear-gradient(135deg, #3C473A, #4e5849)'
+                                          : isAvailable
+                                            ? 'linear-gradient(135deg, #D77A61, #c56950)'
+                                            : '#9CA3AF',
+                                    color: 'white',
+                                    fontSize: 15,
+                                    fontWeight: 700,
+                                    border: 'none',
+                                    cursor: isAvailable && !busy ? 'pointer' : 'not-allowed',
+                                }}
+                            >
+                                {added ? (
+                                    <>
+                                        <Check size={16} /> Añadido al carrito
+                                    </>
+                                ) : busy ? (
+                                    'Agregando...'
+                                ) : inCart ? (
+                                    <>
+                                        <Check size={16} /> Ya está en tu carrito
+                                    </>
+                                ) : (
+                                    <>
+                                        <ShoppingCart size={16} /> Añadir al carrito
+                                    </>
+                                )}
+                            </button>
+                            {inCart && (
+                                <button
+                                    type="button"
+                                    onClick={openCart}
+                                    className="py-4 px-5 rounded-xl transition-all hover:bg-gray-50"
+                                    style={{ fontSize: 14, fontWeight: 600, color: '#544a45', border: '1.5px solid #E5E7EB', background: 'white', cursor: 'pointer' }}
+                                >
+                                    Ver carrito
+                                </button>
                             )}
-                        </button>
+                        </div>
                     </div>
                 </div>
             </section>
-
-            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} carrito={carrito} auth={auth} />
         </StorefrontLayout>
     );
 }

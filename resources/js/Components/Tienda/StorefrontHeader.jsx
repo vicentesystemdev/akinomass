@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
-import { ShoppingCart, User, Menu, X, Search, LogOut, Package, MapPin } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, MapPin } from 'lucide-react';
 
-export default function StorefrontHeader({ auth, cartCount = 0 }) {
+export default function StorefrontHeader({ auth, cartCount = 0, onCartClick, badgePulse = false }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -20,7 +20,6 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8" style={{ height: 64 }}>
                 <div className="flex items-center justify-between h-full gap-4">
-                    {/* Logo */}
                     <Link href="/tienda" className="flex items-center gap-2.5 flex-shrink-0" style={{ textDecoration: 'none' }}>
                         <div
                             className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -31,7 +30,6 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
                         <span style={{ fontSize: 18, fontWeight: 800, color: '#2B221E' }}>AKINOMASS</span>
                     </Link>
 
-                    {/* Nav desktop */}
                     <nav className="hidden md:flex items-center gap-6">
                         <Link
                             href="/tienda/catalogo"
@@ -42,36 +40,45 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
                         </Link>
                     </nav>
 
-                    {/* Right actions */}
                     <div className="flex items-center gap-3">
-                        {/* Carrito */}
-                        <Link
-                            href="/tienda/carrito"
-                            className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all hover:bg-gray-50"
+                        <button
+                            type="button"
+                            onClick={onCartClick}
+                            className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all hover:opacity-90"
                             style={{
                                 background: 'linear-gradient(135deg, #D77A61, #c56950)',
                                 color: 'white',
                                 fontSize: 13,
                                 fontWeight: 600,
-                                textDecoration: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
                             }}
+                            aria-label={`Carrito${cartCount > 0 ? `, ${cartCount} productos` : ''}`}
                         >
                             <ShoppingCart size={15} />
                             <span className="hidden md:inline">Carrito</span>
                             {cartCount > 0 && (
                                 <span
-                                    className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                                    style={{ background: '#DC2626', fontSize: 10, fontWeight: 800, color: 'white', border: '2px solid white' }}
+                                    className="absolute -top-2 -right-2 min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center"
+                                    style={{
+                                        background: '#DC2626',
+                                        fontSize: 10,
+                                        fontWeight: 800,
+                                        color: 'white',
+                                        border: '2px solid white',
+                                        transform: badgePulse ? 'scale(1.2)' : 'scale(1)',
+                                        transition: 'transform 0.2s ease-out',
+                                    }}
                                 >
                                     {cartCount > 99 ? '99+' : cartCount}
                                 </span>
                             )}
-                        </Link>
+                        </button>
 
-                        {/* User menu */}
                         {user ? (
                             <div className="relative">
                                 <button
+                                    type="button"
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all hover:bg-gray-50"
                                     style={{ border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer' }}
@@ -130,6 +137,7 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
 
                                             <div className="border-t mt-1 pt-1" style={{ borderColor: '#F3F4F6' }}>
                                                 <button
+                                                    type="button"
                                                     onClick={() => {
                                                         setUserMenuOpen(false);
                                                         router.post('/tienda/logout');
@@ -156,8 +164,8 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
                             </Link>
                         )}
 
-                        {/* Mobile menu */}
                         <button
+                            type="button"
                             onClick={() => setMenuOpen(!menuOpen)}
                             className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors"
                             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
@@ -168,7 +176,6 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
                 </div>
             </div>
 
-            {/* Mobile menu */}
             {menuOpen && (
                 <div className="md:hidden border-t" style={{ borderColor: '#F3F4F6', background: 'white' }}>
                     <div className="px-4 py-3 space-y-2">
@@ -180,6 +187,17 @@ export default function StorefrontHeader({ auth, cartCount = 0 }) {
                         >
                             Catálogo
                         </Link>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMenuOpen(false);
+                                onCartClick?.();
+                            }}
+                            className="block w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50"
+                            style={{ fontSize: 14, fontWeight: 500, color: '#544a45', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            Carrito {cartCount > 0 ? `(${cartCount})` : ''}
+                        </button>
                         {!user && (
                             <Link
                                 href="/tienda/login"

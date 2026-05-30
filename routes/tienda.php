@@ -4,6 +4,7 @@ use App\Http\Controllers\Tienda\Auth\AuthenticatedClienteController;
 use App\Http\Controllers\Tienda\Auth\RegisteredClienteController;
 use App\Http\Controllers\Tienda\CarritoController;
 use App\Http\Controllers\Tienda\CatalogoPublicoController;
+use App\Http\Controllers\Tienda\CuentaClienteDashboardController;
 use App\Http\Controllers\Tienda\CheckoutController;
 use App\Http\Controllers\Tienda\DireccionClienteController;
 use App\Http\Controllers\Tienda\FacturaWebController;
@@ -70,9 +71,8 @@ Route::middleware(CarritoSessionMiddleware::class)->group(function () {
         Route::get('/tienda/mis-pedidos/{pedido}/factura', [FacturaWebController::class, 'show'])->name('tienda.cuenta.factura.show');
 
         // Cuenta
-        Route::get('/tienda/mi-cuenta', function () {
-            return inertia('Tienda/Cuenta/Index');
-        })->name('tienda.cuenta');
+        Route::get('/tienda/mi-cuenta', [CuentaClienteDashboardController::class, 'index'])
+            ->name('tienda.cuenta');
 
         Route::get('/tienda/mis-direcciones', [DireccionClienteController::class, 'index'])
             ->name('tienda.cuenta.direcciones');
