@@ -42,8 +42,8 @@ export default function ProductoShow({ producto, auth }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="rounded-2xl overflow-hidden" style={{ background: '#F8F8FA', aspectRatio: '3/4' }}>
-                        {producto.imagen_pro ? (
-                            <img src={producto.imagen_pro} alt={producto.nombre_pro} className="w-full h-full object-cover" />
+                        {producto.image_url ? (
+                            <img src={producto.image_url} alt={producto.nombre_pro} className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
                                 <Package size={64} style={{ color: '#D1D5DB' }} />

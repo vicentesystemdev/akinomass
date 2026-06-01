@@ -4,6 +4,7 @@ import SectionCard from '@/Components/UI/SectionCard';
 import StatusBadge from '@/Components/UI/StatusBadge';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import ComprobantePagoViewer from '@/Components/Pagos/ComprobantePagoViewer';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -51,8 +52,12 @@ export default function Show({ pago }) {
         });
     };
 
+    const comprobante = pago.comprobante_web;
+    const faltaComprobanteTienda =
+        comprobante?.origen_tienda && !comprobante?.tiene && pago.estado_pago_pag === 'pendiente';
+
     const canEdit = pago.estado_pago_pag === 'pendiente';
-    const canConfirm = pago.estado_pago_pag === 'pendiente';
+    const canConfirm = pago.estado_pago_pag === 'pendiente' && !faltaComprobanteTienda;
     const canObservar = pago.estado_pago_pag === 'pendiente';
     const canRechazar = pago.estado_pago_pag === 'pendiente' || pago.estado_pago_pag === 'observado';
 
@@ -87,8 +92,14 @@ export default function Show({ pago }) {
         >
             <Head title={`Pago #${pago.cod_pago}`} />
 
-            <div className="max-w-3xl mx-auto space-y-6">
-                {/* Detalle del pago */}
+            <div className="max-w-4xl mx-auto space-y-6">
+                <SectionCard
+                    title="Comprobante del cliente"
+                    subtitle="Revisa el comprobante antes de confirmar el pago"
+                >
+                    <ComprobantePagoViewer comprobante={comprobante} />
+                </SectionCard>
+
                 <SectionCard title="Detalle del Pago">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
@@ -159,6 +170,11 @@ export default function Show({ pago }) {
                                     </svg>
                                     Observar
                                 </button>
+                            )}
+                            {pago.estado_pago_pag === 'pendiente' && faltaComprobanteTienda && (
+                                <p className="w-full text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2">
+                                    No puedes confirmar sin comprobante: el cliente debe subirlo desde la tienda.
+                                </p>
                             )}
                             {canConfirm && (
                                 <PrimaryActionButton

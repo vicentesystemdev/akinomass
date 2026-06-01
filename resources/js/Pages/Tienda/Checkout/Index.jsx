@@ -25,6 +25,7 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
         referencia_pago: '',
         comprobante: null,
     });
+    const [comprobanteError, setComprobanteError] = useState(null);
     const [pedido, setPedido] = useState(pedidoProp || null);
     const [processing, setProcessing] = useState(false);
 
@@ -52,6 +53,9 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
 
     function updatePayment(d) {
         setPaymentData((prev) => ({ ...prev, ...d }));
+        if (d.comprobante) {
+            setComprobanteError(null);
+        }
     }
 
     function handleShippingNext() {
@@ -64,6 +68,12 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
     }
 
     function handlePaymentNext() {
+        if (!paymentData.comprobante) {
+            setComprobanteError('Debes adjuntar el comprobante de pago para continuar.');
+            return;
+        }
+
+        setComprobanteError(null);
         setProcessing(true);
 
         // PASO 1: Generar el pedido PRIMERO
@@ -83,13 +93,20 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
 
                 router.post(`/tienda/checkout/${token}/pago`, formData, {
                     preserveScroll: true,
+                    forceFormData: true,
                     onSuccess: (pagoPage) => {
                         if (pagoPage.props.pedido) {
                             setPedido(pagoPage.props.pedido);
                         }
                         setStep(4);
                     },
-                    onError: () => setStep(4),
+                    onError: (errors) => {
+                        if (errors.comprobante) {
+                            setComprobanteError(
+                                Array.isArray(errors.comprobante) ? errors.comprobante[0] : errors.comprobante,
+                            );
+                        }
+                    },
                     onFinish: () => setProcessing(false),
                 });
             },
@@ -145,6 +162,7 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                         onNext={handlePaymentNext}
                         onBack={() => setStep(2)}
                         processing={processing}
+                        comprobanteError={comprobanteError}
                     />
                 )}
                 {step === 4 && <ConfirmationStep checkout={checkout} pedido={pedido} />}

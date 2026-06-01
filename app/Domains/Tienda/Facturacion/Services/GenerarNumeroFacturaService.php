@@ -4,7 +4,6 @@ namespace App\Domains\Tienda\Facturacion\Services;
 
 use App\Models\Factura;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class GenerarNumeroFacturaService
 {
@@ -14,12 +13,26 @@ class GenerarNumeroFacturaService
         $cacheKey = "factura_secuencia_{$anio}";
 
         return Cache::lock($cacheKey . '_lock', 5)->block(3, function () use ($anio, $cacheKey) {
-            $ultimoNumero = Cache::get($cacheKey, 0);
-            $nuevoNumero = $ultimoNumero + 1;
+            $numero = Cache::get($cacheKey);
 
-            Cache::forever($cacheKey, $nuevoNumero);
+            if ($numero === null) {
+                $numero = Factura::where('numero_factura_fac', 'like', "FAC-{$anio}-%")
+                    ->selectRaw("MAX(CAST(SUBSTRING(numero_factura_fac FROM 9) AS INTEGER)) as max_num")
+                    ->value('max_num') ?? 0;
+            }
 
-            return 'FAC-' . $anio . '-' . str_pad((string) $nuevoNumero, 6, '0', STR_PAD_LEFT);
+            $intentos = 0;
+
+            do {
+                $numero++;
+                $factura = 'FAC-' . $anio . '-' . str_pad((string) $numero, 6, '0', STR_PAD_LEFT);
+                $existe = Factura::where('numero_factura_fac', $factura)->exists();
+                $intentos++;
+            } while ($existe && $intentos < 100);
+
+            Cache::forever($cacheKey, $numero);
+
+            return $factura;
         });
     }
 }

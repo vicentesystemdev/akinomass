@@ -22,7 +22,9 @@ class StoreProductoRequest extends FormRequest
             'precio_venta_pro' => ['required', 'numeric', 'min:0'],
             'precio_costo_pro' => ['nullable', 'numeric', 'min:0'],
             'sku_pro' => ['nullable', 'string', 'max:100', 'unique:productos,sku_pro'],
-            'imagen_pro' => ['nullable', 'string', 'max:255'],
+            'imagen_pro' => $this->hasFile('imagen_pro')
+                ? ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']
+                : ['nullable'],
             'estado_pro' => ['required', Rule::enum(EstadoProductoEnum::class)],
         ];
     }

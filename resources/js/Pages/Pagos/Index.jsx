@@ -6,8 +6,11 @@ import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
 import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
+import LiveSyncBadge from '@/Components/UI/LiveSyncBadge';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { useInertiaPoll } from '@/hooks/useInertiaPoll';
+import { useListHighlight } from '@/hooks/useListHighlight';
 
 const formatBOB = (value) => {
     if (value === null || value === undefined) return '-';
@@ -57,8 +60,10 @@ const metodoOptions = [
 export default function Index({ pagos = { data: [] } }) {
     const [filterEstado, setFilterEstado] = useState('');
     const [filterMetodo, setFilterMetodo] = useState('');
+    const { lastUpdated, isRefreshing, refresh } = useInertiaPoll(['pagos'], 12000, true);
 
     const pagosData = pagos.data || [];
+    const { isHighlighted, hasNewItems } = useListHighlight(pagosData, 'cod_pago', true);
 
     const filteredPagos = useMemo(() => {
         return pagosData.filter((p) => {
@@ -79,17 +84,25 @@ export default function Index({ pagos = { data: [] } }) {
                         { label: 'Pagos' },
                     ]}
                     actions={
-                        <Link href={route('pagos.create')}>
-                            <PrimaryActionButton
-                                icon={
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                }
-                            >
-                                Registrar Pago
-                            </PrimaryActionButton>
-                        </Link>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <LiveSyncBadge isRefreshing={isRefreshing} lastUpdated={lastUpdated} onRefresh={refresh} />
+                            {hasNewItems && (
+                                <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-800 animate-dashboard-pulse">
+                                    Nuevos pagos
+                                </span>
+                            )}
+                            <Link href={route('pagos.create')}>
+                                <PrimaryActionButton
+                                    icon={
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                    }
+                                >
+                                    Registrar Pago
+                                </PrimaryActionButton>
+                            </Link>
+                        </div>
                     }
                 />
             }
@@ -154,12 +167,16 @@ export default function Index({ pagos = { data: [] } }) {
                                 <TableWrapper.HeaderCell>Método</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell align="right">Monto</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell>Estado</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="center">Comprobante</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell>Fecha</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell align="right">Acciones</TableWrapper.HeaderCell>
                             </TableWrapper.Header>
                             <TableWrapper.Body>
                                 {filteredPagos.map((pago) => (
-                                    <TableWrapper.Row key={pago.cod_pago}>
+                                    <TableWrapper.Row
+                                        key={pago.cod_pago}
+                                        className={isHighlighted(pago.cod_pago) ? 'bg-green-50/80 animate-row-highlight' : ''}
+                                    >
                                         <TableWrapper.Cell>
                                             <p className="font-mono font-medium text-cafe-900">
                                                 {pago.pedido?.numero_pedido_ped || `#${pago.cod_pedido}`}
@@ -183,6 +200,22 @@ export default function Index({ pagos = { data: [] } }) {
                                         </TableWrapper.Cell>
                                         <TableWrapper.Cell>
                                             <StatusBadge status={pago.estado_pago_pag} />
+                                        </TableWrapper.Cell>
+                                        <TableWrapper.Cell align="center">
+                                            {pago.comprobante_web?.tiene ? (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800">
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Sí
+                                                </span>
+                                            ) : pago.comprobante_web?.origen_tienda ? (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                                                    Pendiente
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-gray-400">—</span>
+                                            )}
                                         </TableWrapper.Cell>
                                         <TableWrapper.Cell>
                                             <p className="text-sm text-cafe-700">

@@ -128,9 +128,9 @@ export default function Index({ productos = { data: [] }, categorias = [] }) {
                             >
                                 {/* Imagen del producto */}
                                 <div className="relative aspect-square bg-gray-50 overflow-hidden">
-                                    {producto.imagen_pro ? (
+                                    {producto.image_url ? (
                                         <img
-                                            src={producto.imagen_pro}
+                                            src={producto.image_url}
                                             alt={producto.nombre_pro}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {
@@ -140,7 +140,7 @@ export default function Index({ productos = { data: [] }, categorias = [] }) {
                                         />
                                     ) : null}
                                     <div
-                                        className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br from-oliva-50 to-oliva-100 ${producto.imagen_pro ? 'hidden' : 'flex'}`}
+                                        className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br from-oliva-50 to-oliva-100 ${producto.image_url ? 'hidden' : 'flex'}`}
                                     >
                                         <svg className="w-16 h-16 text-oliva-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />

@@ -7,6 +7,7 @@ use App\Domains\Comercial\Pagos\Enums\MetodoPagoEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Pago extends Model
 {
@@ -35,4 +36,9 @@ class Pago extends Model
 
     public function pedido(): BelongsTo { return $this->belongsTo(Pedido::class, 'cod_pedido', 'cod_pedido'); }
     public function usuarioResponsable(): BelongsTo { return $this->belongsTo(User::class, 'cod_usuario_responsable'); }
+
+    public function pagoTienda(): HasOne
+    {
+        return $this->hasOne(PagoTienda::class, 'cod_pago', 'cod_pago');
+    }
 }

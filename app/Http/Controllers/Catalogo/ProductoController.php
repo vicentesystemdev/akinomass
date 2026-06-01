@@ -37,7 +37,34 @@ class ProductoController extends Controller
 
     public function store(StoreProductoRequest $request, CrearProductoAction $action)
     {
-        $action->execute($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('imagen_pro')) {
+            $data['imagen_pro'] = $request->file('imagen_pro');
+        } else {
+            unset($data['imagen_pro']);
+        }
+
+        $action->execute($data);
+
+        return redirect()->route('productos.index');
+    }
+
+    public function update(UpdateProductoRequest $request, Producto $producto, ActualizarProductoAction $action)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('imagen_pro')) {
+            $data['imagen_pro'] = $request->file('imagen_pro');
+        } elseif ($request->boolean('eliminar_imagen')) {
+            $data['imagen_pro'] = null;
+        } else {
+            unset($data['imagen_pro']);
+        }
+
+        unset($data['eliminar_imagen']);
+
+        $action->execute($producto, $data);
 
         return redirect()->route('productos.index');
     }
@@ -51,12 +78,5 @@ class ProductoController extends Controller
             'categorias' => CategoriaProducto::where('activo_cat', true)->orWhere('cod_categoria_producto', $producto->cod_categoria_producto)->get(),
             'estados' => array_column(EstadoProductoEnum::cases(), 'value'),
         ]);
-    }
-
-    public function update(UpdateProductoRequest $request, Producto $producto, ActualizarProductoAction $action)
-    {
-        $action->execute($producto, $request->validated());
-
-        return redirect()->route('productos.index');
     }
 }

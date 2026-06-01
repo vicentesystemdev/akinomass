@@ -4,7 +4,10 @@ import SectionCard from '@/Components/UI/SectionCard';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
 import Pagination from '@/Components/UI/Pagination';
+import LiveSyncBadge from '@/Components/UI/LiveSyncBadge';
 import { Head, Link } from '@inertiajs/react';
+import { useInertiaPoll } from '@/hooks/useInertiaPoll';
+import { useListHighlight } from '@/hooks/useListHighlight';
 
 const tipoMovimientoConfig = {
     entrada: {
@@ -75,17 +78,30 @@ const formatDate = (dateString) => {
 
 export default function Movimientos({ movimientos = { data: [] } }) {
     const movimientosData = movimientos.data || [];
+    const { lastUpdated, isRefreshing, refresh } = useInertiaPoll(['movimientos'], 12000, true);
+    const { isHighlighted, hasNewItems } = useListHighlight(movimientosData, 'cod_movimiento_inventario', true);
+
     return (
         <AuthenticatedLayout
             header={
                 <PageHeader
                     title="Movimientos de Inventario"
-                    subtitle="Historial de entradas, salidas y ajustes"
+                    subtitle="Historial en tiempo real de entradas, salidas y ajustes"
                     breadcrumbs={[
                         { label: 'Dashboard', href: route('dashboard') },
                         { label: 'Inventario', href: route('inventario.index') },
                         { label: 'Movimientos' },
                     ]}
+                    actions={
+                        <div className="flex flex-wrap items-center gap-3">
+                            <LiveSyncBadge isRefreshing={isRefreshing} lastUpdated={lastUpdated} onRefresh={refresh} />
+                            {hasNewItems && (
+                                <span className="rounded-full bg-cyan-100 px-2.5 py-1 text-xs font-semibold text-cyan-900 animate-dashboard-pulse">
+                                    Nuevo movimiento
+                                </span>
+                            )}
+                        </div>
+                    }
                 />
             }
         >
@@ -117,7 +133,10 @@ export default function Movimientos({ movimientos = { data: [] } }) {
                             </TableWrapper.Header>
                             <TableWrapper.Body>
                                 {movimientosData.map((mov) => (
-                                    <TableWrapper.Row key={mov.cod_movimiento_inventario}>
+                                    <TableWrapper.Row
+                                        key={mov.cod_movimiento_inventario}
+                                        className={isHighlighted(mov.cod_movimiento_inventario) ? 'bg-cyan-50/80 animate-row-highlight' : ''}
+                                    >
                                         <TableWrapper.Cell>
                                             <p className="text-sm text-cafe-700 whitespace-nowrap">
                                                 {formatDate(mov.created_at)}

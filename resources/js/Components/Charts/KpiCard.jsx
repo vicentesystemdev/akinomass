@@ -41,7 +41,7 @@ export default function KpiCard({ title, value, subtitle, icon, variant = 'oliva
     const style = variants[variant] || variants.oliva;
 
     return (
-        <div className={`relative overflow-hidden rounded-xl ${style.bg} p-5 border border-gray-100`}>
+        <div className={`relative overflow-hidden rounded-xl ${style.bg} p-5 border border-gray-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5`}>
             <div className="flex items-start justify-between">
                 <div className="flex-1">
                     <p className="text-sm font-medium text-gray-600">{title}</p>

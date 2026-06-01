@@ -6,8 +6,11 @@ import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
 import Pagination from '@/Components/UI/Pagination';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
+import LiveSyncBadge from '@/Components/UI/LiveSyncBadge';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { useInertiaPoll } from '@/hooks/useInertiaPoll';
+import { useListHighlight } from '@/hooks/useListHighlight';
 
 const formatBOB = (value) => {
     if (value === null || value === undefined) return '-';
@@ -34,8 +37,10 @@ const estadoOptions = [
 
 export default function Index({ pedidos = { data: [] } }) {
     const [filterEstado, setFilterEstado] = useState('');
+    const { lastUpdated, isRefreshing, refresh } = useInertiaPoll(['pedidos'], 12000, true);
 
     const pedidosData = pedidos.data || [];
+    const { isHighlighted, hasNewItems } = useListHighlight(pedidosData, 'cod_pedido', true);
 
     const filteredPedidos = useMemo(() => {
         if (!filterEstado) return pedidosData;
@@ -53,6 +58,13 @@ export default function Index({ pedidos = { data: [] } }) {
                         { label: 'Pedidos' },
                     ]}
                     actions={
+                        <div className="flex flex-wrap items-center gap-3">
+                            <LiveSyncBadge isRefreshing={isRefreshing} lastUpdated={lastUpdated} onRefresh={refresh} />
+                            {hasNewItems && (
+                                <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-800 animate-dashboard-pulse">
+                                    Nuevos pedidos
+                                </span>
+                            )}
                         <Link href={route('pedidos.create')}>
                             <PrimaryActionButton
                                 icon={
@@ -64,6 +76,7 @@ export default function Index({ pedidos = { data: [] } }) {
                                 Nuevo Pedido
                             </PrimaryActionButton>
                         </Link>
+                        </div>
                     }
                 />
             }
@@ -106,7 +119,10 @@ export default function Index({ pedidos = { data: [] } }) {
                             </TableWrapper.Header>
                             <TableWrapper.Body>
                                 {filteredPedidos.map((pedido) => (
-                                    <TableWrapper.Row key={pedido.cod_pedido}>
+                                    <TableWrapper.Row
+                                        key={pedido.cod_pedido}
+                                        className={isHighlighted(pedido.cod_pedido) ? 'bg-green-50/80 animate-row-highlight' : ''}
+                                    >
                                         <TableWrapper.Cell>
                                             <p className="font-mono font-medium text-cafe-900">
                                                 {pedido.numero_pedido_ped}

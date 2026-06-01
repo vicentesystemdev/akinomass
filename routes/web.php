@@ -62,6 +62,8 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::post('/interacciones-live/{interaccion_live}/convertir-lead', [LiveSalesController::class, 'convertirLead'])->name('live-sales.convertir-lead');
     Route::post('/interacciones-live/{interaccion_live}/convertir-pedido', [LiveSalesController::class, 'convertirPedido'])->name('live-sales.convertir-pedido');
 
+    Route::get('/pagos/{pago}/comprobante', \App\Http\Controllers\PagoComprobanteController::class)
+        ->name('pagos.comprobante');
     Route::resource('pagos', PagoController::class);
 
     Route::get('/reportes', ReporteController::class)->name('reportes.index');

@@ -2,13 +2,7 @@ import SectionCard from '@/Components/UI/SectionCard';
 import HorizontalBar from '@/Components/Charts/HorizontalBar';
 import VerticalBarChart from '@/Components/Charts/VerticalBarChart';
 import TableWrapper from '@/Components/UI/TableWrapper';
-
-const formatBOB = (value) => {
-    if (value === null || value === undefined) return 'Bs 0.00';
-    const num = parseFloat(value);
-    if (isNaN(num)) return 'Bs 0.00';
-    return `Bs ${num.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+import { formatBOB } from '@/lib/formatters';
 
 export default function VentasTab({ reportes }) {
     const ventasPorCanal = (reportes?.ventas_por_canal || []).map((v) => ({

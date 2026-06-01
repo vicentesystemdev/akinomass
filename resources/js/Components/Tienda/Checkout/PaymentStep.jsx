@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Shield, QrCode, Building2, CreditCard, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Shield, QrCode, Building2, CreditCard, AlertCircle } from 'lucide-react';
+import ComprobanteUpload from './ComprobanteUpload';
 
 const PAYMENT_METHODS = [
     { id: 'qr', label: 'Código QR', sub: 'Pago instantáneo', icon: QrCode, color: '#3C473A', bg: '#f4f5f4' },
@@ -7,7 +7,18 @@ const PAYMENT_METHODS = [
     { id: 'deposito', label: 'Depósito Bancario', sub: 'En ventanilla', icon: CreditCard, color: '#059669', bg: '#ECFDF5' },
 ];
 
-export default function PaymentStep({ method, onMethod, data, onChange, onNext, onBack, processing = false }) {
+export default function PaymentStep({
+    method,
+    onMethod,
+    data,
+    onChange,
+    onNext,
+    onBack,
+    processing = false,
+    comprobanteError = null,
+}) {
+    const canSubmit = Boolean(data.comprobante) && !processing;
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-4">
@@ -16,6 +27,7 @@ export default function PaymentStep({ method, onMethod, data, onChange, onNext, 
                 {PAYMENT_METHODS.map((opt) => (
                     <button
                         key={opt.id}
+                        type="button"
                         onClick={() => onMethod(opt.id)}
                         className="w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all"
                         style={{
@@ -38,7 +50,9 @@ export default function PaymentStep({ method, onMethod, data, onChange, onNext, 
                             className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
                             style={{ borderColor: method === opt.id ? opt.color : '#D1D5DB' }}
                         >
-                            {method === opt.id && <div className="w-2.5 h-2.5 rounded-full" style={{ background: opt.color }} />}
+                            {method === opt.id && (
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ background: opt.color }} />
+                            )}
                         </div>
                     </button>
                 ))}
@@ -46,30 +60,40 @@ export default function PaymentStep({ method, onMethod, data, onChange, onNext, 
                 <div className="p-5 rounded-2xl" style={{ background: '#FAFAFA', border: '1px solid #F3F4F6' }}>
                     <div className="space-y-4">
                         <div>
-                            <label style={{ fontSize: 12.5, fontWeight: 600, color: '#544a45', display: 'block', marginBottom: 5 }}>
+                            <label
+                                style={{
+                                    fontSize: 12.5,
+                                    fontWeight: 600,
+                                    color: '#544a45',
+                                    display: 'block',
+                                    marginBottom: 5,
+                                }}
+                            >
                                 Referencia de pago
                             </label>
                             <input
                                 type="text"
                                 value={data.referencia_pago || ''}
                                 onChange={(e) => onChange({ referencia_pago: e.target.value })}
-                                placeholder="Número de referencia o comprobante"
-                                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #E5E7EB', background: 'white', fontSize: 13.5, outline: 'none', color: '#2B221E' }}
+                                placeholder="Número de operación, referencia bancaria…"
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    borderRadius: 10,
+                                    border: '1.5px solid #E5E7EB',
+                                    background: 'white',
+                                    fontSize: 13.5,
+                                    outline: 'none',
+                                    color: '#2B221E',
+                                }}
                             />
                         </div>
 
-                        <div>
-                            <label style={{ fontSize: 12.5, fontWeight: 600, color: '#544a45', display: 'block', marginBottom: 5 }}>
-                                Comprobante de pago
-                            </label>
-                            <input
-                                type="file"
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                onChange={(e) => onChange({ comprobante: e.target.files[0] })}
-                                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #E5E7EB', background: 'white', fontSize: 13.5, outline: 'none', color: '#2B221E' }}
-                            />
-                            <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>JPG, PNG o PDF. Máximo 5MB.</p>
-                        </div>
+                        <ComprobanteUpload
+                            file={data.comprobante}
+                            error={comprobanteError}
+                            onChange={(file) => onChange({ comprobante: file })}
+                        />
                     </div>
 
                     <div
@@ -78,7 +102,8 @@ export default function PaymentStep({ method, onMethod, data, onChange, onNext, 
                     >
                         <AlertCircle size={13} style={{ color: '#D97706', marginTop: 1, flexShrink: 0 }} />
                         <p style={{ fontSize: 12, color: '#92400E', lineHeight: 1.5 }}>
-                            Registrar tu pago no confirma la acreditación bancaria automáticamente. Te notificaremos cuando validemos tu pago.
+                            Tu comprobante será revisado por nuestro equipo antes de confirmar el pago. El registro no
+                            acredita automáticamente en el banco.
                         </p>
                     </div>
                 </div>
@@ -86,18 +111,38 @@ export default function PaymentStep({ method, onMethod, data, onChange, onNext, 
 
             <div className="space-y-4">
                 <button
+                    type="button"
                     onClick={onNext}
-                    disabled={processing}
+                    disabled={!canSubmit}
                     className="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:opacity-90"
-                    style={{ background: processing ? '#9CA3AF' : 'linear-gradient(135deg, #059669, #10B981)', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: processing ? 'not-allowed' : 'pointer' }}
+                    style={{
+                        background: canSubmit
+                            ? 'linear-gradient(135deg, #059669, #10B981)'
+                            : '#9CA3AF',
+                        color: 'white',
+                        fontSize: 14,
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: canSubmit ? 'pointer' : 'not-allowed',
+                    }}
                 >
                     <Shield size={15} />
-                    {processing ? 'Procesando...' : 'Confirmar Pedido'}
+                    {processing ? 'Procesando...' : 'Confirmar pedido y enviar comprobante'}
                 </button>
+                {!data.comprobante && !processing && (
+                    <p className="text-xs text-center text-amber-700 font-medium">Adjunta el comprobante para continuar</p>
+                )}
                 <button
+                    type="button"
                     onClick={onBack}
                     className="w-full py-2.5 rounded-xl flex items-center justify-center gap-1 hover:bg-gray-50 transition-colors"
-                    style={{ fontSize: 13, color: '#6B7280', border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer' }}
+                    style={{
+                        fontSize: 13,
+                        color: '#6B7280',
+                        border: '1px solid #E5E7EB',
+                        background: 'white',
+                        cursor: 'pointer',
+                    }}
                 >
                     <ChevronLeft size={13} />
                     Volver

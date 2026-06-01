@@ -15,8 +15,10 @@ use App\Models\DetalleCarrito;
 use App\Models\Inventario;
 use App\Models\Pedido;
 use App\Models\PedidoTienda;
-use App\Models\Producto;
+use App\Models\PagoTienda;
 use App\Models\TipoFlujoComercial;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class PagoWebTest extends TiendaTestCase
 {
@@ -92,6 +94,7 @@ class PagoWebTest extends TiendaTestCase
         $response = $this->postJson('/tienda/checkout/' . $this->checkoutSesion->token_che . '/pago', [
             'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
             'metodo_pago_pag' => 'qr',
+            'comprobante' => UploadedFile::fake()->create('comprobante.pdf', 100, 'application/pdf'),
         ]);
 
         $response->assertStatus(401);
@@ -99,16 +102,39 @@ class PagoWebTest extends TiendaTestCase
 
     public function test_registrar_pago_crea_pago_tienda(): void
     {
+        Storage::fake('local');
+        $this->actingAs($this->user);
+
+        $comprobante = UploadedFile::fake()->create('comprobante.pdf', 100, 'application/pdf');
+
+        $response = $this->post('/tienda/checkout/' . $this->checkoutSesion->token_che . '/pago', [
+            'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
+            'metodo_pago_pag' => 'qr',
+            'referencia_pag' => 'REF-123',
+            'comprobante' => $comprobante,
+        ], [
+            'Accept' => 'application/json',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['mensaje', 'pago']);
+
+        $pagoTienda = PagoTienda::where('cod_checkout_sesion', $this->checkoutSesion->cod_checkout_sesion)->first();
+        $this->assertNotNull($pagoTienda?->comprobante_ruta_pwe);
+        Storage::disk('local')->assertExists($pagoTienda->comprobante_ruta_pwe);
+    }
+
+    public function test_registrar_pago_sin_comprobante_falla(): void
+    {
         $this->actingAs($this->user);
 
         $response = $this->postJson('/tienda/checkout/' . $this->checkoutSesion->token_che . '/pago', [
             'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
             'metodo_pago_pag' => 'qr',
-            'referencia_pag' => 'REF-123',
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['mensaje', 'pago']);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['comprobante']);
     }
 
     public function test_metodo_pago_invalido_falla(): void

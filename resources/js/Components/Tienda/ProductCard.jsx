@@ -60,8 +60,8 @@ export default function ProductCard({ producto }) {
 
             <Link href={`/tienda/productos/${producto.cod_producto}`} style={{ textDecoration: 'none' }}>
                 <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#F8F8FA' }}>
-                    {producto.imagen_pro ? (
-                        <img src={producto.imagen_pro} alt={producto.nombre_pro} className="w-full h-full object-cover" />
+                    {producto.image_url ? (
+                        <img src={producto.image_url} alt={producto.nombre_pro} className="w-full h-full object-cover" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center" style={{ background: '#F3F4F6' }}>
                             <ShoppingCart size={40} style={{ color: '#D1D5DB' }} />

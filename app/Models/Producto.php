@@ -33,6 +33,8 @@ class Producto extends Model
         'estado_pro' => EstadoProductoEnum::class,
     ];
 
+    protected $appends = ['image_url'];
+
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(CategoriaProducto::class, 'cod_categoria_producto', 'cod_categoria_producto');
@@ -41,5 +43,14 @@ class Producto extends Model
     public function inventario(): HasOne
     {
         return $this->hasOne(Inventario::class, 'cod_producto', 'cod_producto');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->imagen_pro) {
+            return null;
+        }
+
+        return asset('storage/' . $this->imagen_pro);
     }
 }

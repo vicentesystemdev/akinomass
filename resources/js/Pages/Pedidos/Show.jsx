@@ -24,16 +24,25 @@ const formatDate = (dateString) => {
 export default function Show({ pedido }) {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
+    const [processing, setProcessing] = useState(false);
 
     const handleConfirmar = () => {
+        setProcessing(true);
         router.post(route('pedidos.confirmar', pedido.cod_pedido), {}, {
+            preserveScroll: true,
+            only: ['pedido'],
             onSuccess: () => setShowConfirmModal(false),
+            onFinish: () => setProcessing(false),
         });
     };
 
     const handleCancelar = () => {
+        setProcessing(true);
         router.post(route('pedidos.cancelar', pedido.cod_pedido), {}, {
+            preserveScroll: true,
+            only: ['pedido'],
             onSuccess: () => setShowCancelModal(false),
+            onFinish: () => setProcessing(false),
         });
     };
 
@@ -250,7 +259,7 @@ export default function Show({ pedido }) {
                                 </div>
                             </div>
                             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
-                                <PrimaryActionButton onClick={handleConfirmar}>
+                                <PrimaryActionButton onClick={handleConfirmar} disabled={processing}>
                                     Sí, Confirmar
                                 </PrimaryActionButton>
                                 <SecondaryButton onClick={() => setShowConfirmModal(false)}>
@@ -290,10 +299,12 @@ export default function Show({ pedido }) {
                             </div>
                             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
                                 <button
+                                    type="button"
                                     onClick={handleCancelar}
-                                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-200"
+                                    disabled={processing}
+                                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-200 disabled:opacity-50"
                                 >
-                                    Sí, Cancelar
+                                    {processing ? 'Procesando…' : 'Sí, Cancelar'}
                                 </button>
                                 <SecondaryButton onClick={() => setShowCancelModal(false)}>
                                     Volver
