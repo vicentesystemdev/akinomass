@@ -12,6 +12,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\Comercial\LiveSalesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\ReporteController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::resource('pagos', PagoController::class);
 
     Route::get('/reportes', ReporteController::class)->name('reportes.index');
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
     Route::post('/pagos/{pago}/confirmar', [PagoController::class, 'confirmar'])->name('pagos.confirmar');
     Route::post('/pagos/{pago}/observar', [PagoController::class, 'observar'])->name('pagos.observar');
     Route::post('/pagos/{pago}/rechazar', [PagoController::class, 'rechazar'])->name('pagos.rechazar');
