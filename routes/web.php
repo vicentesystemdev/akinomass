@@ -14,6 +14,7 @@ use App\Http\Controllers\Comercial\LiveSalesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\Auditoria\AuditoriaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -72,6 +73,9 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::post('/pagos/{pago}/confirmar', [PagoController::class, 'confirmar'])->name('pagos.confirmar');
     Route::post('/pagos/{pago}/observar', [PagoController::class, 'observar'])->name('pagos.observar');
     Route::post('/pagos/{pago}/rechazar', [PagoController::class, 'rechazar'])->name('pagos.rechazar');
+
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
+    Route::get('/auditoria/{cod_auditoria}', [AuditoriaController::class, 'show'])->name('auditoria.show');
 
 });
 

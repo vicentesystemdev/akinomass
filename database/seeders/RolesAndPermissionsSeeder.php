@@ -62,6 +62,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'cuenta.ver_pedidos',
             'cuenta.ver_pedido',
             'cuenta.gestionar_direcciones',
+            'auditoria.ver',
+            'auditoria.ver_detalle',
+            'auditoria.filtrar',
+            'auditoria.exportar',
         ];
 
         foreach ($permissions as $permission) {

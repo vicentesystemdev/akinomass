@@ -2,11 +2,29 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Link } from '@inertiajs/react';
+import { filterLetters, filterPhone, filterLower, toUpper } from '@/utils/formatters';
 
 export default function ClienteForm({ form, submit, canales = [], tiposFlujo = [], estados = [], isEdit = false }) {
     const canalesArray = Array.isArray(canales) ? canales : [];
     const tiposFlujoArray = Array.isArray(tiposFlujo) ? tiposFlujo : [];
-    const onChange = (e) => form.setData(e.target.name, e.target.value);
+
+    const fieldHandlers = {
+        nombre_cli: (v) => filterLetters(v),
+        documento_cli: (v) => toUpper(v),
+        telefono_cli: (v) => filterPhone(v),
+        correo_cli: (v) => filterLower(v),
+        direccion_cli: (v) => toUpper(v),
+        estado_cli: (v) => v,
+        cod_canal_venta: (v) => v,
+        cod_tipo_flujo_comercial: (v) => v,
+        observacion_cli: (v) => v,
+    };
+
+    const onChange = (e) => {
+        const { name, value } = e.target;
+        const transform = fieldHandlers[name] || ((v) => v);
+        form.setData(name, transform(value));
+    };
 
     const inputClass = "w-full rounded-xl border-gray-300 shadow-sm focus:border-terracota-500 focus:ring-terracota-500 py-2.5 px-3 text-sm text-cafe-700 transition-all duration-200";
     const labelClass = "block text-sm font-medium text-cafe-700 mb-1.5";

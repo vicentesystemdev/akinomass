@@ -4,6 +4,7 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { toUpper } from '@/utils/formatters';
 
 const tipoLabels = {
     primer_contacto: 'Primer Contacto',
@@ -64,7 +65,7 @@ export default function Create({ tipos }) {
                                 type="text"
                                 name="nombre_pla"
                                 value={form.data.nombre_pla ?? ''}
-                                onChange={(e) => form.setData('nombre_pla', e.target.value)}
+                                onChange={(e) => form.setData('nombre_pla', toUpper(e.target.value))}
                                 className={`${inputClass} ${form.errors.nombre_pla ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                 placeholder="Ej: Bienvenida nuevo cliente"
                                 required

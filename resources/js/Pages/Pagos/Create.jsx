@@ -4,6 +4,7 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { filterNumeric, toUpper } from '@/utils/formatters';
 
 const metodoLabels = {
     qr: 'QR',
@@ -98,11 +99,12 @@ export default function Create({ pedidos, metodosPago }) {
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Bs</span>
                                     <input
-                                        type="number"
+                                        type="text"
+                                        inputMode="decimal"
                                         step="0.01"
                                         min="0.01"
                                         value={form.data.monto_pag ?? ''}
-                                        onChange={(e) => form.setData('monto_pag', e.target.value)}
+                                        onChange={(e) => form.setData('monto_pag', filterNumeric(e.target.value))}
                                         className={`${inputClass} pl-10 ${form.errors.monto_pag ? 'border-red-500' : ''}`}
                                         placeholder="0.00"
                                         required
@@ -118,7 +120,7 @@ export default function Create({ pedidos, metodosPago }) {
                                 <input
                                     type="text"
                                     value={form.data.referencia_pag ?? ''}
-                                    onChange={(e) => form.setData('referencia_pag', e.target.value)}
+                                    onChange={(e) => form.setData('referencia_pag', toUpper(e.target.value))}
                                     className={`${inputClass} ${form.errors.referencia_pag ? 'border-red-500' : ''}`}
                                     placeholder="Nro. de comprobante, transferencia, etc."
                                 />
