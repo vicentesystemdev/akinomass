@@ -6,6 +6,7 @@ import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useCallback, useMemo } from 'react';
+import { filterNumeric, filterInteger } from '@/utils/formatters';
 
 const formatBOB = (value) => {
     const num = parseFloat(value) || 0;
@@ -176,21 +177,23 @@ export default function Create({ clientes, canales, tiposFlujo, productos }) {
                                         <div>
                                             <label className="text-xs font-medium text-gray-500 mb-1 block">Cantidad</label>
                                             <input
-                                                type="number"
+                                                type="text"
+                                                inputMode="numeric"
                                                 min="1"
                                                 value={detalle.cantidad_det ?? 1}
-                                                onChange={(e) => updateDetalle(index, 'cantidad_det', e.target.value)}
+                                                onChange={(e) => updateDetalle(index, 'cantidad_det', filterInteger(e.target.value))}
                                                 className="w-full rounded-lg border-gray-300 text-sm py-2 px-2.5 focus:border-terracota-500 focus:ring-terracota-500"
                                             />
                                         </div>
                                         <div>
                                             <label className="text-xs font-medium text-gray-500 mb-1 block">Precio Unit.</label>
                                             <input
-                                                type="number"
+                                                type="text"
+                                                inputMode="decimal"
                                                 step="0.01"
                                                 min="0"
                                                 value={detalle.precio_unitario_det ?? 0}
-                                                onChange={(e) => updateDetalle(index, 'precio_unitario_det', e.target.value)}
+                                                onChange={(e) => updateDetalle(index, 'precio_unitario_det', filterNumeric(e.target.value))}
                                                 className="w-full rounded-lg border-gray-300 text-sm py-2 px-2.5 focus:border-terracota-500 focus:ring-terracota-500"
                                             />
                                         </div>
@@ -237,11 +240,12 @@ export default function Create({ clientes, canales, tiposFlujo, productos }) {
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-gray-500">Descuento:</span>
                                     <input
-                                        type="number"
+                                        type="text"
+                                        inputMode="decimal"
                                         step="0.01"
                                         min="0"
                                         value={form.data.descuento_ped ?? 0}
-                                        onChange={(e) => form.setData('descuento_ped', e.target.value)}
+                                        onChange={(e) => form.setData('descuento_ped', filterNumeric(e.target.value))}
                                         className="flex-1 rounded-lg border-gray-300 text-sm py-1.5 px-2 text-right focus:border-terracota-500 focus:ring-terracota-500"
                                     />
                                 </div>

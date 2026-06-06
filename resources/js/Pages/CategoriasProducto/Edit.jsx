@@ -4,6 +4,7 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { filterLetters } from '@/utils/formatters';
 
 export default function Edit({ categoria }) {
     const form = useForm({
@@ -49,7 +50,7 @@ export default function Edit({ categoria }) {
                         <input
                             type="text"
                             value={form.data.nombre_cat ?? ''}
-                            onChange={(e) => form.setData('nombre_cat', e.target.value)}
+                            onChange={(e) => form.setData('nombre_cat', filterLetters(e.target.value))}
                             className={`${inputClass} ${form.errors.nombre_cat ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                             placeholder="Ej: Remeras, Pantalones, Accesorios"
                             required

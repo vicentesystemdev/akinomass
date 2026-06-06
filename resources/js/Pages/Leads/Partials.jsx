@@ -2,9 +2,23 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Link } from '@inertiajs/react';
+import { filterLetters, filterPhone, filterLower, toUpper } from '@/utils/formatters';
 
 export default function LeadForm({ form, submit, canales, tiposFlujo, usuarios, estados, isEdit = false }) {
-    const onChange = (e) => form.setData(e.target.name, e.target.value);
+    const fieldHandlers = {
+        nombre_lea: (v) => filterLetters(v),
+        alias_lea: (v) => toUpper(v),
+        telefono_lea: (v) => filterPhone(v),
+        correo_lea: (v) => filterLower(v),
+        producto_interes_lea: (v) => toUpper(v),
+        observacion_lea: (v) => v,
+    };
+
+    const onChange = (e) => {
+        const { name, value } = e.target;
+        const transform = fieldHandlers[name] || ((v) => v);
+        form.setData(name, transform(value));
+    };
 
     const inputClass = "w-full rounded-xl border-gray-300 shadow-sm focus:border-terracota-500 focus:ring-terracota-500 py-2.5 px-3 text-sm text-cafe-700 transition-all duration-200";
     const labelClass = "block text-sm font-medium text-cafe-700 mb-1.5";

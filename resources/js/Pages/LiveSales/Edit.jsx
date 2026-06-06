@@ -4,6 +4,7 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { toUpper } from '@/utils/formatters';
 
 export default function Edit({ sesion, canales, estados }) {
     const form = useForm({
@@ -60,7 +61,7 @@ export default function Edit({ sesion, canales, estados }) {
                         <input
                             type="text"
                             value={form.data.titulo_ses ?? ''}
-                            onChange={(e) => form.setData('titulo_ses', e.target.value)}
+                            onChange={(e) => form.setData('titulo_ses', toUpper(e.target.value))}
                             className={`${inputClass} ${form.errors.titulo_ses ? 'border-red-500' : ''}`}
                             required
                         />

@@ -4,6 +4,7 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { filterInteger, toUpper } from '@/utils/formatters';
 
 export default function Ajustar({ productos }) {
     const form = useForm({
@@ -69,10 +70,11 @@ export default function Ajustar({ productos }) {
                             Stock Nuevo <span className="text-red-500">*</span>
                         </label>
                         <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             min="0"
                             value={form.data.stock_nuevo_mov ?? 0}
-                            onChange={(e) => form.setData('stock_nuevo_mov', e.target.value)}
+                            onChange={(e) => form.setData('stock_nuevo_mov', filterInteger(e.target.value))}
                             className={`${inputClass} ${form.errors.stock_nuevo_mov ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                             placeholder="Ingrese el stock real correcto"
                             required
@@ -92,7 +94,7 @@ export default function Ajustar({ productos }) {
                         <input
                             type="text"
                             value={form.data.motivo_mov ?? ''}
-                            onChange={(e) => form.setData('motivo_mov', e.target.value)}
+                            onChange={(e) => form.setData('motivo_mov', toUpper(e.target.value))}
                             className={`${inputClass} ${form.errors.motivo_mov ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                             placeholder="Ej: Conteo físico, Corrección de error, Producto dañado"
                             required

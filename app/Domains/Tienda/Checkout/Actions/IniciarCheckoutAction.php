@@ -2,6 +2,8 @@
 
 namespace App\Domains\Tienda\Checkout\Actions;
 
+use App\Domains\Auditoria\DTOs\RegistrarAuditoriaData;
+use App\Domains\Auditoria\Services\RegistrarAuditoriaService;
 use App\Domains\Tienda\Carrito\Enums\EstadoCarritoEnum;
 use App\Domains\Tienda\Checkout\DTOs\IniciarCheckoutData;
 use App\Domains\Tienda\Checkout\Enums\EstadoCheckoutSesionEnum;
@@ -15,6 +17,7 @@ class IniciarCheckoutAction
 {
     public function __construct(
         private CheckoutService $checkoutService,
+        private RegistrarAuditoriaService $auditoriaService,
     ) {}
 
     public function execute(int $userId, IniciarCheckoutData $data): CheckoutSesion
@@ -58,6 +61,9 @@ class IniciarCheckoutAction
             'total_che' => $totales['total'],
             'expira_en_che' => now()->addHours(2),
         ]);
+
+        $contexto = RegistrarAuditoriaData::fromRequest(request());
+        $this->auditoriaService->registrarInsercion($contexto, 'Checkout', 'checkout_sesiones', (string) $checkoutSesion->cod_checkout_sesion, submodulo: 'Inicio');
 
         return $checkoutSesion;
     }

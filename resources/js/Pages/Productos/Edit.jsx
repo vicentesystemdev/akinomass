@@ -5,6 +5,7 @@ import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useRef, useCallback } from 'react';
+import { filterLetters, toUpper, filterNumeric } from '@/utils/formatters';
 
 const estadoLabels = {
     activo: 'Activo',
@@ -73,6 +74,14 @@ export default function Edit({ producto, categorias, estados }) {
     };
 
     const submit = () => {
+        const venta = parseFloat(form.data.precio_venta_pro);
+        const costo = parseFloat(form.data.precio_costo_pro);
+
+        if (costo && venta < costo) {
+            form.setError('precio_venta_pro', 'El precio de venta no puede ser menor al precio de costo.');
+            return;
+        }
+
         form.post(route('productos.update', producto.cod_producto));
     };
 
@@ -111,7 +120,7 @@ export default function Edit({ producto, categorias, estados }) {
                                 <input
                                     type="text"
                                     value={form.data.nombre_pro ?? ''}
-                                    onChange={(e) => form.setData('nombre_pro', e.target.value)}
+                                    onChange={(e) => form.setData('nombre_pro', filterLetters(e.target.value))}
                                     className={`${inputClass} ${form.errors.nombre_pro ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                     placeholder="Ej: Remera básica algodón"
                                     required
@@ -126,7 +135,7 @@ export default function Edit({ producto, categorias, estados }) {
                                 <input
                                     type="text"
                                     value={form.data.sku_pro ?? ''}
-                                    onChange={(e) => form.setData('sku_pro', e.target.value)}
+                                    onChange={(e) => form.setData('sku_pro', toUpper(e.target.value))}
                                     className={`${inputClass} font-mono ${form.errors.sku_pro ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                     placeholder="Ej: REM-001"
                                 />
@@ -205,11 +214,12 @@ export default function Edit({ producto, categorias, estados }) {
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Bs</span>
                                     <input
-                                        type="number"
+                                        type="text"
+                                        inputMode="decimal"
                                         step="0.01"
                                         min="0"
                                         value={form.data.precio_venta_pro ?? ''}
-                                        onChange={(e) => form.setData('precio_venta_pro', e.target.value)}
+                                        onChange={(e) => form.setData('precio_venta_pro', filterNumeric(e.target.value))}
                                         className={`${inputClass} pl-10 ${form.errors.precio_venta_pro ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                         placeholder="0.00"
                                         required
@@ -225,11 +235,12 @@ export default function Edit({ producto, categorias, estados }) {
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Bs</span>
                                     <input
-                                        type="number"
+                                        type="text"
+                                        inputMode="decimal"
                                         step="0.01"
                                         min="0"
                                         value={form.data.precio_costo_pro ?? ''}
-                                        onChange={(e) => form.setData('precio_costo_pro', e.target.value)}
+                                        onChange={(e) => form.setData('precio_costo_pro', filterNumeric(e.target.value))}
                                         className={`${inputClass} pl-10 ${form.errors.precio_costo_pro ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                         placeholder="0.00"
                                     />

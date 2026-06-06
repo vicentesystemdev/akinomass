@@ -4,6 +4,7 @@ import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { filterInteger, toUpper } from '@/utils/formatters';
 
 export default function Entrada({ productos }) {
     const form = useForm({
@@ -69,10 +70,11 @@ export default function Entrada({ productos }) {
                             Cantidad <span className="text-red-500">*</span>
                         </label>
                         <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             min="1"
                             value={form.data.cantidad_mov ?? 1}
-                            onChange={(e) => form.setData('cantidad_mov', e.target.value)}
+                            onChange={(e) => form.setData('cantidad_mov', filterInteger(e.target.value))}
                             className={`${inputClass} ${form.errors.cantidad_mov ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                             placeholder="Ingrese la cantidad"
                             required
@@ -89,7 +91,7 @@ export default function Entrada({ productos }) {
                         <input
                             type="text"
                             value={form.data.motivo_mov ?? ''}
-                            onChange={(e) => form.setData('motivo_mov', e.target.value)}
+                            onChange={(e) => form.setData('motivo_mov', toUpper(e.target.value))}
                             className={`${inputClass} ${form.errors.motivo_mov ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                             placeholder="Ej: Compra a proveedor, Devolución de cliente"
                             required
