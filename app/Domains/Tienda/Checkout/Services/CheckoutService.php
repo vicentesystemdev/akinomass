@@ -11,7 +11,7 @@ class CheckoutService
 {
     public function resolverPorToken(string $token): ?CheckoutSesion
     {
-        return CheckoutSesion::with(['cuentaCliente', 'carrito.detalles', 'direccionCliente', 'pedidoTienda.pedido'])
+        return CheckoutSesion::with(['cuentaCliente', 'carrito.detalles.variante.talla', 'direccionCliente', 'pedidoTienda.pedido'])
             ->where('token_che', $token)
             ->first();
     }
@@ -20,7 +20,7 @@ class CheckoutService
     {
         $cuentaCliente = CuentaCliente::where('user_id', $userId)->first();
 
-        if (!$cuentaCliente) {
+        if (! $cuentaCliente) {
             return false;
         }
 

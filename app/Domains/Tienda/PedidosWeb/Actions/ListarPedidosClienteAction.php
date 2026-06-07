@@ -9,7 +9,7 @@ class ListarPedidosClienteAction
 {
     public function execute(int $userId): Collection
     {
-        return PedidoTienda::with(['pedido.cliente', 'pedido.detalles.producto'])
+        return PedidoTienda::with(['pedido.cliente', 'pedido.detalles.producto', 'pedido.detalles.variante.talla'])
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();

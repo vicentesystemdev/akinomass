@@ -15,6 +15,7 @@ class ReservaStockCarritoService
         int $codDetalleCarrito,
         int $codProducto,
         int $cantidad,
+        ?int $codVarianteProducto,
         ?int $userId,
         ?string $sessionId,
         int $ttlMinutos = 20,
@@ -23,6 +24,7 @@ class ReservaStockCarritoService
             'cod_carrito' => $carrito->cod_carrito,
             'cod_detalle_carrito' => $codDetalleCarrito,
             'cod_producto' => $codProducto,
+            'cod_variante_producto' => $codVarianteProducto,
             'user_id' => $userId,
             'session_id_res' => $sessionId,
             'cantidad_res' => $cantidad,
@@ -38,6 +40,7 @@ class ReservaStockCarritoService
     ): void {
         if ($nuevaCantidad <= 0) {
             $this->liberarReserva($reserva);
+
             return;
         }
 
@@ -95,17 +98,19 @@ class ReservaStockCarritoService
             ->first();
     }
 
-    public function obtenerReservaPorCarritoYProducto(int $codCarrito, int $codProducto): ?ReservaStockCarrito
+    public function obtenerReservaPorCarritoYProducto(int $codCarrito, int $codProducto, ?int $codVarianteProducto = null): ?ReservaStockCarrito
     {
         return ReservaStockCarrito::where('cod_carrito', $codCarrito)
             ->where('cod_producto', $codProducto)
+            ->when($codVarianteProducto, fn ($query) => $query->where('cod_variante_producto', $codVarianteProducto), fn ($query) => $query->whereNull('cod_variante_producto'))
             ->where('estado_res', EstadoReservaStockEnum::ACTIVA)
             ->first();
     }
 
-    public function sumarReservasActivasPorProducto(int $codProducto): int
+    public function sumarReservasActivasPorProducto(int $codProducto, ?int $codVarianteProducto = null): int
     {
         return (int) ReservaStockCarrito::where('cod_producto', $codProducto)
+            ->when($codVarianteProducto, fn ($query) => $query->where('cod_variante_producto', $codVarianteProducto), fn ($query) => $query->whereNull('cod_variante_producto'))
             ->where('estado_res', EstadoReservaStockEnum::ACTIVA)
             ->where('expira_en_res', '>', Carbon::now())
             ->sum('cantidad_res');

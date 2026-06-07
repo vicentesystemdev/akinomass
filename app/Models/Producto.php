@@ -6,6 +6,7 @@ use App\Domains\Catalogo\Productos\Enums\EstadoProductoEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Producto extends Model
@@ -42,15 +43,26 @@ class Producto extends Model
 
     public function inventario(): HasOne
     {
-        return $this->hasOne(Inventario::class, 'cod_producto', 'cod_producto');
+        return $this->hasOne(Inventario::class, 'cod_producto', 'cod_producto')
+            ->whereNull('cod_variante_producto');
+    }
+
+    public function inventarios(): HasMany
+    {
+        return $this->hasMany(Inventario::class, 'cod_producto', 'cod_producto');
+    }
+
+    public function variantes(): HasMany
+    {
+        return $this->hasMany(VarianteProducto::class, 'cod_producto', 'cod_producto');
     }
 
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->imagen_pro) {
+        if (! $this->imagen_pro) {
             return null;
         }
 
-        return asset('storage/' . $this->imagen_pro);
+        return asset('storage/'.$this->imagen_pro);
     }
 }

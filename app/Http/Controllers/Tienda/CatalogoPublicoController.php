@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tienda;
 
 use App\Domains\Tienda\Catalogo\Actions\ListarCategoriasPublicasAction;
 use App\Domains\Tienda\Catalogo\Actions\ListarProductosPublicosAction;
+use App\Domains\Tienda\Catalogo\Actions\ListarTallasPublicasAction;
 use App\Domains\Tienda\Catalogo\Actions\ObtenerProductoPublicoAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tienda\ListarCatalogoRequest;
@@ -20,15 +21,18 @@ class CatalogoPublicoController extends Controller
         ListarCatalogoRequest $request,
         ListarProductosPublicosAction $listarAction,
         ListarCategoriasPublicasAction $categoriasAction,
+        ListarTallasPublicasAction $tallasAction,
     ): Response|JsonResponse {
         $filtros = $request->validated();
         $productos = $listarAction->execute($filtros);
         $categorias = $categoriasAction->execute();
+        $tallas = $tallasAction->execute();
 
         if ($request->expectsJson()) {
             return response()->json([
                 'productos' => $productos,
                 'categorias' => $categorias,
+                'tallas' => $tallas,
             ]);
         }
 
@@ -37,6 +41,7 @@ class CatalogoPublicoController extends Controller
         return Inertia::render($page, [
             'productos' => $productos,
             'categorias' => $categorias,
+            'tallas' => $tallas,
             'filtros' => $filtros,
         ]);
     }
@@ -48,7 +53,7 @@ class CatalogoPublicoController extends Controller
     ): Response|JsonResponse {
         $producto = $action->execute($producto->cod_producto);
 
-        if (!$producto) {
+        if (! $producto) {
             abort(404);
         }
 
@@ -65,18 +70,21 @@ class CatalogoPublicoController extends Controller
         CategoriaProducto $categoria,
         ListarProductosPublicosAction $listarAction,
         ListarCategoriasPublicasAction $categoriasAction,
-        Request $request,
+        ListarTallasPublicasAction $tallasAction,
+        ListarCatalogoRequest $request,
     ): Response|JsonResponse {
-        $filtros = $request->only(['q', 'orden', 'solo_disponibles', 'page']);
+        $filtros = $request->validated();
         $filtros['cod_categoria_producto'] = $categoria->cod_categoria_producto;
 
         $productos = $listarAction->execute($filtros);
         $categorias = $categoriasAction->execute();
+        $tallas = $tallasAction->execute();
 
         if ($request->expectsJson()) {
             return response()->json([
                 'productos' => $productos,
                 'categorias' => $categorias,
+                'tallas' => $tallas,
                 'categoria_actual' => $categoria,
             ]);
         }
@@ -84,6 +92,7 @@ class CatalogoPublicoController extends Controller
         return Inertia::render('Tienda/Catalogo', [
             'productos' => $productos,
             'categorias' => $categorias,
+            'tallas' => $tallas,
             'categoria_actual' => $categoria,
             'filtros' => $filtros,
         ]);

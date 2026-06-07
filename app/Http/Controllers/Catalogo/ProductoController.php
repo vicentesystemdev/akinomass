@@ -10,6 +10,7 @@ use App\Http\Requests\Productos\StoreProductoRequest;
 use App\Http\Requests\Productos\UpdateProductoRequest;
 use App\Models\CategoriaProducto;
 use App\Models\Producto;
+use App\Models\TallaProducto;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,6 +33,9 @@ class ProductoController extends Controller
         return Inertia::render('Productos/Create', [
             'categorias' => CategoriaProducto::where('activo_cat', true)->get(),
             'estados' => array_column(EstadoProductoEnum::cases(), 'value'),
+            'tallas' => TallaProducto::where('activo_talla_producto', true)
+                ->orderBy('orden_talla_producto')
+                ->get(),
         ]);
     }
 
@@ -74,9 +78,12 @@ class ProductoController extends Controller
         $this->authorize('productos.editar');
 
         return Inertia::render('Productos/Edit', [
-            'producto' => $producto,
+            'producto' => $producto->load('variantes.talla'),
             'categorias' => CategoriaProducto::where('activo_cat', true)->orWhere('cod_categoria_producto', $producto->cod_categoria_producto)->get(),
             'estados' => array_column(EstadoProductoEnum::cases(), 'value'),
+            'tallas' => TallaProducto::where('activo_talla_producto', true)
+                ->orderBy('orden_talla_producto')
+                ->get(),
         ]);
     }
 }

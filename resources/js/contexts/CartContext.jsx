@@ -37,7 +37,7 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
     const closeCart = useCallback(() => setCartOpen(false), []);
 
     const isInCart = useCallback(
-        (codProducto) => (carrito?.detalles || []).some((d) => d.cod_producto === codProducto),
+        (codProducto, codVarianteProducto = null) => (carrito?.detalles || []).some((d) => d.cod_producto === codProducto && (d.cod_variante_producto ?? null) === codVarianteProducto),
         [carrito],
     );
 
@@ -47,10 +47,10 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
     );
 
     const addItem = useCallback(
-        async (codProducto, cantidad = 1, { openDrawer = false, silent = false } = {}) => {
+        async (codProducto, cantidad = 1, { openDrawer = false, silent = false, codVarianteProducto = null } = {}) => {
             setBusy(true);
             try {
-                const updated = await addCarritoItem(codProducto, cantidad);
+                const updated = await addCarritoItem(codProducto, cantidad, codVarianteProducto);
                 setCarrito(updated);
                 pulseBadge();
                 if (!silent) {
@@ -71,13 +71,13 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
     );
 
     const changeQuantity = useCallback(
-        async (codProducto, cantidad) => {
+        async (codProducto, cantidad, codVarianteProducto = null) => {
             setUpdatingProductId(codProducto);
             try {
                 const updated =
                     cantidad <= 0
-                        ? await removeCarritoItem(codProducto)
-                        : await updateCarritoItem(codProducto, cantidad);
+                        ? await removeCarritoItem(codProducto, codVarianteProducto)
+                        : await updateCarritoItem(codProducto, cantidad, codVarianteProducto);
                 setCarrito(updated);
                 pulseBadge();
             } catch (error) {
@@ -90,10 +90,10 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
     );
 
     const removeItem = useCallback(
-        async (codProducto) => {
+        async (codProducto, codVarianteProducto = null) => {
             setUpdatingProductId(codProducto);
             try {
-                const updated = await removeCarritoItem(codProducto);
+                const updated = await removeCarritoItem(codProducto, codVarianteProducto);
                 setCarrito(updated);
                 showToast('Producto eliminado');
             } catch (error) {

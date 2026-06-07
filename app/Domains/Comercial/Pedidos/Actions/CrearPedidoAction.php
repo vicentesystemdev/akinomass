@@ -56,17 +56,12 @@ class CrearPedidoAction
         $productosIds = array_unique(array_column($detalles, 'cod_producto'));
 
         $productos = Producto::whereIn('cod_producto', $productosIds)->get()->keyBy('cod_producto');
-        $inventarios = Inventario::whereIn('cod_producto', $productosIds)
-            ->where('activo_inv', true)
-            ->get()
-            ->keyBy('cod_producto');
-
         foreach ($detalles as $detalle) {
             $codProducto = $detalle['cod_producto'];
             $cantidad = (int) $detalle['cantidad_det'];
 
             $producto = $productos[$codProducto] ?? null;
-            if (!$producto) {
+            if (! $producto) {
                 throw ValidationException::withMessages([
                     'detalles' => ["El producto {$codProducto} no existe."],
                 ]);
@@ -78,7 +73,11 @@ class CrearPedidoAction
                 ]);
             }
 
-            $stock = $inventarios[$codProducto]->stock_actual_inv ?? 0;
+            $inventario = Inventario::where('cod_producto', $codProducto)
+                ->when($detalle['cod_variante_producto'] ?? null, fn ($query, $codVariante) => $query->where('cod_variante_producto', $codVariante), fn ($query) => $query->whereNull('cod_variante_producto'))
+                ->where('activo_inv', true)
+                ->first();
+            $stock = $inventario?->stock_actual_inv ?? 0;
             if ($cantidad > $stock) {
                 throw ValidationException::withMessages([
                     'detalles' => ["Stock insuficiente para \"{$producto->nombre_pro}\". Disponible: {$stock}, solicitado: {$cantidad}."],

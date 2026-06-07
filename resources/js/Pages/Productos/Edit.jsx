@@ -3,6 +3,7 @@ import PageHeader from '@/Components/UI/PageHeader';
 import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import VariantsSection from './VariantsSection';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useRef, useCallback } from 'react';
 import { filterLetters, toUpper, filterNumeric } from '@/utils/formatters';
@@ -14,7 +15,7 @@ const estadoLabels = {
     descontinuado: 'Descontinuado',
 };
 
-export default function Edit({ producto, categorias, estados }) {
+export default function Edit({ producto, categorias, estados, tallas }) {
     const [preview, setPreview] = useState(null);
     const [dragActive, setDragActive] = useState(false);
     const [removeExisting, setRemoveExisting] = useState(false);
@@ -33,6 +34,14 @@ export default function Edit({ producto, categorias, estados }) {
         imagen_pro: null,
         eliminar_imagen: false,
         estado_pro: estadoValue || estados?.[0] || 'activo',
+        variantes: (producto?.variantes || []).map((variante) => ({
+            cod_variante_producto: variante.cod_variante_producto,
+            cod_talla_producto: variante.cod_talla_producto,
+            sku_variante_producto: variante.sku_variante_producto ?? '',
+            precio_venta_variante: variante.precio_venta_variante ?? '',
+            estado_variante_producto: variante.estado_variante_producto ?? 'activo',
+            activo_variante_producto: variante.activo_variante_producto ?? true,
+        })),
     });
 
     const handleFile = useCallback((file) => {
@@ -250,6 +259,10 @@ export default function Edit({ producto, categorias, estados }) {
                                 )}
                             </div>
                         </FormCard.Row>
+                    </FormCard.Section>
+
+                    <FormCard.Section title="Variantes y tallas">
+                        <VariantsSection form={form} tallas={tallas} baseSku={form.data.sku_pro} />
                     </FormCard.Section>
 
                     <FormCard.Section title="Imagen del Producto">

@@ -7,6 +7,7 @@ use App\Domains\Tienda\Carrito\Services\CarritoPersistenciaService;
 use App\Domains\Tienda\Carrito\Services\ReservaStockCarritoService;
 use App\Domains\Tienda\Carrito\Services\StockDisponibleTiendaService;
 use App\Models\DetalleCarrito;
+use App\Models\Inventario;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -24,14 +25,26 @@ class ActualizarCantidadCarritoAction
         return DB::transaction(function () use ($detalle, $cantidad) {
             $detalle->refresh();
 
-            $stockDisponible = $this->stockDisponibleService->obtenerStockDisponible($detalle->cod_producto);
+            $inventario = Inventario::where('cod_producto', $detalle->cod_producto)
+                ->when(
+                    $detalle->cod_variante_producto,
+                    fn ($q) => $q->where('cod_variante_producto', $detalle->cod_variante_producto),
+                    fn ($q) => $q->whereNull('cod_variante_producto')
+                )
+                ->where('activo_inv', true)
+                ->lockForUpdate()
+                ->first();
+
+            $stockFisico = $inventario ? (int) $inventario->stock_actual_inv : 0;
+            $stockReservado = $this->reservaService->sumarReservasActivasPorProducto($detalle->cod_producto, $detalle->cod_variante_producto);
+            $stockDisponible = max(0, $stockFisico - $stockReservado);
 
             $cantidadPrevia = (int) $detalle->cantidad_dca;
             $diferencia = $cantidad - $cantidadPrevia;
 
             if ($diferencia > 0 && $stockDisponible < $diferencia) {
                 throw ValidationException::withMessages([
-                    'cantidad' => ['Stock insuficiente. Disponible adicional: ' . $stockDisponible],
+                    'cantidad' => ['Stock insuficiente. Disponible adicional: '.$stockDisponible],
                 ]);
             }
 

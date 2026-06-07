@@ -13,9 +13,10 @@ class PedidoTiendaService
     {
         return Cache::rememberForever('lookup:canal_web', function () {
             $canal = CanalVenta::where('codigo_can', 'web')->first();
-            if (!$canal) {
+            if (! $canal) {
                 throw new \RuntimeException('El canal de venta "web" no existe. Ejecuta: php artisan db:seed --class=CanalesVentaSeeder');
             }
+
             return $canal->cod_canal_venta;
         });
     }
@@ -24,9 +25,10 @@ class PedidoTiendaService
     {
         return Cache::rememberForever('lookup:flujo_compra_web', function () {
             $flujo = TipoFlujoComercial::where('codigo_tip', 'compra_web')->first();
-            if (!$flujo) {
+            if (! $flujo) {
                 throw new \RuntimeException('El tipo de flujo comercial "compra_web" no existe. Ejecuta: php artisan db:seed --class=TiposFlujoComercialSeeder');
             }
+
             return $flujo->cod_tipo_flujo_comercial;
         });
     }
@@ -35,7 +37,7 @@ class PedidoTiendaService
     {
         $cuenta = CuentaCliente::where('user_id', $userId)->first();
 
-        if (!$cuenta) {
+        if (! $cuenta) {
             throw new \RuntimeException('El usuario no tiene una cuenta de cliente activa.');
         }
 
@@ -47,6 +49,7 @@ class PedidoTiendaService
         return $detalles->map(function ($detalle) {
             return [
                 'cod_producto' => $detalle->cod_producto,
+                'cod_variante_producto' => $detalle->cod_variante_producto,
                 'cantidad_det' => $detalle->cantidad_dca,
                 'precio_unitario_det' => $detalle->precio_unitario_dca,
             ];

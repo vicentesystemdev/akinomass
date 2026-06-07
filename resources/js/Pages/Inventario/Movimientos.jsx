@@ -5,7 +5,7 @@ import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
 import Pagination from '@/Components/UI/Pagination';
 import LiveSyncBadge from '@/Components/UI/LiveSyncBadge';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useInertiaPoll } from '@/hooks/useInertiaPoll';
 import { useListHighlight } from '@/hooks/useListHighlight';
 
@@ -76,7 +76,7 @@ const formatDate = (dateString) => {
     });
 };
 
-export default function Movimientos({ movimientos = { data: [] } }) {
+export default function Movimientos({ movimientos = { data: [] }, categorias = [], filtros = {} }) {
     const movimientosData = movimientos.data || [];
     const { lastUpdated, isRefreshing, refresh } = useInertiaPoll(['movimientos'], 12000, true);
     const { isHighlighted, hasNewItems } = useListHighlight(movimientosData, 'cod_movimiento_inventario', true);
@@ -108,6 +108,35 @@ export default function Movimientos({ movimientos = { data: [] } }) {
             <Head title="Movimientos de Inventario" />
 
             <div className="space-y-6">
+                <SectionCard title="Filtrar movimientos" subtitle="Consulta el historial relacionado con una categoría.">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div className="flex-1">
+                            <label className="mb-1.5 block text-sm font-medium text-cafe-700">Categoría</label>
+                            <select
+                                value={filtros.cod_categoria_producto ?? ''}
+                                onChange={(event) => router.get(
+                                    route('inventario.movimientos'),
+                                    event.target.value ? { cod_categoria_producto: event.target.value } : {},
+                                    { preserveState: true, replace: true },
+                                )}
+                                className="w-full rounded-xl border-gray-300 px-3 py-2.5 text-sm text-cafe-700 shadow-sm focus:border-terracota-500 focus:ring-terracota-500"
+                            >
+                                <option value="">Todas las categorías</option>
+                                {categorias.map((categoria) => (
+                                    <option key={categoria.cod_categoria_producto} value={categoria.cod_categoria_producto}>
+                                        {categoria.nombre_cat}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        {filtros.cod_categoria_producto && (
+                            <Link href={route('inventario.movimientos')} className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-cafe-700 hover:bg-gray-50">
+                                Limpiar filtro
+                            </Link>
+                        )}
+                    </div>
+                </SectionCard>
+
                 {/* Leyenda de tipos */}
                 <SectionCard>
                     <div className="flex flex-wrap gap-3">
@@ -125,11 +154,12 @@ export default function Movimientos({ movimientos = { data: [] } }) {
                             <TableWrapper.Header>
                                 <TableWrapper.HeaderCell>Fecha</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell>Producto</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Variante / talla</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell>Tipo</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell align="center">Cantidad</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell align="center">Stock Anterior</TableWrapper.HeaderCell>
                                 <TableWrapper.HeaderCell align="center">Stock Nuevo</TableWrapper.HeaderCell>
-                                <TableWrapper.HeaderCell>Responsable</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Responsable / motivo</TableWrapper.HeaderCell>
                             </TableWrapper.Header>
                             <TableWrapper.Body>
                                 {movimientosData.map((mov) => (
@@ -141,6 +171,14 @@ export default function Movimientos({ movimientos = { data: [] } }) {
                                             <p className="text-sm text-cafe-700 whitespace-nowrap">
                                                 {formatDate(mov.created_at)}
                                             </p>
+                                        </TableWrapper.Cell>
+                                        <TableWrapper.Cell>
+                                            <p className="text-sm text-cafe-700">
+                                                {mov.inventario?.variante?.talla?.codigo_talla_producto || 'Producto base'}
+                                            </p>
+                                            {mov.inventario?.variante?.sku_variante_producto && (
+                                                <p className="text-xs font-mono text-gray-400">{mov.inventario.variante.sku_variante_producto}</p>
+                                            )}
                                         </TableWrapper.Cell>
                                         <TableWrapper.Cell>
                                             <div>
@@ -183,9 +221,8 @@ export default function Movimientos({ movimientos = { data: [] } }) {
                                             </span>
                                         </TableWrapper.Cell>
                                         <TableWrapper.Cell>
-                                            <span className="text-sm text-cafe-700">
-                                                {mov.usuario_responsable?.name || 'Sistema'}
-                                            </span>
+                                            <p className="text-sm text-cafe-700">{mov.usuario_responsable?.name || 'Sistema'}</p>
+                                            <p className="text-xs text-gray-500">{mov.motivo_mov}</p>
                                         </TableWrapper.Cell>
                                     </TableWrapper.Row>
                                 ))}

@@ -16,16 +16,16 @@ export default function Carrito({ carrito, auth }) {
         }
     };
 
-    const handleUpdateQuantity = (producto, cantidad) => {
+    const handleUpdateQuantity = (producto, cantidad, codVarianteProducto = null) => {
         if (cantidad <= 0) {
-            router.delete(`/tienda/carrito/items/${producto}`, { preserveScroll: true });
+            router.delete(`/tienda/carrito/items/${producto}`, { data: { cod_variante_producto: codVarianteProducto }, preserveScroll: true });
         } else {
-            router.patch(`/tienda/carrito/items/${producto}`, { cantidad }, { preserveScroll: true });
+            router.patch(`/tienda/carrito/items/${producto}`, { cantidad, cod_variante_producto: codVarianteProducto }, { preserveScroll: true });
         }
     };
 
-    const handleRemove = (producto) => {
-        router.delete(`/tienda/carrito/items/${producto}`, { preserveScroll: true });
+    const handleRemove = (producto, codVarianteProducto = null) => {
+        router.delete(`/tienda/carrito/items/${producto}`, { data: { cod_variante_producto: codVarianteProducto }, preserveScroll: true });
     };
 
     return (
@@ -80,9 +80,17 @@ export default function Carrito({ carrito, auth }) {
                                                 {item.sku_producto_dca && (
                                                     <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>SKU: {item.sku_producto_dca}</p>
                                                 )}
+                                                {item.variante?.talla ? (
+                                                    <p style={{ fontSize: 12, color: '#D77A61', fontWeight: 600, marginTop: 2 }}>
+                                                        Talla: {item.variante.talla.codigo_talla_producto}
+                                                    </p>
+                                                ) : null}
+                                                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 1 }}>
+                                                    Bs. {Number(item.precio_unitario_dca).toFixed(2)} c/u
+                                                </p>
                                             </div>
                                             <button
-                                                onClick={() => handleRemove(item.cod_producto)}
+                                                onClick={() => handleRemove(item.cod_producto, item.cod_variante_producto)}
                                                 className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-50 transition-colors flex-shrink-0"
                                                 style={{ color: '#D1D5DB', background: 'none', border: 'none', cursor: 'pointer' }}
                                             >
@@ -92,7 +100,7 @@ export default function Carrito({ carrito, auth }) {
                                         <div className="flex items-center justify-between mt-3">
                                             <div className="flex items-center gap-2 rounded-xl p-1" style={{ background: '#F3F4F6' }}>
                                                 <button
-                                                    onClick={() => handleUpdateQuantity(item.cod_producto, item.cantidad_dca - 1)}
+                                                    onClick={() => handleUpdateQuantity(item.cod_producto, item.cantidad_dca - 1, item.cod_variante_producto)}
                                                     className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
                                                     style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
                                                 >
@@ -102,7 +110,7 @@ export default function Carrito({ carrito, auth }) {
                                                     {item.cantidad_dca}
                                                 </span>
                                                 <button
-                                                    onClick={() => handleUpdateQuantity(item.cod_producto, item.cantidad_dca + 1)}
+                                                    onClick={() => handleUpdateQuantity(item.cod_producto, item.cantidad_dca + 1, item.cod_variante_producto)}
                                                     className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
                                                     style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
                                                 >
