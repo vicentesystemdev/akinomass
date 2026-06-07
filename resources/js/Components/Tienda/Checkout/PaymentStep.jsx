@@ -16,6 +16,7 @@ export default function PaymentStep({
     onBack,
     processing = false,
     comprobanteError = null,
+    onComprobanteError = () => {},
 }) {
     const canSubmit = Boolean(data.comprobante) && !processing;
 
@@ -92,7 +93,10 @@ export default function PaymentStep({
                         <ComprobanteUpload
                             file={data.comprobante}
                             error={comprobanteError}
-                            onChange={(file) => onChange({ comprobante: file })}
+                            onChange={(file, fileError = null) => {
+                                onChange({ comprobante: file });
+                                onComprobanteError(fileError);
+                            }}
                         />
                     </div>
 

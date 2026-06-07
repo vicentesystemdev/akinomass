@@ -23,7 +23,7 @@ function StockBadge({ badge, stock, sinVariante }) {
     );
 }
 
-export default function ProductoShow({ producto, auth }) {
+function ProductoShowContent({ producto }) {
     const { isInCart, addItem, busy, openCart } = useCart();
     const [added, setAdded] = useState(false);
     const [cantidad, setCantidad] = useState(1);
@@ -70,7 +70,7 @@ export default function ProductoShow({ producto, auth }) {
     };
 
     return (
-        <StorefrontLayout auth={auth}>
+        <>
             <Head title={`${producto.nombre_pro} - AKINOMASS`} />
 
             <section className="max-w-6xl mx-auto px-4 md:px-8 py-8">
@@ -253,6 +253,14 @@ export default function ProductoShow({ producto, auth }) {
                     </div>
                 </div>
             </section>
+        </>
+    );
+}
+
+export default function ProductoShow({ producto, auth }) {
+    return (
+        <StorefrontLayout auth={auth}>
+            <ProductoShowContent producto={producto} />
         </StorefrontLayout>
     );
 }

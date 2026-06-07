@@ -17,6 +17,7 @@ use App\Models\Pedido;
 use App\Models\PedidoTienda;
 use App\Models\PagoTienda;
 use App\Models\TipoFlujoComercial;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -122,6 +123,40 @@ class PagoWebTest extends TiendaTestCase
         $pagoTienda = PagoTienda::where('cod_checkout_sesion', $this->checkoutSesion->cod_checkout_sesion)->first();
         $this->assertNotNull($pagoTienda?->comprobante_ruta_pwe);
         Storage::disk('local')->assertExists($pagoTienda->comprobante_ruta_pwe);
+    }
+
+    public function test_registrar_pago_desde_pedido_pendiente_revision(): void
+    {
+        Storage::fake('local');
+        $this->actingAs($this->user);
+
+        $this->pedidoTienda->update([
+            'estado_pte' => EstadoPedidoTiendaEnum::PENDIENTE_REVISION,
+        ]);
+
+        $response = $this->post('/tienda/checkout/' . $this->checkoutSesion->token_che . '/pago', [
+            'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
+            'metodo_pago_pag' => 'qr',
+            'comprobante' => UploadedFile::fake()->create('comprobante.pdf', 100, 'application/pdf'),
+        ], [
+            'Accept' => 'application/json',
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->pedidoTienda->refresh();
+        $this->assertEquals(EstadoPedidoTiendaEnum::PENDIENTE_VALIDACION_PAGO, $this->pedidoTienda->estado_pte);
+    }
+
+    public function test_estado_pedido_tienda_permite_pendiente_validacion_pago(): void
+    {
+        DB::table('pedidos_tienda')
+            ->where('cod_pedido_tienda', $this->pedidoTienda->cod_pedido_tienda)
+            ->update(['estado_pte' => EstadoPedidoTiendaEnum::PENDIENTE_VALIDACION_PAGO->value]);
+
+        $this->pedidoTienda->refresh();
+
+        $this->assertEquals(EstadoPedidoTiendaEnum::PENDIENTE_VALIDACION_PAGO, $this->pedidoTienda->estado_pte);
     }
 
     public function test_registrar_pago_sin_comprobante_falla(): void

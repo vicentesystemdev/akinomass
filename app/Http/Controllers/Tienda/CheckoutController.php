@@ -238,7 +238,7 @@ class CheckoutController extends Controller
             abort(403);
         }
 
-        $action->execute($checkoutSesion, 50);
+        $action->execute($checkoutSesion, $configService->obtenerTiempoCheckoutMinutos());
 
         if ($request->expectsJson()) {
             $checkoutData = $this->enriquecerCheckoutResponse(

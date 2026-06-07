@@ -13,6 +13,7 @@ use App\Domains\Tienda\Configuracion\Services\ConfiguracionTiendaService;
 use App\Models\Carrito;
 use App\Models\CheckoutSesion;
 use App\Models\CuentaCliente;
+use App\Models\Inventario;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -54,8 +55,17 @@ class IniciarCheckoutAction
                 ]);
             }
 
-            $reservasActivas = $this->reservaService->reservasActivasPorCarrito($carrito);
-            if ($reservasActivas === 0) {
+            if ($this->reservaService->reservasActivasPorCarrito($carrito) === 0) {
+                $this->validarStockDisponibleParaRenovarReservas($carrito);
+                $this->reservaService->renovarReservasPorCarrito(
+                    $carrito,
+                    $this->configService->obtenerTiempoReservaCarritoMinutos(),
+                    $userId,
+                    $carrito->session_id_car,
+                );
+            }
+
+            if ($this->reservaService->reservasActivasPorCarrito($carrito) === 0) {
                 throw ValidationException::withMessages([
                     'carrito' => ['Las reservas de productos han vencido. Revisa tu carrito.'],
                 ]);
@@ -84,5 +94,33 @@ class IniciarCheckoutAction
 
             return $checkoutSesion;
         });
+    }
+
+    private function validarStockDisponibleParaRenovarReservas(Carrito $carrito): void
+    {
+        foreach ($carrito->detalles as $detalle) {
+            $inventario = Inventario::where('cod_producto', $detalle->cod_producto)
+                ->when(
+                    $detalle->cod_variante_producto,
+                    fn ($query, $codVariante) => $query->where('cod_variante_producto', $codVariante),
+                    fn ($query) => $query->whereNull('cod_variante_producto')
+                )
+                ->where('activo_inv', true)
+                ->lockForUpdate()
+                ->first();
+
+            $stockFisico = $inventario ? (int) $inventario->stock_actual_inv : 0;
+            $stockReservado = $this->reservaService->sumarReservasActivasPorProducto(
+                $detalle->cod_producto,
+                $detalle->cod_variante_producto
+            );
+            $stockDisponible = max(0, $stockFisico - $stockReservado);
+
+            if ($stockDisponible < (int) $detalle->cantidad_dca) {
+                throw ValidationException::withMessages([
+                    'carrito' => ['Algunos productos ya no tienen stock suficiente. Actualiza tu carrito.'],
+                ]);
+            }
+        }
     }
 }

@@ -64,26 +64,6 @@ class AgregarItemCarritoAction
                 ]);
             }
 
-            // Validar que para prendas únicas no se agregue más de 1 unidad total en el carrito
-            $esVirtual = str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-%'); // o 'GEN-CAT-'
-            if (! str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-')) {
-                $existenteInCart = DetalleCarrito::where('cod_carrito', $carrito->cod_carrito)
-                    ->where('cod_producto', $data->codProducto)
-                    ->when(
-                        $data->codVarianteProducto,
-                        fn ($q) => $q->where('cod_variante_producto', $data->codVarianteProducto),
-                        fn ($q) => $q->whereNull('cod_variante_producto')
-                    )
-                    ->first();
-
-                $cantidadResultante = ($existenteInCart ? (int) $existenteInCart->cantidad_dca : 0) + $data->cantidad;
-                if ($cantidadResultante > 1) {
-                    throw ValidationException::withMessages([
-                        'cantidad' => ['Cada prenda es única, no puedes tener más de 1 unidad de este producto en tu carrito.'],
-                    ]);
-                }
-            }
-
             $itemsActuales = $this->persistenciaService->contarItems($carrito);
             if ($itemsActuales >= 50) {
                 throw ValidationException::withMessages([

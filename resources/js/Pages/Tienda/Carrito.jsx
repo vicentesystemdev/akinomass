@@ -1,16 +1,36 @@
+import { useState } from 'react';
 import { Head, router, Link } from '@inertiajs/react';
 import StorefrontLayout from '@/Layouts/StorefrontLayout';
-import { ShoppingCart, X, Plus, Minus, ArrowLeft, Shield } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Clock, Shield, ShoppingCart, X } from 'lucide-react';
 
-export default function Carrito({ carrito, auth }) {
+function extractFirstError(errors) {
+    const first = Object.values(errors || {})[0];
+    return Array.isArray(first) ? first[0] : first;
+}
+
+export default function Carrito({ carrito, reservas, auth }) {
+    const [checkoutError, setCheckoutError] = useState(null);
+    const [processingCheckout, setProcessingCheckout] = useState(false);
     const items = carrito?.detalles || [];
     const subtotal = carrito ? Number(carrito.subtotal_car) : 0;
     const total = carrito ? Number(carrito.total_car) : 0;
     const cartCount = items.reduce((sum, d) => sum + d.cantidad_dca, 0);
+    const reservaActiva = (reservas?.cantidad_reservas_activas ?? 0) > 0;
+    const tiempoReserva = reservaActiva
+        ? reservas?.tiempo_restante_formateado
+        : `${reservas?.ttl_minutos ?? 20} min`;
 
     const handleCheckout = () => {
+        setCheckoutError(null);
         if (auth?.user) {
-            router.post('/tienda/checkout', { cod_carrito: carrito.cod_carrito });
+            setProcessingCheckout(true);
+            router.post('/tienda/checkout', { cod_carrito: carrito.cod_carrito }, {
+                preserveScroll: true,
+                onError: (errors) => {
+                    setCheckoutError(extractFirstError(errors) || 'No se pudo iniciar el checkout. Revisa tu carrito.');
+                },
+                onFinish: () => setProcessingCheckout(false),
+            });
         } else {
             router.visit('/tienda/login');
         }
@@ -112,6 +132,31 @@ export default function Carrito({ carrito, auth }) {
 
                         {/* Summary */}
                         <div className="space-y-4">
+                            <div className="p-4 rounded-2xl bg-white" style={{ border: '1px solid rgba(215,122,97,0.22)' }}>
+                                <div className="flex items-start gap-3">
+                                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FDF6F0', color: '#D77A61' }}>
+                                        <Clock size={16} />
+                                    </div>
+                                    <div>
+                                        <p style={{ fontSize: 13, fontWeight: 800, color: '#2B221E' }}>
+                                            Reserva del carrito: {tiempoReserva}
+                                        </p>
+                                        <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3, lineHeight: 1.45 }}>
+                                            {reservaActiva
+                                                ? `Tiempo configurado: ${reservas.ttl_minutos} min.`
+                                                : `Al iniciar el checkout renovaremos la reserva si todavía hay stock.`}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {checkoutError && (
+                                <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                                    <AlertCircle size={15} style={{ color: '#DC2626', marginTop: 1, flexShrink: 0 }} />
+                                    <p style={{ fontSize: 12.5, color: '#991B1B', fontWeight: 600, lineHeight: 1.45 }}>{checkoutError}</p>
+                                </div>
+                            )}
+
                             <div className="p-5 rounded-2xl bg-white" style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
                                 <h3 style={{ fontSize: 15, fontWeight: 700, color: '#2B221E', marginBottom: 14 }}>Resumen del pedido</h3>
                                 <div className="space-y-2 mb-4">
@@ -127,17 +172,18 @@ export default function Carrito({ carrito, auth }) {
 
                                 <button
                                     onClick={handleCheckout}
+                                    disabled={processingCheckout}
                                     className="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:opacity-90"
                                     style={{
-                                        background: 'linear-gradient(135deg, #D77A61, #c56950)',
+                                        background: processingCheckout ? '#9CA3AF' : 'linear-gradient(135deg, #D77A61, #c56950)',
                                         color: 'white',
                                         fontSize: 14,
                                         fontWeight: 700,
                                         border: 'none',
-                                        cursor: 'pointer',
+                                        cursor: processingCheckout ? 'not-allowed' : 'pointer',
                                     }}
                                 >
-                                    {auth?.user ? 'Proceder al Pago' : 'Iniciar Sesión para Comprar'}
+                                    {processingCheckout ? 'Preparando checkout...' : (auth?.user ? 'Proceder al Pago' : 'Iniciar Sesión para Comprar')}
                                 </button>
 
                                 <div className="flex items-center justify-center gap-2 mt-3">

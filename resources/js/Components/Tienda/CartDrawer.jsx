@@ -1,8 +1,16 @@
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { ShoppingCart, X, Plus, Minus, Shield, Loader2 } from 'lucide-react';
+import { AlertCircle, ShoppingCart, X, Plus, Minus, Shield, Loader2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 
+function extractFirstError(errors) {
+    const first = Object.values(errors || {})[0];
+    return Array.isArray(first) ? first[0] : first;
+}
+
 export default function CartDrawer({ auth }) {
+    const [checkoutError, setCheckoutError] = useState(null);
+    const [processingCheckout, setProcessingCheckout] = useState(false);
     const {
         carrito,
         cartOpen,
@@ -18,10 +26,19 @@ export default function CartDrawer({ auth }) {
     const itemCount = items.reduce((sum, d) => sum + d.cantidad_dca, 0);
 
     const handleCheckout = () => {
-        closeCart();
+        setCheckoutError(null);
         if (auth?.user) {
-            router.post('/tienda/checkout', { cod_carrito: carrito.cod_carrito });
+            setProcessingCheckout(true);
+            router.post('/tienda/checkout', { cod_carrito: carrito.cod_carrito }, {
+                preserveScroll: true,
+                onSuccess: () => closeCart(),
+                onError: (errors) => {
+                    setCheckoutError(extractFirstError(errors) || 'No se pudo iniciar el checkout. Revisa tu carrito.');
+                },
+                onFinish: () => setProcessingCheckout(false),
+            });
         } else {
+            closeCart();
             router.visit('/tienda/login');
         }
     };
@@ -182,6 +199,12 @@ export default function CartDrawer({ auth }) {
 
                 {items.length > 0 && (
                     <div className="px-5 py-4" style={{ borderTop: '1px solid #F3F4F6' }}>
+                        {checkoutError && (
+                            <div className="flex items-start gap-2 p-3 rounded-xl mb-3" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                                <AlertCircle size={14} style={{ color: '#DC2626', marginTop: 1, flexShrink: 0 }} />
+                                <p style={{ fontSize: 12, color: '#991B1B', fontWeight: 600, lineHeight: 1.45 }}>{checkoutError}</p>
+                            </div>
+                        )}
                         <div className="space-y-1.5 mb-4">
                             <div className="flex justify-between">
                                 <span style={{ fontSize: 13, color: '#6B7280' }}>Subtotal</span>
@@ -196,17 +219,18 @@ export default function CartDrawer({ auth }) {
                         <button
                             type="button"
                             onClick={handleCheckout}
+                            disabled={processingCheckout}
                             className="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:opacity-90"
                             style={{
-                                background: 'linear-gradient(135deg, #D77A61, #c56950)',
+                                background: processingCheckout ? '#9CA3AF' : 'linear-gradient(135deg, #D77A61, #c56950)',
                                 color: 'white',
                                 fontSize: 14,
                                 fontWeight: 700,
                                 border: 'none',
-                                cursor: 'pointer',
+                                cursor: processingCheckout ? 'not-allowed' : 'pointer',
                             }}
                         >
-                            {auth?.user ? 'Proceder al Pago' : 'Iniciar Sesión para Comprar'}
+                            {processingCheckout ? 'Preparando checkout...' : (auth?.user ? 'Proceder al Pago' : 'Iniciar Sesión para Comprar')}
                         </button>
 
                         <div className="flex items-center justify-center gap-4 mt-3">

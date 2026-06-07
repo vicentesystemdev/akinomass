@@ -6,7 +6,29 @@ import CartStep from '@/Components/Tienda/Checkout/CartStep';
 import ShippingStep from '@/Components/Tienda/Checkout/ShippingStep';
 import PaymentStep from '@/Components/Tienda/Checkout/PaymentStep';
 import ConfirmationStep from '@/Components/Tienda/Checkout/ConfirmationStep';
-import { ChevronLeft } from 'lucide-react';
+import { AlertCircle, ChevronLeft, Clock } from 'lucide-react';
+
+function extractFirstError(errors) {
+    const first = Object.values(errors || {})[0];
+    return Array.isArray(first) ? first[0] : first;
+}
+
+function buildShippingPayload(data) {
+    const direccionCompleta = [
+        data.direccion_entrega,
+        data.ciudad_entrega,
+        data.departamento_entrega,
+        data.referencia_entrega ? `Ref: ${data.referencia_entrega}` : null,
+    ].filter(Boolean).join(', ');
+
+    return {
+        email_contacto: data.email_contacto,
+        telefono_contacto: data.telefono_contacto,
+        direccion_entrega: direccionCompleta,
+        documento_facturacion: data.documento_facturacion,
+        razon_social: data.razon_social,
+    };
+}
 
 export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
     const [step, setStep] = useState(1);
@@ -26,11 +48,14 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
         comprobante: null,
     });
     const [comprobanteError, setComprobanteError] = useState(null);
+    const [serverError, setServerError] = useState(null);
     const [pedido, setPedido] = useState(pedidoProp || null);
     const [processing, setProcessing] = useState(false);
 
     const token = checkout?.token_che;
     const checkoutEstado = checkout?.estado_che;
+    const tiempoCheckout = checkout?.tiempo_checkout;
+    const reservas = checkout?.reservas;
 
     useEffect(() => {
         if (pedidoProp) {
@@ -49,20 +74,24 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
 
     function updateShipping(d) {
         setShippingData((prev) => ({ ...prev, ...d }));
+        setServerError(null);
     }
 
     function updatePayment(d) {
         setPaymentData((prev) => ({ ...prev, ...d }));
+        setServerError(null);
         if (d.comprobante) {
             setComprobanteError(null);
         }
     }
 
     function handleShippingNext() {
+        setServerError(null);
         setProcessing(true);
-        router.patch(`/tienda/checkout/${token}/datos`, shippingData, {
+        router.patch(`/tienda/checkout/${token}/datos`, buildShippingPayload(shippingData), {
             preserveScroll: true,
             onSuccess: () => setStep(3),
+            onError: (errors) => setServerError(extractFirstError(errors) || 'No se pudieron guardar los datos de entrega.'),
             onFinish: () => setProcessing(false),
         });
     }
@@ -74,9 +103,9 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
         }
 
         setComprobanteError(null);
+        setServerError(null);
         setProcessing(true);
 
-        // PASO 1: Generar el pedido PRIMERO
         router.post(`/tienda/checkout/${token}/generar-pedido`, {
             cod_checkout_sesion: checkout.cod_checkout_sesion,
         }, {
@@ -106,11 +135,15 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                                 Array.isArray(errors.comprobante) ? errors.comprobante[0] : errors.comprobante,
                             );
                         }
+                        setServerError(extractFirstError(errors) || 'No se pudo registrar el pago.');
                     },
                     onFinish: () => setProcessing(false),
                 });
             },
-            onError: () => setProcessing(false),
+            onError: (errors) => {
+                setServerError(extractFirstError(errors) || 'No se pudo generar el pedido.');
+                setProcessing(false);
+            },
         });
     }
 
@@ -144,6 +177,36 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
 
             {/* Content */}
             <main className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+                {step < 4 && tiempoCheckout && (
+                    <div className="mb-5 rounded-2xl bg-white p-4" style={{ border: '1px solid rgba(215,122,97,0.22)' }}>
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FDF6F0', color: '#D77A61' }}>
+                                    <Clock size={16} />
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: 13, fontWeight: 800, color: '#2B221E' }}>
+                                        Checkout activo: {tiempoCheckout.tiempo_restante_formateado}
+                                    </p>
+                                    <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3 }}>
+                                        Tiempo configurado: {tiempoCheckout.ttl_minutos} min
+                                        {reservas?.tiempo_restante_segundos > 0
+                                            ? ` · reserva de stock: ${Math.ceil(reservas.tiempo_restante_segundos / 60)} min`
+                                            : ''}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {serverError && (
+                    <div className="flex items-start gap-2 p-3 rounded-xl mb-5" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                        <AlertCircle size={15} style={{ color: '#DC2626', marginTop: 1, flexShrink: 0 }} />
+                        <p style={{ fontSize: 12.5, color: '#991B1B', fontWeight: 600, lineHeight: 1.45 }}>{serverError}</p>
+                    </div>
+                )}
+
                 {step === 1 && <CartStep checkout={checkout} onNext={() => setStep(2)} />}
                 {step === 2 && (
                     <ShippingStep
@@ -163,6 +226,7 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                         onBack={() => setStep(2)}
                         processing={processing}
                         comprobanteError={comprobanteError}
+                        onComprobanteError={setComprobanteError}
                     />
                 )}
                 {step === 4 && <ConfirmationStep checkout={checkout} pedido={pedido} />}

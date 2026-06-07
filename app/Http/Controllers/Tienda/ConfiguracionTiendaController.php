@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tienda\ActualizarConfiguracionTiendaRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,11 +23,10 @@ class ConfiguracionTiendaController extends Controller
     }
 
     public function actualizar(
-        Request $request,
-        ActualizarConfiguracionTiendaRequest $formRequest,
+        ActualizarConfiguracionTiendaRequest $request,
         ActualizarConfiguracionTiendaAction $action,
     ): RedirectResponse|JsonResponse {
-        $action->execute($request->user()->id, $formRequest->validated());
+        $action->execute($request->user()->id, $request->validated());
 
         if ($request->expectsJson()) {
             return response()->json(['success' => 'Configuración de tienda actualizada.']);

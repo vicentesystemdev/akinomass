@@ -44,6 +44,7 @@ class RegistrarPagoDesdeCheckoutAction
         }
 
         $estadosPermitidosPago = [
+            EstadoPedidoTiendaEnum::PENDIENTE_REVISION,
             EstadoPedidoTiendaEnum::PENDIENTE_VALIDACION_PAGO,
             EstadoPedidoTiendaEnum::ACEPTADO,
             EstadoPedidoTiendaEnum::PENDIENTE_PAGO,
@@ -109,6 +110,10 @@ class RegistrarPagoDesdeCheckoutAction
 
             $checkoutSesion->update([
                 'estado_che' => EstadoCheckoutSesionEnum::PAGO_REGISTRADO,
+            ]);
+
+            $pedidoTienda->update([
+                'estado_pte' => EstadoPedidoTiendaEnum::PENDIENTE_VALIDACION_PAGO,
             ]);
 
             PagoWebRegistradoEvent::dispatch($pagoTienda);

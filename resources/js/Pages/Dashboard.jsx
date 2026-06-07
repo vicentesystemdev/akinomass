@@ -15,7 +15,7 @@ const QuickLinkCard = ({ links }) => {
 
     return (
         <SectionCard title="Accesos rápidos" className="overflow-hidden">
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 gap-2">
                 {links.map((item) => (
                     <Link
                         key={item.routeName}
@@ -45,6 +45,7 @@ export default function Dashboard({ metricas }) {
         { label: 'Inventario', routeName: 'inventario.index', icon: '🏭', canView: hasPermission('inventario.ver') },
         { label: 'Pedidos', routeName: 'pedidos.index', icon: '🛒', canView: hasPermission('pedidos.ver') },
         { label: 'Pagos', routeName: 'pagos.index', icon: '💳', canView: hasPermission('pagos.ver') },
+        { label: 'Config. tienda', routeName: 'configuracion.tienda.index', icon: '⏱️', canView: hasPermission('configuracion_tienda.ver') },
         { label: 'Live Sales', routeName: 'live-sales.index', icon: '📱', canView: hasPermission('pedidos.ver') || hasPermission('leads.ver') },
         { label: 'Reportes', routeName: 'reportes.index', icon: '📊', canView: hasPermission('reportes.ver') },
     ].filter((item) => item.canView);

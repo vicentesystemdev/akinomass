@@ -119,6 +119,23 @@ class CheckoutTest extends TiendaTestCase
         ]);
     }
 
+    public function test_iniciar_checkout_renueva_reservas_vencidas_si_hay_stock(): void
+    {
+        ReservaStockCarrito::where('cod_carrito', $this->carrito->cod_carrito)
+            ->update(['expira_en_res' => now()->subMinute()]);
+
+        $this->actingAs($this->user);
+
+        $response = $this->postJson('/tienda/checkout', [
+            'cod_carrito' => $this->carrito->cod_carrito,
+        ]);
+
+        $response->assertStatus(200);
+
+        $reserva = ReservaStockCarrito::where('cod_carrito', $this->carrito->cod_carrito)->first();
+        $this->assertTrue($reserva->expira_en_res->isFuture());
+    }
+
     public function test_carrito_vacio_falla(): void
     {
         $this->carrito->detalles()->delete();

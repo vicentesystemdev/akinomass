@@ -17,7 +17,7 @@ class ActualizarConfiguracionTiendaAction
             foreach ($valores as $clave => $valor) {
                 $this->configService->actualizarValor(
                     clave: $clave,
-                    valor: (string) $valor,
+                    valor: is_bool($valor) ? ($valor ? 'true' : 'false') : (string) $valor,
                     userId: $userId,
                 );
             }

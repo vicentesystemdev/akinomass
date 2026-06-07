@@ -8,7 +8,7 @@ class ActualizarConfiguracionTiendaRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('configuracion_tienda.editar') ?? false;
     }
 
     public function rules(): array

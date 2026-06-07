@@ -91,6 +91,29 @@ class ReservaStockCarritoService
             ]);
     }
 
+    public function renovarReservasPorCarrito(Carrito $carrito, int $ttlMinutos, ?int $userId, ?string $sessionId): void
+    {
+        $expiraEn = Carbon::now()->addMinutes($ttlMinutos);
+
+        foreach ($carrito->detalles as $detalle) {
+            ReservaStockCarrito::updateOrCreate(
+                ['cod_detalle_carrito' => $detalle->cod_detalle_carrito],
+                [
+                    'cod_carrito' => $carrito->cod_carrito,
+                    'cod_producto' => $detalle->cod_producto,
+                    'cod_variante_producto' => $detalle->cod_variante_producto,
+                    'user_id' => $userId,
+                    'session_id_res' => $sessionId,
+                    'cantidad_res' => $detalle->cantidad_dca,
+                    'estado_res' => EstadoReservaStockEnum::ACTIVA,
+                    'expira_en_res' => $expiraEn,
+                    'liberada_en_res' => null,
+                    'confirmada_en_res' => null,
+                ]
+            );
+        }
+    }
+
     public function obtenerReservaPorDetalle(int $codDetalleCarrito): ?ReservaStockCarrito
     {
         return ReservaStockCarrito::where('cod_detalle_carrito', $codDetalleCarrito)

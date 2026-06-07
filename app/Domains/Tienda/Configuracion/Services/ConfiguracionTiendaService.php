@@ -96,6 +96,11 @@ class ConfiguracionTiendaService
         return $this->obtenerEntero('pago_observado_correccion_minutos', 1440);
     }
 
+    public function obtenerTiempoResubidaPagoRechazadoMinutos(): int
+    {
+        return $this->obtenerEntero('pago_rechazado_resubida_minutos', 1440);
+    }
+
     public function obtenerPermitirExtensionReserva(): bool
     {
         return $this->obtenerBooleano('carrito_permitir_extension', true);

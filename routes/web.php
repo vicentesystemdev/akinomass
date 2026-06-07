@@ -111,9 +111,13 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
     Route::get('/auditoria/{cod_auditoria}', [AuditoriaController::class, 'show'])->name('auditoria.show');
 
-    Route::prefix('configuraciones/tienda')->middleware('role:Administrador')->group(function () {
-        Route::get('/', [ConfiguracionTiendaController::class, 'index'])->name('configuracion.tienda.index');
-        Route::patch('/', [ConfiguracionTiendaController::class, 'actualizar'])->name('configuracion.tienda.actualizar');
+    Route::prefix('configuraciones/tienda')->group(function () {
+        Route::get('/', [ConfiguracionTiendaController::class, 'index'])
+            ->middleware('permission:configuracion_tienda.ver')
+            ->name('configuracion.tienda.index');
+        Route::patch('/', [ConfiguracionTiendaController::class, 'actualizar'])
+            ->middleware('permission:configuracion_tienda.editar')
+            ->name('configuracion.tienda.actualizar');
     });
 
     Route::prefix('admin/tienda/pedidos')->group(function () {

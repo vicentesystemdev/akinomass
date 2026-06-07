@@ -1,11 +1,11 @@
-import { router } from '@inertiajs/react';
-import { ShoppingCart, X, Plus, Minus, ChevronRight, Shield, Truck, RefreshCw } from 'lucide-react';
+import { ShoppingCart, ChevronRight, Shield, Truck, RefreshCw, Clock } from 'lucide-react';
 
 export default function CartStep({ checkout, onNext }) {
     const carrito = checkout?.carrito;
     const items = carrito?.detalles || [];
     const subtotal = checkout ? Number(checkout.subtotal_che) : 0;
     const total = checkout ? Number(checkout.total_che) : 0;
+    const reservas = checkout?.reservas;
 
     if (items.length === 0) {
         return (
@@ -57,6 +57,26 @@ export default function CartStep({ checkout, onNext }) {
             </div>
 
             <div className="space-y-4">
+                {reservas && (
+                    <div className="p-4 rounded-2xl bg-white" style={{ border: '1px solid rgba(215,122,97,0.22)' }}>
+                        <div className="flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FDF6F0', color: '#D77A61' }}>
+                                <Clock size={16} />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: 13, fontWeight: 800, color: '#2B221E' }}>
+                                    Stock reservado
+                                </p>
+                                <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3, lineHeight: 1.45 }}>
+                                    {reservas.tiempo_restante_segundos > 0
+                                        ? `Quedan ${Math.ceil(reservas.tiempo_restante_segundos / 60)} min de reserva.`
+                                        : reservas.mensaje_reserva}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="p-5 rounded-2xl bg-white" style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
                     <h3 style={{ fontSize: 15, fontWeight: 700, color: '#2B221E', marginBottom: 14 }}>Resumen del pedido</h3>
                     <div className="space-y-2.5">
