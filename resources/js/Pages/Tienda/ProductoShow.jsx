@@ -13,21 +13,11 @@ function StockBadge({ badge, stock, sinVariante }) {
             </div>
         );
     }
-    if (badge === 'ultimo_stock') {
-        return (
-            <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ background: '#D97706' }} />
-                <span style={{ fontSize: 13, color: '#D97706', fontWeight: 500 }}>
-                    Stock bajo — {sinVariante ? `${stock} disponibles` : `quedan ${stock}`}
-                </span>
-            </div>
-        );
-    }
     return (
         <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full" style={{ background: '#059669' }} />
-            <span style={{ fontSize: 13, color: '#059669', fontWeight: 500 }}>
-                Disponible{sinVariante ? ` (${stock} en stock)` : ''}
+            <span style={{ fontSize: 13, color: '#059669', fontWeight: 600 }}>
+                Disponible (Prenda única)
             </span>
         </div>
     );
@@ -128,8 +118,8 @@ export default function ProductoShow({ producto, auth }) {
                         )}
 
                         <div className="mb-6">
-                            <span style={{ fontSize: 32, fontWeight: 900, color: '#2B221E' }}>
-                                Bs. {Number(varianteSeleccionada?.precio_venta_variante ?? producto.precio_venta_pro).toFixed(2)}
+                            <span className="text-3xl font-black text-cafe-950">
+                                Bs. {Number(Number(varianteSeleccionada?.precio_venta_variante ?? producto.precio_venta_pro).toFixed(1))}
                             </span>
                         </div>
 
@@ -166,23 +156,18 @@ export default function ProductoShow({ producto, auth }) {
                                                 disabled={agotada}
                                                 onClick={() => handleSeleccionarVariante(variante.cod_variante_producto)}
                                                 title={agotada ? 'Sin stock' : `${variante.stock_disponible ?? 0} disponibles`}
-                                                className="relative rounded-xl px-4 py-2 text-sm font-semibold transition-all"
-                                                style={{
-                                                    borderWidth: 1.5,
-                                                    borderStyle: 'solid',
-                                                    borderColor: esSeleccionada ? '#D77A61' : agotada ? '#E5E7EB' : '#D1D5DB',
-                                                    background: esSeleccionada ? '#FDF6F0' : 'white',
-                                                    color: agotada ? '#C4C4C4' : esSeleccionada ? '#D77A61' : '#2B221E',
-                                                    cursor: agotada ? 'not-allowed' : 'pointer',
-                                                    textDecoration: agotada ? 'line-through' : 'none',
-                                                    opacity: agotada ? 0.6 : 1,
-                                                }}
+                                                className={`relative rounded-xl px-4 py-2 text-sm font-semibold transition-all border-2 active:scale-95 duration-200 ${
+                                                    esSeleccionada
+                                                        ? 'border-terracota-500 bg-crema-100 text-terracota-500 shadow-sm'
+                                                        : agotada
+                                                        ? 'border-gray-200 bg-white text-gray-300 line-through opacity-50 cursor-not-allowed'
+                                                        : 'border-gray-300 bg-white text-cafe-950 hover:border-terracota-300 hover:text-terracota-500 cursor-pointer'
+                                                }`}
                                             >
                                                 {variante.talla?.codigo_talla_producto ?? '?'}
                                                 {variante.stock_badge === 'ultimo_stock' && !agotada && (
                                                     <span
-                                                        className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full"
-                                                        style={{ background: '#D97706' }}
+                                                        className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full bg-warning border-2 border-white"
                                                         title="Stock bajo"
                                                     />
                                                 )}
@@ -219,64 +204,23 @@ export default function ProductoShow({ producto, auth }) {
                             )}
                         </div>
 
-                        {/* Selector de cantidad */}
-                        {isAvailable && (
-                            <div className="flex items-center gap-4 mb-6">
-                                <label style={{ fontSize: 13, fontWeight: 600, color: '#544a45' }}>Cantidad:</label>
-                                <div className="flex items-center gap-2 rounded-xl p-1" style={{ background: '#F3F4F6' }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setCantidad(Math.max(1, cantidad - 1))}
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
-                                        style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
-                                    >
-                                        -
-                                    </button>
-                                    <span style={{ fontSize: 14, fontWeight: 700, color: '#2B221E', minWidth: 32, textAlign: 'center' }}>
-                                        {cantidad}
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => setCantidad(Math.min(stock, cantidad + 1))}
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
-                                        style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {badgeActivo === 'ultimo_stock' && isAvailable && (
-                            <p
-                                className="flex items-center gap-1.5 mb-3 px-3 py-2 rounded-xl"
-                                style={{ fontSize: 13, fontWeight: 600, background: '#FEF3C7', color: '#B45309' }}
-                            >
-                                <AlertTriangle size={14} />
-                                Stock bajo: quedan {stock} unidades
-                            </p>
-                        )}
-
+                        {/* Botón de añadir al carrito */}
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 type="button"
                                 onClick={handleAddToCart}
-                                disabled={busy || (tieneVariantes && codVarianteProducto && !isAvailable)}
-                                className="flex-1 py-4 rounded-xl flex items-center justify-center gap-2 transition-all"
-                                style={{
-                                    background: added
-                                        ? 'linear-gradient(135deg, #059669, #10B981)'
+                                disabled={busy || inCart || (tieneVariantes && codVarianteProducto && !isAvailable)}
+                                className={`flex-1 py-4 rounded-xl flex items-center justify-center gap-2 transition-all text-white font-bold border-none text-base active:scale-95 duration-200 ${
+                                    busy || inCart ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'
+                                } ${
+                                    added
+                                        ? 'bg-gradient-to-br from-success to-emerald-500'
                                         : inCart && !added
-                                          ? 'linear-gradient(135deg, #3C473A, #4e5849)'
+                                          ? 'bg-gray-400'
                                           : tieneVariantes && codVarianteProducto && !isAvailable
-                                            ? '#9CA3AF'
-                                            : 'linear-gradient(135deg, #D77A61, #c56950)',
-                                    color: 'white',
-                                    fontSize: 15,
-                                    fontWeight: 700,
-                                    border: 'none',
-                                    cursor: busy ? 'not-allowed' : 'pointer',
-                                }}
+                                            ? 'bg-gray-400'
+                                            : 'bg-gradient-to-br from-terracota-500 to-terracota-600 hover:shadow-md'
+                                }`}
                             >
                                 {added ? (
                                     <>
@@ -288,7 +232,7 @@ export default function ProductoShow({ producto, auth }) {
                                     'Agotado'
                                 ) : inCart ? (
                                     <>
-                                        <Check size={16} /> Ya está en tu carrito
+                                        <Check size={16} /> Reservado (En Carrito)
                                     </>
                                 ) : (
                                     <>
@@ -300,8 +244,7 @@ export default function ProductoShow({ producto, auth }) {
                                 <button
                                     type="button"
                                     onClick={openCart}
-                                    className="py-4 px-5 rounded-xl transition-all hover:bg-gray-50"
-                                    style={{ fontSize: 14, fontWeight: 600, color: '#544a45', border: '1.5px solid #E5E7EB', background: 'white', cursor: 'pointer' }}
+                                    className="py-4 px-5 rounded-xl transition-all border border-gray-200 bg-white text-cafe-700 font-semibold hover:bg-gray-50 cursor-pointer"
                                 >
                                     Ver carrito
                                 </button>

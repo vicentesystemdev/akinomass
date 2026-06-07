@@ -48,6 +48,14 @@ class ActualizarCantidadCarritoAction
                 ]);
             }
 
+            // Validar que para prendas únicas no se actualice la cantidad a más de 1
+            $producto = \App\Models\Producto::find($detalle->cod_producto);
+            if ($producto && !str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-') && $cantidad > 1) {
+                throw ValidationException::withMessages([
+                    'cantidad' => ['Cada prenda es única, no puedes tener más de 1 unidad de este producto en tu carrito.'],
+                ]);
+            }
+
             $detalleActualizado = $this->persistenciaService->actualizarDetalle(
                 $detalle->cod_detalle_carrito,
                 $cantidad

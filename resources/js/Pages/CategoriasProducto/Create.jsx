@@ -74,19 +74,6 @@ export default function Create() {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <input
-                            type="checkbox"
-                            id="activo_cat"
-                            checked={!!form.data.activo_cat}
-                            onChange={(e) => form.setData('activo_cat', e.target.checked)}
-                            className="rounded border-gray-300 text-terracota-500 focus:ring-terracota-500"
-                        />
-                        <label htmlFor="activo_cat" className="text-sm font-medium text-cafe-700">
-                            Categoría activa
-                        </label>
-                    </div>
-
                     <FormCard.Actions>
                         <Link href={route('categorias-producto.index')}>
                             <SecondaryButton>Cancelar</SecondaryButton>

@@ -3,7 +3,7 @@ import { filterNumeric, toUpper } from '@/utils/formatters';
 const inputClass = 'w-full rounded-xl border-gray-300 shadow-sm focus:border-terracota-500 focus:ring-terracota-500 py-2.5 px-3 text-sm text-cafe-700';
 const errorClass = 'mt-1 text-xs text-red-600';
 
-export default function VariantsSection({ form, tallas = [], baseSku = '' }) {
+export default function VariantsSection({ form, tallas = [], baseSku = '', categorias = [] }) {
     const variantes = form.data.variantes || [];
     const findVariante = (codTalla) =>
         variantes.find((variante) => String(variante.cod_talla_producto) === String(codTalla));
@@ -21,13 +21,22 @@ export default function VariantsSection({ form, tallas = [], baseSku = '' }) {
             return;
         }
 
+        const selectedCatId = form.data.cod_categoria_producto;
+        const selectedCat = categorias?.find(c => String(c.cod_categoria_producto) === String(selectedCatId));
+        const catPrefix = selectedCat ? selectedCat.nombre_cat.substring(0, 3).toUpperCase() : 'CAT';
+
+        const prodName = form.data.nombre_pro || 'PROD';
+        const prodPrefix = prodName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase() || 'PROD';
+
+        const indexNum = variantes.length + 1;
+        const correlative = String(indexNum).padStart(2, '0');
+        const suggestedSku = `${catPrefix}-${prodPrefix}-${toUpper(talla.codigo_talla_producto)}-${correlative}`;
+
         form.setData('variantes', [
             ...variantes,
             {
                 cod_talla_producto: talla.cod_talla_producto,
-                sku_variante_producto: baseSku
-                    ? `${toUpper(baseSku)}-${toUpper(talla.codigo_talla_producto)}`
-                    : '',
+                sku_variante_producto: suggestedSku,
                 precio_venta_variante: '',
                 estado_variante_producto: 'activo',
                 activo_variante_producto: true,

@@ -11,7 +11,7 @@ export default function ProductCard({ producto }) {
     const stock = producto.stock_disponible ?? 0;
     const badge = producto.stock_badge || (stock > 0 ? 'disponible' : 'agotado');
     const isAvailable = badge === 'disponible' || badge === 'ultimo_stock';
-    const displayPrice = Number(producto.precio_venta_pro).toFixed(2);
+    const displayPrice = Number(Number(producto.precio_venta_pro).toFixed(1));
     const processing = busy && !addedFlash;
     const tieneVariantes = (producto.variantes || []).length > 0;
 
@@ -70,7 +70,7 @@ export default function ProductCard({ producto }) {
 
                     {!isAvailable && (
                         <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)' }}>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>Agotado</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>Vendido</span>
                         </div>
                     )}
 
@@ -112,8 +112,8 @@ export default function ProductCard({ producto }) {
                 <div className="flex items-center justify-between mb-3">
                     <span style={{ fontSize: 17, fontWeight: 800, color: '#2B221E' }}>Bs. {displayPrice}</span>
                     {isAvailable && !tieneVariantes && (
-                        <span style={{ fontSize: 11, color: badge === 'ultimo_stock' ? '#B45309' : '#6B7280', fontWeight: 500 }}>
-                            {stock} en stock
+                        <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>
+                            Disponible
                         </span>
                     )}
                 </div>
@@ -126,7 +126,7 @@ export default function ProductCard({ producto }) {
                                 <span
                                     key={variante.cod_variante_producto}
                                     className="px-2 py-1 rounded-lg"
-                                    title={disponible ? `${variante.stock_disponible ?? 0} disponibles` : 'Agotado'}
+                                    title={disponible ? `${variante.stock_disponible ?? 0} disponibles` : 'Vendido'}
                                     style={{
                                         fontSize: 10.5,
                                         fontWeight: 700,
@@ -151,8 +151,8 @@ export default function ProductCard({ producto }) {
                 <button
                     type="button"
                     onClick={tieneVariantes ? () => router.visit(`/tienda/productos/${producto.cod_producto}`) : handleAddToCart}
-                    disabled={!isAvailable || busy}
-                    className="w-full py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all"
+                    disabled={!isAvailable || busy || inCart}
+                    className="w-full py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 duration-200"
                     style={{
                         background: addedFlash
                             ? 'linear-gradient(135deg, #059669, #10B981)'
@@ -165,7 +165,7 @@ export default function ProductCard({ producto }) {
                         fontSize: 12.5,
                         fontWeight: 600,
                         border: 'none',
-                        cursor: isAvailable && !busy ? 'pointer' : 'not-allowed',
+                        cursor: isAvailable && !busy && !inCart ? 'pointer' : 'not-allowed',
                         opacity: processing ? 0.75 : 1,
                         transform: addedFlash ? 'scale(0.98)' : 'scale(1)',
                         transition: 'background 0.2s, opacity 0.2s, transform 0.15s',
@@ -188,7 +188,7 @@ export default function ProductCard({ producto }) {
                     ) : inCart ? (
                         <>
                             <Check size={13} />
-                            <span>En carrito</span>
+                            <span>Reservado en Carrito</span>
                         </>
                     ) : (
                         <>

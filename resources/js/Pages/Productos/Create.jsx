@@ -59,14 +59,46 @@ export default function Create({ categorias, tallas }) {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const submit = () => {
-        const venta = parseFloat(form.data.precio_venta_pro);
-        const costo = parseFloat(form.data.precio_costo_pro);
+    const validateDecimal = (val) => {
+        if (val === '' || val === null || val === undefined) return true;
+        return /^\d+(\.\d)?$/.test(val.toString());
+    };
 
-        if (costo && venta < costo) {
+    const submit = () => {
+        form.clearErrors();
+
+        const venta = form.data.precio_venta_pro;
+        const costo = form.data.precio_costo_pro;
+
+        if (venta && !validateDecimal(venta)) {
+            form.setError('precio_venta_pro', 'El precio de venta no puede tener más de un decimal (ej: 10.5).');
+            return;
+        }
+
+        if (costo && !validateDecimal(costo)) {
+            form.setError('precio_costo_pro', 'El precio de costo no puede tener más de un decimal (ej: 10.5).');
+            return;
+        }
+
+        const ventaFloat = parseFloat(venta);
+        const costoFloat = parseFloat(costo);
+
+        if (costoFloat && ventaFloat < costoFloat) {
             form.setError('precio_venta_pro', 'El precio de venta no puede ser menor al precio de costo.');
             return;
         }
+
+        let hasVariantError = false;
+        if (form.data.variantes && form.data.variantes.length > 0) {
+            form.data.variantes.forEach((v, index) => {
+                if (v.precio_venta_variante && !validateDecimal(v.precio_venta_variante)) {
+                    form.setError(`variantes.${index}.precio_venta_variante`, 'El precio de la variante no puede tener más de un decimal (ej: 10.5).');
+                    hasVariantError = true;
+                }
+            });
+        }
+
+        if (hasVariantError) return;
 
         form.post(route('productos.store'));
     };
@@ -218,7 +250,7 @@ export default function Create({ categorias, tallas }) {
                     </FormCard.Section>
 
                     <FormCard.Section title="Variantes y tallas">
-                        <VariantsSection form={form} tallas={tallas} baseSku={form.data.sku_pro} />
+                        <VariantsSection form={form} tallas={tallas} baseSku={form.data.sku_pro} categorias={categorias} />
                     </FormCard.Section>
 
                     <FormCard.Section title="Imagen del Producto">

@@ -58,37 +58,75 @@ class InventarioController extends Controller
         ]);
     }
 
-    public function entradaForm(): Response
+    public function entradaForm()
     {
-        $this->authorize('inventario.ajustar');
-
-        return Inertia::render('Inventario/Entrada', ['productos' => Producto::all()]);
+        return redirect()->route('inventario.ajuste.form', ['tipo' => 'entrada_fardo']);
     }
 
-    public function salidaForm(): Response
+    public function salidaForm()
     {
-        $this->authorize('inventario.ajustar');
-
-        return Inertia::render('Inventario/Salida', ['productos' => Producto::all()]);
+        return redirect()->route('inventario.ajuste.form', ['tipo' => 'salida_merma']);
     }
 
     public function ajusteForm(Request $request): Response
     {
         $this->authorize('inventario.ajustar');
 
+        $consulta = app(ConsultaInventarioCategoriaService::class);
+        $categoriasModel = CategoriaProducto::query()
+            ->where('activo_cat', true)
+            ->orderBy('nombre_cat')
+            ->get();
+
+        $resumenes = $consulta->resumenesPorCategoria($categoriasModel->pluck('cod_categoria_producto'));
+
+        $categorias = $categoriasModel->map(function ($cat) use ($resumenes) {
+            $res = $resumenes->get($cat->cod_categoria_producto);
+            return [
+                'cod_categoria_producto' => $cat->cod_categoria_producto,
+                'nombre_cat' => $cat->nombre_cat,
+                'stock_total' => $res ? (int) $res['stock_total'] : 0,
+                'stock_reservado' => $res ? (int) $res['stock_reservado'] : 0,
+                'stock_disponible' => $res ? (int) $res['stock_disponible'] : 0,
+                'stock_minimo' => $res ? (int) $res['stock_minimo'] : 0,
+            ];
+        });
+
         return Inertia::render('Inventario/Ajustar', [
-            'productos' => Producto::query()
-                ->with([
-                    'inventario',
-                    'variantes' => fn ($query) => $query
-                        ->where('activo_variante_producto', true)
-                        ->with(['talla', 'inventario']),
-                ])
-                ->orderBy('nombre_pro')
-                ->get(),
-            'codProductoSeleccionado' => $request->integer('cod_producto') ?: null,
-            'codVarianteSeleccionada' => $request->integer('cod_variante_producto') ?: null,
+            'categorias' => $categorias,
+            'codCategoriaSeleccionada' => $request->integer('cod_categoria_producto') ?: null,
+            'tipoSeleccionado' => $request->input('tipo') ?: null,
         ]);
+    }
+
+    private function obtenerProductoRepresentativo(int $codCategoria): Producto
+    {
+        $categoria = CategoriaProducto::findOrFail($codCategoria);
+        $sku = 'GEN-CAT-' . $codCategoria;
+        
+        $producto = Producto::where('sku_pro', $sku)->first();
+        
+        if (! $producto) {
+            $producto = Producto::create([
+                'cod_categoria_producto' => $codCategoria,
+                'nombre_pro' => 'Stock Agrupado - ' . $categoria->nombre_cat,
+                'descripcion_pro' => 'Producto virtual representativo del stock agrupado de la categoría ' . $categoria->nombre_cat . '.',
+                'precio_venta_pro' => 0.0,
+                'precio_costo_pro' => 0.0,
+                'sku_pro' => $sku,
+                'estado_pro' => \App\Domains\Catalogo\Productos\Enums\EstadoProductoEnum::ACTIVO,
+            ]);
+
+            \App\Models\Inventario::create([
+                'cod_producto' => $producto->cod_producto,
+                'stock_actual_inv' => 0,
+                'stock_minimo_inv' => 0,
+                'ubicacion_inv' => 'Almacén 1',
+                'activo_inv' => true,
+            ]);
+        }
+        
+        return $producto;
     }
 
     public function store(StoreInventarioRequest $request, CrearOActualizarInventarioAction $action)
@@ -112,10 +150,72 @@ class InventarioController extends Controller
         return redirect()->route('inventario.index');
     }
 
-    public function registrarAjuste(AjustarInventarioRequest $request, RegistrarAjusteInventarioAction $action)
+    public function registrarAjuste(AjustarInventarioRequest $request)
     {
-        $action->execute($request->validated(), $request->user()?->id);
+        $data = $request->validated();
+        $codCategoria = $data['cod_categoria_producto'];
+        
+        $productoRepresentativo = $this->obtenerProductoRepresentativo($codCategoria);
+        $codProducto = $productoRepresentativo->cod_producto;
+        
+        $tipoAjuste = $data['tipo_ajuste'];
+        $cantidad = $data['cantidad'];
+        $motivo = $data['motivo_mov'];
+        $observacion = $data['observacion_mov'] ?? null;
+        $codUsuario = $request->user()?->id;
 
-        return redirect()->route('inventario.index');
+        \Illuminate\Support\Facades\DB::transaction(function () use ($codProducto, $tipoAjuste, $cantidad, $motivo, $observacion, $codUsuario) {
+            $inventarioService = app(\App\Domains\Inventario\Services\InventarioService::class);
+            $auditoriaService = app(\App\Domains\Auditoria\Services\RegistrarAuditoriaService::class);
+
+            if ($tipoAjuste === 'ajuste_minimo') {
+                $inventarioService->crearOActualizarInventario([
+                    'cod_producto' => $codProducto,
+                    'stock_minimo_inv' => $cantidad,
+                    'ubicacion_inv' => 'Almacén 1',
+                ]);
+
+                $contexto = \App\Domains\Auditoria\DTOs\RegistrarAuditoriaData::fromRequest(request());
+                $auditoriaService->registrarAccion(
+                    $contexto, 'Inventario', 'inventarios', (string) $codProducto, 'update',
+                    submodulo: 'Ajuste Mínimo',
+                    accionFuncional: 'Ajuste de stock mínimo por categoría',
+                    descripcion: "Se ajustó el stock mínimo agrupado de la categoría a {$cantidad}.",
+                );
+                return;
+            }
+
+            $tipoMov = match ($tipoAjuste) {
+                'entrada_fardo' => \App\Domains\Inventario\Enums\TipoMovimientoInventarioEnum::ENTRADA,
+                'salida_merma' => \App\Domains\Inventario\Enums\TipoMovimientoInventarioEnum::SALIDA,
+                'ajuste_conteo' => \App\Domains\Inventario\Enums\TipoMovimientoInventarioEnum::AJUSTE,
+            };
+
+            $inventarioService->registrarMovimiento(
+                codProducto: $codProducto,
+                tipo: $tipoMov,
+                cantidad: $tipoAjuste === 'ajuste_conteo' ? 0 : $cantidad,
+                motivo: $motivo,
+                observacion: $observacion,
+                codUsuario: $codUsuario,
+                stockAjuste: $tipoAjuste === 'ajuste_conteo' ? $cantidad : null,
+            );
+
+            $submodulo = match ($tipoAjuste) {
+                'entrada_fardo' => 'Entrada Fardo',
+                'salida_merma' => 'Salida Merma',
+                'ajuste_conteo' => 'Ajuste Conteo',
+            };
+
+            $contexto = \App\Domains\Auditoria\DTOs\RegistrarAuditoriaData::fromRequest(request());
+            $auditoriaService->registrarAccion(
+                $contexto, 'Inventario', 'movimientos_inventario', (string) $codProducto, 'update',
+                submodulo: $submodulo,
+                accionFuncional: 'Ajuste de inventario agrupado',
+                descripcion: "Movimiento de tipo {$tipoAjuste} por cantidad {$cantidad} en la categoría.",
+            );
+        });
+
+        return redirect()->route('inventario.index')->with('success', 'Inventario actualizado correctamente.');
     }
 }

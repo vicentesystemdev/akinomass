@@ -22,6 +22,13 @@ class StoreCategoriaProductoRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('activo_cat')) {
+            $this->merge(['activo_cat' => true]);
+        }
+    }
+
     public function after(): array
     {
         return [

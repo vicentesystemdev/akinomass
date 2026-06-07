@@ -24,8 +24,8 @@ class StoreProductoRequest extends FormRequest
             ],
             'nombre_pro' => ['required', 'string', 'max:255'],
             'descripcion_pro' => ['nullable', 'string'],
-            'precio_venta_pro' => ['required', 'numeric', 'gt:0', 'gte:precio_costo_pro'],
-            'precio_costo_pro' => ['nullable', 'numeric', 'gt:0'],
+            'precio_venta_pro' => ['required', 'numeric', 'gt:0', 'gte:precio_costo_pro', 'regex:/^\d+(\.\d)?$/'],
+            'precio_costo_pro' => ['nullable', 'numeric', 'gt:0', 'regex:/^\d+(\.\d)?$/'],
             'sku_pro' => ['nullable', 'string', 'max:100', Rule::unique('productos', 'sku_pro')],
             'imagen_pro' => $this->hasFile('imagen_pro')
                 ? ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']
@@ -34,7 +34,7 @@ class StoreProductoRequest extends FormRequest
             'variantes' => ['nullable', 'array'],
             'variantes.*.cod_talla_producto' => ['required', 'integer', 'exists:tallas_producto,cod_talla_producto'],
             'variantes.*.sku_variante_producto' => ['nullable', 'string', 'max:100'],
-            'variantes.*.precio_venta_variante' => ['nullable', 'numeric', 'gt:0'],
+            'variantes.*.precio_venta_variante' => ['nullable', 'numeric', 'gt:0', 'regex:/^\d+(\.\d)?$/'],
             'variantes.*.estado_variante_producto' => ['nullable', Rule::enum(EstadoProductoEnum::class)],
             'variantes.*.activo_variante_producto' => ['nullable', 'boolean'],
         ];
@@ -99,8 +99,10 @@ class StoreProductoRequest extends FormRequest
             'precio_venta_pro.numeric' => 'El precio de venta debe ser numérico.',
             'precio_venta_pro.gt' => 'El precio de venta debe ser mayor a 0.',
             'precio_venta_pro.gte' => 'El precio de venta debe ser mayor o igual al precio de costo.',
+            'precio_venta_pro.regex' => 'El precio de venta no puede tener más de un decimal (ej: 10.5).',
             'precio_costo_pro.numeric' => 'El precio de costo debe ser numérico.',
             'precio_costo_pro.gt' => 'El precio de costo debe ser mayor a 0.',
+            'precio_costo_pro.regex' => 'El precio de costo no puede tener más de un decimal (ej: 10.5).',
             'sku_pro.string' => 'El SKU debe ser texto.',
             'sku_pro.max' => 'El SKU no puede superar los 100 caracteres.',
             'sku_pro.unique' => 'El SKU ya está registrado.',
@@ -118,6 +120,7 @@ class StoreProductoRequest extends FormRequest
             'variantes.*.sku_variante_producto.max' => 'El SKU de la variante no puede superar los 100 caracteres.',
             'variantes.*.precio_venta_variante.numeric' => 'El precio de la variante debe ser numérico.',
             'variantes.*.precio_venta_variante.gt' => 'El precio de la variante debe ser mayor a 0.',
+            'variantes.*.precio_venta_variante.regex' => 'El precio de la variante no puede tener más de un decimal (ej: 10.5).',
             'variantes.*.estado_variante_producto.enum' => 'El estado de la variante no es válido.',
             'variantes.*.activo_variante_producto.boolean' => 'El estado activo de la variante no es válido.',
         ];

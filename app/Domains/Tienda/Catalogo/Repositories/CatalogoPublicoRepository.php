@@ -22,6 +22,7 @@ class CatalogoPublicoRepository
                 ->with(['talla' => fn ($tallaQuery) => $tallaQuery->where('activo_talla_producto', true), 'inventario']),
         ])
             ->where('estado_pro', 'activo')
+            ->where('sku_pro', 'not like', 'GEN-CAT-%')
             ->whereHas('categoria', fn ($q) => $q->where('activo_cat', true));
 
         if ($codCategoria) {
@@ -97,6 +98,7 @@ class CatalogoPublicoRepository
         ])
             ->where('cod_producto', $codProducto)
             ->where('estado_pro', 'activo')
+            ->where('sku_pro', 'not like', 'GEN-CAT-%')
             ->whereHas('categoria', fn ($q) => $q->where('activo_cat', true))
             ->first();
     }

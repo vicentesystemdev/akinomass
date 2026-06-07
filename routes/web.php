@@ -41,7 +41,7 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::patch('/plantillas-mensaje/{plantillas_mensaje}/toggle', [PlantillaMensajeController::class, 'toggle'])->name('plantillas-mensaje.toggle');
     Route::patch('/leads/{lead}/estado', [LeadController::class, 'updateEstado'])->name('leads.update-estado');
     Route::post('/leads/{lead}/convertir', [LeadController::class, 'convertir'])->name('leads.convertir');
-    Route::resource('categorias-producto', CategoriaProductoController::class)->except(['show', 'destroy']);
+    Route::resource('categorias-producto', CategoriaProductoController::class)->except(['destroy']);
     Route::resource('productos', ProductoController::class)->except(['show', 'destroy']);
 
     Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');

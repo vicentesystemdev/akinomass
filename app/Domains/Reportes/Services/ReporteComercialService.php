@@ -55,6 +55,9 @@ class ReporteComercialService
 
                 // Inventario
                 'productos_stock_bajo' => $this->repository->productosConStockBajo(),
+                'productos_por_categoria' => $this->repository->productosPorCategoria(),
+                'stock_por_categoria' => $this->repository->stockPorCategoria(),
+                'productos_variantes_proporcion' => $this->repository->productosConYSinVariantes(),
 
                 // LiveSales
                 'sesiones_live_por_estado' => $this->repository->sesionesLivePorEstado(),

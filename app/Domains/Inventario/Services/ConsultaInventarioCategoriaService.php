@@ -41,6 +41,7 @@ class ConsultaInventarioCategoriaService
 
         $productos = Producto::query()
             ->where('cod_categoria_producto', $codCategoriaProducto)
+            ->where('sku_pro', 'not like', 'GEN-CAT-%')
             ->with([
                 'inventario',
                 'inventarios',
@@ -54,8 +55,14 @@ class ConsultaInventarioCategoriaService
 
         $reservas = $this->reservasActivasPorProducto($productos->pluck('cod_producto'));
 
+        $skuVirtual = 'GEN-CAT-' . $codCategoriaProducto;
+        $virtualProduct = Producto::where('sku_pro', $skuVirtual)->first();
+        $inventarioVirtual = $virtualProduct ? \App\Models\Inventario::where('cod_producto', $virtualProduct->cod_producto)->whereNull('cod_variante_producto')->first() : null;
+        $stockVirtual = $inventarioVirtual ? (int) $inventarioVirtual->stock_actual_inv : 0;
+
         return [
             'categoria' => $categoria->only(['cod_categoria_producto', 'nombre_cat', 'descripcion_cat', 'activo_cat']),
+            'stock_virtual' => $stockVirtual,
             'productos' => $productos->map(function (Producto $producto) use ($reservas): array {
                 $inventarioBase = $producto->inventario;
                 $stockFisico = (int) $producto->inventarios->sum('stock_actual_inv');
@@ -93,43 +100,45 @@ class ConsultaInventarioCategoriaService
 
         return [
             'categorias' => $codigos->count(),
-            'productos_activos' => $items->sum('productos_activos'),
+            'productos_activos' => $items->sum('total_productos_registrados'),
             'stock_total' => $items->sum('stock_total'),
             'stock_reservado' => $items->sum('stock_reservado'),
             'stock_disponible' => $items->sum('stock_disponible'),
         ];
     }
 
-    private function resumenesPorCategoria(Collection $codigosCategoria): Collection
+    public function resumenesPorCategoria(Collection $codigosCategoria): Collection
     {
         if ($codigosCategoria->isEmpty()) {
             return collect();
         }
 
-        $productosActivos = Producto::query()
+        // 1. Obtener todos los productos reales
+        $productos = Producto::query()
             ->whereIn('cod_categoria_producto', $codigosCategoria)
-            ->where('estado_pro', EstadoProductoEnum::ACTIVO->value)
-            ->selectRaw('cod_categoria_producto, COUNT(*) as total')
-            ->groupBy('cod_categoria_producto')
-            ->pluck('total', 'cod_categoria_producto');
+            ->where('sku_pro', 'not like', 'GEN-CAT-%')
+            ->with(['inventarios'])
+            ->get()
+            ->groupBy('cod_categoria_producto');
 
-        $variantesActivas = DB::table('variantes_producto as v')
-            ->join('productos as p', 'p.cod_producto', '=', 'v.cod_producto')
-            ->whereIn('p.cod_categoria_producto', $codigosCategoria)
-            ->where('v.activo_variante_producto', true)
-            ->selectRaw('p.cod_categoria_producto, COUNT(*) as total')
-            ->groupBy('p.cod_categoria_producto')
-            ->pluck('total', 'p.cod_categoria_producto');
+        // 2. Obtener reservas activas por producto
+        $reservas = DB::table('reservas_stock_carrito')
+            ->where('estado_res', EstadoReservaStockEnum::ACTIVA->value)
+            ->where('expira_en_res', '>', now())
+            ->selectRaw('cod_producto, COALESCE(SUM(cantidad_res), 0) as total')
+            ->groupBy('cod_producto')
+            ->pluck('total', 'cod_producto');
 
-        $inventarios = DB::table('inventarios as i')
+        // 3. Obtener stock total, mínimo e inventario agrupado (incluye el producto virtual)
+        $inventariosAgrupados = DB::table('inventarios as i')
             ->join('productos as p', 'p.cod_producto', '=', 'i.cod_producto')
             ->whereIn('p.cod_categoria_producto', $codigosCategoria)
-            ->selectRaw('p.cod_categoria_producto, COUNT(*) as inventarios, COALESCE(SUM(i.stock_actual_inv), 0) as stock_total, COALESCE(SUM(i.stock_minimo_inv), 0) as stock_minimo')
+            ->selectRaw('p.cod_categoria_producto, COALESCE(SUM(i.stock_actual_inv), 0) as stock_total, COALESCE(SUM(i.stock_minimo_inv), 0) as stock_minimo')
             ->groupBy('p.cod_categoria_producto')
             ->get()
             ->keyBy('cod_categoria_producto');
 
-        $reservas = DB::table('reservas_stock_carrito as r')
+        $reservasAgrupadas = DB::table('reservas_stock_carrito as r')
             ->join('productos as p', 'p.cod_producto', '=', 'r.cod_producto')
             ->whereIn('p.cod_categoria_producto', $codigosCategoria)
             ->where('r.estado_res', EstadoReservaStockEnum::ACTIVA->value)
@@ -138,22 +147,50 @@ class ConsultaInventarioCategoriaService
             ->groupBy('p.cod_categoria_producto')
             ->pluck('total', 'p.cod_categoria_producto');
 
-        return $codigosCategoria->mapWithKeys(function (int $codigo) use ($inventarios, $productosActivos, $reservas, $variantesActivas): array {
-            $inventario = $inventarios->get($codigo);
-            $stockTotal = (int) ($inventario?->stock_total ?? 0);
-            $stockReservado = (int) $reservas->get($codigo, 0);
-            $stockDisponible = max(0, $stockTotal - $stockReservado);
-            $stockMinimo = (int) ($inventario?->stock_minimo ?? 0);
+        return $codigosCategoria->mapWithKeys(function (int $codigo) use ($productos, $reservas, $inventariosAgrupados, $reservasAgrupadas): array {
+            $prodsDeCat = $productos->get($codigo, collect());
+            
+            $totalRegistrados = $prodsDeCat->count();
+            $cantidadDisponible = 0;
+            $cantidadReservada = 0;
+            $cantidadVendida = 0;
+
+            foreach ($prodsDeCat as $p) {
+                $stockFisico = (int) $p->inventarios->sum('stock_actual_inv');
+                $stockReservado = (int) $reservas->get($p->cod_producto, 0);
+                $stockDisponible = max(0, $stockFisico - $stockReservado);
+
+                $esAgotado = $p->estado_pro === EstadoProductoEnum::AGOTADO || $p->estado_pro === EstadoProductoEnum::INACTIVO || $stockFisico <= 0;
+
+                if ($stockReservado > 0) {
+                    $cantidadReservada++;
+                }
+
+                if ($esAgotado) {
+                    $cantidadVendida++;
+                } elseif ($stockDisponible > 0 && $p->estado_pro === EstadoProductoEnum::ACTIVO) {
+                    $cantidadDisponible++;
+                } else {
+                    $cantidadVendida++;
+                }
+            }
+
+            $invAgrupado = $inventariosAgrupados->get($codigo);
+            $stockTotal = (int) ($invAgrupado?->stock_total ?? 0);
+            $stockReservadoTotal = (int) $reservasAgrupadas->get($codigo, 0);
+            $stockDisponibleTotal = max(0, $stockTotal - $stockReservadoTotal);
+            $stockMinimo = (int) ($invAgrupado?->stock_minimo ?? 0);
 
             return [$codigo => [
-                'productos_activos' => (int) $productosActivos->get($codigo, 0),
-                'variantes_activas' => (int) $variantesActivas->get($codigo, 0),
-                'inventarios' => (int) ($inventario?->inventarios ?? 0),
+                'total_productos_registrados' => $totalRegistrados,
+                'productos_disponibles' => $cantidadDisponible,
+                'productos_reservados' => $cantidadReservada,
+                'productos_vendidos' => $cantidadVendida,
                 'stock_total' => $stockTotal,
-                'stock_reservado' => $stockReservado,
-                'stock_disponible' => $stockDisponible,
+                'stock_reservado' => $stockReservadoTotal,
+                'stock_disponible' => $stockDisponibleTotal,
                 'stock_minimo' => $stockMinimo,
-                'estado_stock' => $this->estadoStock($inventario !== null, $stockDisponible, $stockMinimo),
+                'estado_stock' => $this->estadoStock($invAgrupado !== null, $stockDisponibleTotal, $stockMinimo),
             ]];
         });
     }
@@ -208,9 +245,10 @@ class ConsultaInventarioCategoriaService
     private function resumenVacio(): array
     {
         return [
-            'productos_activos' => 0,
-            'variantes_activas' => 0,
-            'inventarios' => 0,
+            'total_productos_registrados' => 0,
+            'productos_disponibles' => 0,
+            'productos_reservados' => 0,
+            'productos_vendidos' => 0,
             'stock_total' => 0,
             'stock_reservado' => 0,
             'stock_disponible' => 0,

@@ -1,13 +1,13 @@
 import { Search } from 'lucide-react';
 
-const chipStyle = (active) => ({
-    fontSize: 12.5,
-    fontWeight: 600,
-    background: active ? 'linear-gradient(135deg, #3C473A, #4e5849)' : 'white',
-    color: active ? 'white' : '#6B7280',
-    border: active ? 'none' : '1px solid #E5E7EB',
-    cursor: 'pointer',
-});
+const getChipClass = (active, isSize = false) =>
+    `text-xs font-semibold transition-all border ${
+        isSize ? 'px-3 py-1 rounded-lg' : 'px-3.5 py-1.5 rounded-xl'
+    } ${
+        active
+            ? 'bg-gradient-to-br from-oliva-700 to-oliva-600 text-white border-transparent shadow-sm'
+            : 'bg-white text-gray-500 border-gray-200 hover:border-oliva-300 hover:text-oliva-700 cursor-pointer'
+    }`;
 
 export default function CatalogFilters({ categorias = [], tallas = [], filtros = {}, onFilter }) {
     const tallasActivas = tallas.length > 0;
@@ -43,8 +43,7 @@ export default function CatalogFilters({ categorias = [], tallas = [], filtros =
                 <button
                     type="button"
                     onClick={() => aplicarFiltro({ ...filtros, cod_categoria_producto: null })}
-                    className="px-3.5 py-1.5 rounded-xl transition-all"
-                    style={chipStyle(!filtros.cod_categoria_producto)}
+                    className={getChipClass(!filtros.cod_categoria_producto)}
                 >
                     Todos
                 </button>
@@ -53,8 +52,7 @@ export default function CatalogFilters({ categorias = [], tallas = [], filtros =
                         key={cat.cod_categoria_producto}
                         type="button"
                         onClick={() => aplicarFiltro({ ...filtros, cod_categoria_producto: cat.cod_categoria_producto })}
-                        className="px-3.5 py-1.5 rounded-xl transition-all"
-                        style={chipStyle(mismaOpcion(filtros.cod_categoria_producto, cat.cod_categoria_producto))}
+                        className={getChipClass(mismaOpcion(filtros.cod_categoria_producto, cat.cod_categoria_producto))}
                     >
                         {cat.nombre_cat}
                     </button>
@@ -70,8 +68,7 @@ export default function CatalogFilters({ categorias = [], tallas = [], filtros =
                     <button
                         type="button"
                         onClick={() => aplicarFiltro({ ...filtros, cod_talla_producto: null })}
-                        className="px-3 py-1 rounded-lg transition-all"
-                        style={chipStyle(!filtros.cod_talla_producto)}
+                        className={getChipClass(!filtros.cod_talla_producto, true)}
                     >
                         Todas
                     </button>
@@ -80,8 +77,7 @@ export default function CatalogFilters({ categorias = [], tallas = [], filtros =
                             key={talla.cod_talla_producto}
                             type="button"
                             onClick={() => aplicarFiltro({ ...filtros, cod_talla_producto: talla.cod_talla_producto })}
-                            className="px-3 py-1 rounded-lg transition-all"
-                            style={chipStyle(mismaOpcion(filtros.cod_talla_producto, talla.cod_talla_producto))}
+                            className={getChipClass(mismaOpcion(filtros.cod_talla_producto, talla.cod_talla_producto), true)}
                         >
                             {talla.codigo_talla_producto}
                         </button>

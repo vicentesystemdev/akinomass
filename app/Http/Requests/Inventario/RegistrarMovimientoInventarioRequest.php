@@ -21,6 +21,35 @@ class RegistrarMovimientoInventarioRequest extends FormRequest
         ];
     }
 
+    public function after(): array
+    {
+        return [
+            function (\Illuminate\Validation\Validator $validator): void {
+                if ($validator->errors()->has('cod_producto') || $validator->errors()->has('cantidad_mov')) {
+                    return;
+                }
+
+                $codProducto = $this->input('cod_producto');
+                $producto = \App\Models\Producto::find($codProducto);
+                if ($producto && !str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-')) {
+                    $inventario = \App\Models\Inventario::where('cod_producto', $codProducto)->first();
+                    $stockActual = $inventario ? (int) $inventario->stock_actual_inv : 0;
+                    $cantidad = (int) $this->input('cantidad_mov');
+
+                    $route = request()->route();
+                    if ($route && str_contains($route->getName(), 'entrada')) {
+                        if ($stockActual + $cantidad > 1) {
+                            $validator->errors()->add(
+                                'cantidad_mov',
+                                'Cada producto representa una prenda única, por lo que su stock no puede ser mayor a 1.'
+                            );
+                        }
+                    }
+                }
+            }
+        ];
+    }
+
     public function messages(): array
     {
         return [
