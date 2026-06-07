@@ -4,6 +4,7 @@ namespace App\Domains\Tienda\PedidosWeb\Actions;
 
 use App\Domains\Comercial\Pedidos\Actions\CrearPedidoAction;
 use App\Domains\Tienda\Carrito\Enums\EstadoCarritoEnum;
+use App\Domains\Tienda\Carrito\Services\ReservaStockCarritoService;
 use App\Domains\Tienda\Checkout\Enums\EstadoCheckoutSesionEnum;
 use App\Domains\Tienda\PedidosWeb\DTOs\GenerarPedidoDesdeCheckoutData;
 use App\Domains\Tienda\PedidosWeb\Enums\EstadoPedidoTiendaEnum;
@@ -21,6 +22,7 @@ class GenerarPedidoDesdeCheckoutAction
     public function __construct(
         private PedidoTiendaService $service,
         private CrearPedidoAction $crearPedidoAction,
+        private ReservaStockCarritoService $reservaService,
     ) {}
 
     public function execute(int $userId, GenerarPedidoDesdeCheckoutData $data): PedidoTienda
@@ -87,7 +89,7 @@ class GenerarPedidoDesdeCheckoutAction
                 'session_id_pte' => $data->sessionId,
                 'ip_origen_pte' => $data->ipOrigen,
                 'user_agent_pte' => $data->userAgent,
-                'estado_pte' => EstadoPedidoTiendaEnum::PENDIENTE_PAGO,
+                'estado_pte' => EstadoPedidoTiendaEnum::PENDIENTE_REVISION,
             ]);
 
             $checkoutSesion->update([
@@ -97,6 +99,8 @@ class GenerarPedidoDesdeCheckoutAction
             $carrito->update([
                 'estado_car' => EstadoCarritoEnum::CONVERTIDO,
             ]);
+
+            $this->reservaService->convertirReservasAPedido($carrito);
 
             PedidoWebGeneradoEvent::dispatch($pedidoTienda);
 

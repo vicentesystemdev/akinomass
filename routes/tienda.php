@@ -60,6 +60,10 @@ Route::middleware(CarritoSessionMiddleware::class)->group(function () {
             Route::get('/{token}', [CheckoutController::class, 'show'])->name('tienda.checkout.show');
             Route::patch('/{token}/datos', [CheckoutController::class, 'actualizarDatos'])->name('tienda.checkout.datos');
             Route::post('/{token}/cancelar', [CheckoutController::class, 'cancelar'])->name('tienda.checkout.cancelar');
+            Route::post('/{token}/volver-carrito', [CheckoutController::class, 'volverAlCarrito'])->name('tienda.checkout.volver-carrito');
+            Route::post('/{token}/cancelar-compra', [CheckoutController::class, 'cancelarCompra'])->name('tienda.checkout.cancelar-compra');
+            Route::post('/{token}/extender-reservas', [CheckoutController::class, 'extenderReservas'])->name('tienda.checkout.extender-reservas');
+            Route::post('/{token}/recalcular', [CheckoutController::class, 'recalcularTotales'])->name('tienda.checkout.recalcular');
             Route::post('/{token}/generar-pedido', [PedidoWebController::class, 'generar'])->name('tienda.checkout.generar-pedido');
             Route::post('/{token}/pago', [PagoWebController::class, 'registrar'])->name('tienda.checkout.pago');
         });
@@ -69,6 +73,7 @@ Route::middleware(CarritoSessionMiddleware::class)->group(function () {
         Route::get('/tienda/mis-pedidos/{pedido}', [PedidoWebController::class, 'show'])->name('tienda.cuenta.pedido.show');
         Route::get('/tienda/mis-pedidos/{pedido}/pago', [PagoWebController::class, 'show'])->name('tienda.cuenta.pago.show');
         Route::get('/tienda/mis-pedidos/{pedido}/factura', [FacturaWebController::class, 'show'])->name('tienda.cuenta.factura.show');
+        Route::post('/tienda/pagos/{pagoTienda}/resubir', [PagoWebController::class, 'resubir'])->name('tienda.pago.resubir');
 
         // Cuenta
         Route::get('/tienda/mi-cuenta', [CuentaClienteDashboardController::class, 'index'])

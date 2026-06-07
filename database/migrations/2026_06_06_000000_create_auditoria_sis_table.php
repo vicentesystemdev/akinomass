@@ -9,11 +9,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("CREATE TYPE tipo_accion_auditoria AS ENUM (
-            'insert', 'update', 'delete',
-            'login', 'logout',
-            'cancelacion', 'anulacion', 'cambio_estado'
-        )");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("CREATE TYPE tipo_accion_auditoria AS ENUM (
+                'insert', 'update', 'delete',
+                'login', 'logout',
+                'cancelacion', 'anulacion', 'cambio_estado'
+            )");
+        }
 
         Schema::create('auditoria_sis', function (Blueprint $table) {
             $table->bigIncrements('cod_auditoria');
@@ -64,6 +66,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('auditoria_sis');
-        DB::statement('DROP TYPE IF EXISTS tipo_accion_auditoria');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP TYPE IF EXISTS tipo_accion_auditoria');
+        }
     }
 };

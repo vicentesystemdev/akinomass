@@ -7,7 +7,9 @@ use App\Domains\Tienda\Checkout\Enums\EstadoCheckoutSesionEnum;
 use App\Domains\Tienda\PagosWeb\DTOs\RegistrarPagoDesdeCheckoutData;
 use App\Domains\Tienda\PagosWeb\Events\PagoWebRegistradoEvent;
 use App\Domains\Tienda\PagosWeb\Services\PagoTiendaService;
+use App\Domains\Tienda\PedidosWeb\Enums\EstadoPedidoTiendaEnum;
 use App\Models\CheckoutSesion;
+use App\Models\ComprobantePagoTienda;
 use App\Models\PagoTienda;
 use App\Models\PedidoTienda;
 use Illuminate\Http\UploadedFile;
@@ -41,9 +43,23 @@ class RegistrarPagoDesdeCheckoutAction
             ]);
         }
 
-        if ($pedidoTienda->estado_pte->value !== 'pendiente_pago') {
+        $estadosPermitidosPago = [
+            EstadoPedidoTiendaEnum::PENDIENTE_VALIDACION_PAGO,
+            EstadoPedidoTiendaEnum::ACEPTADO,
+            EstadoPedidoTiendaEnum::PENDIENTE_PAGO,
+        ];
+
+        $estadoPermitido = false;
+        foreach ($estadosPermitidosPago as $estado) {
+            if ($pedidoTienda->estado_pte === $estado) {
+                $estadoPermitido = true;
+                break;
+            }
+        }
+
+        if (!$estadoPermitido) {
             throw ValidationException::withMessages([
-                'pedido' => ['El pedido no está pendiente de pago.'],
+                'pedido' => ['El pedido no está en un estado que permita registrar pago.'],
             ]);
         }
 
@@ -77,6 +93,19 @@ class RegistrarPagoDesdeCheckoutAction
                 'fecha_subida_comprobante_pwe' => $fechaSubida,
                 'intentos_pago_pwe' => 1,
             ]);
+
+            if ($comprobante) {
+                ComprobantePagoTienda::create([
+                    'cod_pago_tienda' => $pagoTienda->cod_pago_tienda,
+                    'ruta_comprobante_cpt' => $comprobanteRuta,
+                    'hash_comprobante_cpt' => $comprobanteHash,
+                    'mime_cpt' => $comprobante->getClientMimeType(),
+                    'tamano_bytes_cpt' => $comprobante->getSize(),
+                    'estado_cpt' => 'pendiente',
+                    'subido_por_user_id' => $userId,
+                    'subido_en_cpt' => $fechaSubida ?? now(),
+                ]);
+            }
 
             $checkoutSesion->update([
                 'estado_che' => EstadoCheckoutSesionEnum::PAGO_REGISTRADO,

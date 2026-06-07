@@ -8,6 +8,9 @@ use App\Domains\Tienda\Carrito\Actions\EliminarItemCarritoAction;
 use App\Domains\Tienda\Carrito\Actions\VaciarCarritoAction;
 use App\Domains\Tienda\Carrito\DTOs\AgregarItemCarritoData;
 use App\Domains\Tienda\Carrito\Services\CarritoPersistenciaService;
+use App\Domains\Tienda\Carrito\Services\ReservaStockCarritoService;
+use App\Domains\Tienda\Configuracion\Services\ConfiguracionTiendaService;
+use App\Domains\Tienda\Mensajes\TiendaMensajeService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tienda\ActualizarCantidadCarritoRequest;
 use App\Http\Requests\Tienda\AgregarItemCarritoRequest;
@@ -22,13 +25,46 @@ use Inertia\Response;
 
 class CarritoController extends Controller
 {
-    public function index(Request $request, CarritoPersistenciaService $service): Response|JsonResponse|RedirectResponse
-    {
+    public function index(
+        Request $request,
+        CarritoPersistenciaService $service,
+        ReservaStockCarritoService $reservaService,
+        ConfiguracionTiendaService $configService,
+        TiendaMensajeService $mensajeService,
+    ): Response|JsonResponse|RedirectResponse {
         $carrito = $this->resolverCarrito($request, $service);
         $carrito = $carrito ? $carrito->load('detalles.producto') : null;
 
         if ($request->expectsJson()) {
-            return response()->json(['carrito' => $carrito]);
+            $data = ['carrito' => $carrito];
+
+            if ($carrito) {
+                $reservasActivas = $reservaService->reservasActivasPorCarrito($carrito);
+                $reservaMasAntigua = $carrito->reservas()
+                    ->where('estado_res', 'activa')
+                    ->where('expira_en_res', '>', now())
+                    ->orderBy('expira_en_res', 'asc')
+                    ->first();
+
+                $data['reservas'] = [
+                    'cantidad_reservas_activas' => $reservasActivas,
+                    'expiracion_reserva' => $reservaMasAntigua?->expira_en_res,
+                    'tiempo_restante_segundos' => $reservaMasAntigua
+                        ? $mensajeService->obtenerTiempoRestanteSegundos($reservaMasAntigua->expira_en_res)
+                        : 0,
+                    'tiempo_restante_formateado' => $reservaMasAntigua
+                        ? $mensajeService->formatearTiempoRestante(
+                            $mensajeService->obtenerTiempoRestanteSegundos($reservaMasAntigua->expira_en_res)
+                        )
+                        : 'Sin reserva',
+                    'mensaje_reserva' => $reservasActivas > 0
+                        ? 'Tus productos están reservados por tiempo limitado.'
+                        : 'No tienes productos reservados.',
+                    'ttl_minutos' => $configService->obtenerTiempoReservaCarritoMinutos(),
+                ];
+            }
+
+            return response()->json($data);
         }
 
         return redirect()->route('tienda.catalogo')->with('open_cart', true);
@@ -39,6 +75,9 @@ class CarritoController extends Controller
         AgregarItemCarritoRequest $formRequest,
         AgregarItemCarritoAction $action,
         CarritoPersistenciaService $service,
+        ReservaStockCarritoService $reservaService,
+        ConfiguracionTiendaService $configService,
+        TiendaMensajeService $mensajeService,
     ): RedirectResponse|JsonResponse {
         $carrito = $this->resolverOCrearCarrito($request, $service);
 
@@ -48,10 +87,25 @@ class CarritoController extends Controller
         $carrito = $carrito->fresh()->load('detalles');
 
         if ($request->expectsJson()) {
+            $reservasActivas = $reservaService->reservasActivasPorCarrito($carrito);
+            $reservaMasAntigua = $carrito->reservas()
+                ->where('estado_res', 'activa')
+                ->where('expira_en_res', '>', now())
+                ->orderBy('expira_en_res', 'asc')
+                ->first();
+
             return response()->json([
                 'mensaje' => 'Producto agregado al carrito.',
                 'detalle' => $detalle,
                 'carrito' => $carrito,
+                'reservas' => [
+                    'cantidad_reservas_activas' => $reservasActivas,
+                    'expiracion_reserva' => $reservaMasAntigua?->expira_en_res,
+                    'tiempo_restante_segundos' => $reservaMasAntigua
+                        ? $mensajeService->obtenerTiempoRestanteSegundos($reservaMasAntigua->expira_en_res)
+                        : 0,
+                    'mensaje_reserva' => 'Tus productos están reservados por tiempo limitado.',
+                ],
             ]);
         }
 
@@ -64,6 +118,8 @@ class CarritoController extends Controller
         ActualizarCantidadCarritoRequest $formRequest,
         ActualizarCantidadCarritoAction $action,
         CarritoPersistenciaService $service,
+        ReservaStockCarritoService $reservaService,
+        TiendaMensajeService $mensajeService,
     ): RedirectResponse|JsonResponse {
         $carrito = $this->resolverCarrito($request, $service);
 
@@ -82,9 +138,24 @@ class CarritoController extends Controller
         $action->execute($detalle, $formRequest->validated('cantidad'));
 
         if ($request->expectsJson()) {
+            $carritoFresh = $carrito->fresh()->load('detalles');
+            $reservasActivas = $reservaService->reservasActivasPorCarrito($carritoFresh);
+            $reservaMasAntigua = $carritoFresh->reservas()
+                ->where('estado_res', 'activa')
+                ->where('expira_en_res', '>', now())
+                ->orderBy('expira_en_res', 'asc')
+                ->first();
+
             return response()->json([
                 'mensaje' => 'Cantidad actualizada.',
-                'carrito' => $carrito->fresh()->load('detalles'),
+                'carrito' => $carritoFresh,
+                'reservas' => [
+                    'cantidad_reservas_activas' => $reservasActivas,
+                    'expiracion_reserva' => $reservaMasAntigua?->expira_en_res,
+                    'tiempo_restante_segundos' => $reservaMasAntigua
+                        ? $mensajeService->obtenerTiempoRestanteSegundos($reservaMasAntigua->expira_en_res)
+                        : 0,
+                ],
             ]);
         }
 
@@ -96,6 +167,8 @@ class CarritoController extends Controller
         Producto $producto,
         EliminarItemCarritoAction $action,
         CarritoPersistenciaService $service,
+        ReservaStockCarritoService $reservaService,
+        TiendaMensajeService $mensajeService,
     ): RedirectResponse|JsonResponse {
         $carrito = $this->resolverCarrito($request, $service);
 
@@ -114,9 +187,15 @@ class CarritoController extends Controller
         $action->execute($detalle);
 
         if ($request->expectsJson()) {
+            $carritoFresh = $carrito->fresh()->load('detalles');
+            $reservasActivas = $reservaService->reservasActivasPorCarrito($carritoFresh);
+
             return response()->json([
                 'mensaje' => 'Producto eliminado del carrito.',
-                'carrito' => $carrito->fresh()->load('detalles'),
+                'carrito' => $carritoFresh,
+                'reservas' => [
+                    'cantidad_reservas_activas' => $reservasActivas,
+                ],
             ]);
         }
 
@@ -144,6 +223,9 @@ class CarritoController extends Controller
             return response()->json([
                 'mensaje' => 'Carrito vaciado.',
                 'carrito' => $carrito->fresh()->load('detalles'),
+                'reservas' => [
+                    'cantidad_reservas_activas' => 0,
+                ],
             ]);
         }
 

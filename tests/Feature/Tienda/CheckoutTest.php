@@ -3,6 +3,7 @@
 namespace Tests\Feature\Tienda;
 
 use App\Domains\Tienda\Carrito\Enums\EstadoCarritoEnum;
+use App\Domains\Tienda\Carrito\Enums\EstadoReservaStockEnum;
 use App\Domains\Tienda\Checkout\Enums\EstadoCheckoutSesionEnum;
 use App\Models\CanalVenta;
 use App\Models\Carrito;
@@ -12,6 +13,7 @@ use App\Models\CuentaCliente;
 use App\Models\DetalleCarrito;
 use App\Models\Inventario;
 use App\Models\Producto;
+use App\Models\ReservaStockCarrito;
 use App\Models\TipoFlujoComercial;
 use App\Models\User;
 
@@ -78,6 +80,17 @@ class CheckoutTest extends TiendaTestCase
             'subtotal_dca' => 200.00,
             'nombre_producto_dca' => 'Producto Test',
             'sku_producto_dca' => 'TEST-001',
+        ]);
+
+        $detalle = $this->carrito->detalles()->first();
+        ReservaStockCarrito::create([
+            'cod_carrito' => $this->carrito->cod_carrito,
+            'cod_detalle_carrito' => $detalle->cod_detalle_carrito,
+            'cod_producto' => $this->producto->cod_producto,
+            'user_id' => $this->user->id,
+            'cantidad_res' => 2,
+            'estado_res' => EstadoReservaStockEnum::ACTIVA,
+            'expira_en_res' => now()->addMinutes(20),
         ]);
     }
 

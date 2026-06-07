@@ -36,17 +36,21 @@ class CategoriaProductoController extends Controller
         return redirect()->route('categorias-producto.index');
     }
 
-    public function edit(CategoriaProducto $categoria): Response
+    public function edit(int $categoriaProducto): Response
     {
         $this->authorize('productos.editar');
+
+        $categoria = CategoriaProducto::findOrFail($categoriaProducto);
 
         return Inertia::render('CategoriasProducto/Edit', [
             'categoria' => $categoria,
         ]);
     }
 
-    public function update(UpdateCategoriaProductoRequest $request, CategoriaProducto $categoria, ActualizarCategoriaProductoAction $action)
+    public function update(UpdateCategoriaProductoRequest $request, int $categoriaProducto, ActualizarCategoriaProductoAction $action)
     {
+        $categoria = CategoriaProducto::findOrFail($categoriaProducto);
+
         $action->execute($categoria, $request->validated());
 
         return redirect()->route('categorias-producto.index');
