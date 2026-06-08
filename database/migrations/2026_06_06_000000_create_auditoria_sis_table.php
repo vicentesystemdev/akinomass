@@ -9,18 +9,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("CREATE TYPE tipo_accion_auditoria AS ENUM (
-            'insert', 'update', 'delete',
-            'login', 'logout',
-            'cancelacion', 'anulacion', 'cambio_estado'
-        )");
-
         Schema::create('auditoria_sis', function (Blueprint $table) {
             $table->bigIncrements('cod_auditoria');
 
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+
             $table->unsignedBigInteger('cod_cliente')->nullable();
-            $table->foreign('cod_cliente')->references('cod_cliente')->on('clientes')->nullOnDelete();
+            $table->foreign('cod_cliente')
+                ->references('cod_cliente')
+                ->on('clientes')
+                ->nullOnDelete();
 
             $table->timestamp('fecha_aud')->useCurrent();
 
@@ -64,6 +62,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('auditoria_sis');
-        DB::statement('DROP TYPE IF EXISTS tipo_accion_auditoria');
     }
 };
