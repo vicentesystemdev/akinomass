@@ -42,6 +42,11 @@ export default function StatusBadge({
         contactado: { bg: 'bg-amber-100', text: 'text-amber-800', dot: 'bg-amber-500', label: 'Contactado' },
         interesado: { bg: 'bg-amber-100', text: 'text-amber-800', dot: 'bg-amber-500', label: 'Interesado' },
         pendiente_pago: { bg: 'bg-amber-100', text: 'text-amber-800', dot: 'bg-amber-500', label: 'Pendiente pago' },
+        pendiente_confirmacion: { bg: 'bg-amber-100', text: 'text-amber-800', dot: 'bg-amber-500', label: 'Pendiente confirmacion' },
+        confirmada: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-500', label: 'Confirmada' },
+        convertida_checkout: { bg: 'bg-cyan-100', text: 'text-cyan-800', dot: 'bg-cyan-500', label: 'Convertida checkout' },
+        convertida_pedido: { bg: 'bg-blue-100', text: 'text-blue-800', dot: 'bg-blue-500', label: 'Convertida pedido' },
+        cancelada: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-500', label: 'Cancelada' },
         
         // Estados de LiveSales
         programada: { bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400', label: 'Programada' },

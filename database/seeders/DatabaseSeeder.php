@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 use Database\Seeders\PlantillasMensajeSeeder;
+use Database\Seeders\TallaProductoSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             CanalesVentaSeeder::class,
             TiposFlujoComercialSeeder::class,
+            TallaProductoSeeder::class,
             ConfiguracionTiendaSeeder::class,
         ]);
 

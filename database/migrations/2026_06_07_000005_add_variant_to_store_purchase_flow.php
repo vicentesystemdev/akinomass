@@ -13,7 +13,10 @@ return new class extends Migration
             $table->unsignedBigInteger('cod_variante_producto')->nullable()->after('cod_producto');
             $table->foreign('cod_variante_producto')->references('cod_variante_producto')->on('variantes_producto')->restrictOnDelete()->cascadeOnUpdate();
         });
-        DB::statement('ALTER TABLE detalles_carrito DROP CONSTRAINT IF EXISTS detalles_carrito_cod_carrito_cod_producto_unique');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE detalles_carrito DROP CONSTRAINT IF EXISTS detalles_carrito_cod_carrito_cod_producto_unique');
+        }
+
         DB::statement('CREATE UNIQUE INDEX detalles_carrito_base_unique ON detalles_carrito (cod_carrito, cod_producto) WHERE cod_variante_producto IS NULL');
         DB::statement('CREATE UNIQUE INDEX detalles_carrito_variante_unique ON detalles_carrito (cod_carrito, cod_variante_producto) WHERE cod_variante_producto IS NOT NULL');
 

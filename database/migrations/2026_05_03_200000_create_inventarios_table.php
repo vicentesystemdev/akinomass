@@ -18,7 +18,10 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('cod_producto')->references('cod_producto')->on('productos');
-            $table->unique('cod_producto');
+
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->unique('cod_producto');
+            }
         });
     }
 

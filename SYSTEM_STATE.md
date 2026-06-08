@@ -88,3 +88,56 @@
 ## 10. Conclusión
 
 Este sistema tiene una base sólida: Laravel moderno, Inertia React y una separación de dominios clara. La lógica de pedidos y la estructura condicional ya están encaminadas, pero todavía hay espacio para mejorar la consistencia en la capa de dominio y para reforzar la separación entre reglas de negocio, persistencia y transferencia de datos.
+
+## 11. Cambios recientes (resumen estructural)
+
+- Periodo: commits entre 2026-05-30 y 2026-06-08
+- Objetivo: integración y ampliación del módulo de tienda (catalogo, carrito, checkout, pagos), mejoras de catálogo y auditoría, y soportes de variantes/tallas.
+
+- Cambios principales en la estructura del backend (`app/`):
+    - Nuevo/actualizado dominio `app/Domains/Tienda/` con submódulos:
+        - `Carrito`: acciones (`AgregarItemCarritoAction`, `ActualizarCantidadCarritoAction`, `VaciarCarritoAction`, `ExpirarReservasCarritoAction`), DTOs y servicios de persistencia y reserva de stock.
+        - `Catalogo`: acciones públicas, repositorio público y servicios para listado/consulta de productos públicos.
+        - `Checkout`: acciones y servicios para iniciar, cancelar y expirar checkouts; integración con reserva/extensión de reservas.
+        - `PagosWeb` y `PedidosWeb`: acciones y listeners para aceptar/rechazar pagos, descontar stock definitivo, y generar pedidos desde checkout.
+    - Ampliaciones en `app/Domains/Catalogo/Productos/` y `app/Domains/Comercial/Pedidos/` (acciones de crear/actualizar producto y crear/confirmar/confirmar pedidos).
+    - Nuevos servicios en `app/Domains/Inventario/` para manejo y consulta de inventarios por categoría y protección de inventarios de variantes.
+    - Nuevo módulo de auditoría en `app/Domains/Auditoria/` con DTOs, listeners y servicios para registrar auditoría de eventos relevantes.
+
+- Nuevos modelos y cambios en `app/Models/`:
+    - `VarianteProducto`, `TallaProducto` (para soporte de variantes y tallas).
+    - `ReservaStockCarrito`, `Carrito`, `PagoTienda`, `ConfiguracionTienda`, `ComprobantePagoTienda`, `AuditoriaSis`, entre otros.
+
+- Migraciones y seeders añadidos:
+    - Migraciones para tallas y variantes de producto, reservas de stock de carrito, configuraciones de tienda, comprobantes de pago, auditoría, y ajustes relacionados con variantes.
+    - Seeders: `TallaProductoSeeder`, `ConfiguracionTiendaSeeder`, `DemoVariantesSeeder` (nuevo), y actualizaciones en `DatabaseSeeder`.
+
+- Cambios en controladores y requests HTTP:
+    - Nuevos controladores: `Tienda` (CarritoController, CatalogoPublicoController, AdminPagoTiendaController, AdminPedidoTiendaController), `Catalogo` (ProductoController, CategoriaProductoController), `AuditoriaController`.
+    - Nuevos y actualizados `FormRequest` para productos, categorías, inventario y tienda (ej. `StoreProductoRequest`, `UpdateProductoRequest`, `AjustarInventarioRequest`, `AgregarItemCarritoRequest`).
+
+- Frontend (React/Inertia) — `resources/js/`:
+    - Nuevas páginas y componentes para la tienda: `Carrito`, `Catalogo`, `ProductoShow`, `Home`, `Checkout` y componentes de `CartDrawer`, `ProductCard`, `CatalogFilters`, `StorefrontHeader/Foot er`.
+    - Soporte UI para auditoría: componentes `AuditoriaTable`, `AuditoriaDetailCard`, `AuditoriaDiffViewer`.
+    - Hooks y utilidades nuevos: `useInertiaPoll`, `useListHighlight`, `tiendaCartApi` y formateadores actualizados.
+
+- Rutas y bootstrap:
+    - Se añadieron/actualizaron rutas en `routes/tienda.php`, `routes/web.php` y `routes/console.php` para exponer los nuevos endpoints de tienda y auditoría.
+    - `bootstrap/providers.php` y providers específicos de dominios (`TiendaServiceProvider`, `ComercialServiceProvider`, `AuditoriaServiceProvider`) actualizados.
+
+- Ajustes de build/configuración:
+    - `vite.config.js` adaptado para los cambios en frontend.
+
+- Tests y QA:
+    - Añadidos múltiples tests feature relacionados con tienda, carrito, pagos, inventario y admin (tests/Feature/Tienda/_, tests/Feature/Admin/_).
+
+- Notas sobre impacto y recomendaciones inmediatas:
+    - La estructura del dominio `Tienda` madura rápidamente: conviene consolidar los servicios de persistencia (`CarritoPersistenciaService`, `ReservaStockCarritoService`) y definir claramente qué responsabilidad queda en services vs repositories.
+    - Las migraciones nuevas requieren ejecución en entornos de desarrollo/pruebas y coordinación con seeders (`php artisan migrate` + `db:seed`).
+    - Revisar `vite.config.js` en despliegues para asegurar que los assets del storefront se compilan correctamente.
+
+Si quieres, puedo:
+
+- Insertar una lista explícita de commits (hash + mensaje) en esta sección.
+- Añadir un listado por archivo modificado (agrupado por tipo: models, migrations, controllers, frontend).
+- Ejecutar `php artisan migrate` y `php artisan db:seed` en un ambiente controlado (necesitaré confirmación y acceso a la DB).

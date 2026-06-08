@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement('ALTER TABLE inventarios DROP CONSTRAINT IF EXISTS inventarios_cod_variante_producto_foreign');
         DB::statement('
             ALTER TABLE inventarios
@@ -20,6 +24,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement('ALTER TABLE inventarios DROP CONSTRAINT IF EXISTS inventarios_cod_variante_producto_foreign');
         DB::statement('
             ALTER TABLE inventarios
