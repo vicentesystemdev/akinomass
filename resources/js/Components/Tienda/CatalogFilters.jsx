@@ -1,60 +1,34 @@
 import { Search } from 'lucide-react';
 
-export default function CatalogFilters({ categorias = [], filtros = {}, onFilter }) {
-    return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-7">
-            <div>
-                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#2B221E' }}>Nuestra Colección</h2>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-                {/* Category chips */}
-                <button
-                    onClick={() => onFilter({ ...filtros, cod_categoria_producto: null })}
-                    className="px-3.5 py-1.5 rounded-xl transition-all"
-                    style={{
-                        fontSize: 12.5,
-                        fontWeight: 600,
-                        background: !filtros.cod_categoria_producto ? 'linear-gradient(135deg, #3C473A, #4e5849)' : 'white',
-                        color: !filtros.cod_categoria_producto ? 'white' : '#6B7280',
-                        border: !filtros.cod_categoria_producto ? 'none' : '1px solid #E5E7EB',
-                        cursor: 'pointer',
-                    }}
-                >
-                    Todos
-                </button>
-                {categorias.map((cat) => (
-                    <button
-                        key={cat.cod_categoria_producto}
-                        onClick={() => onFilter({ ...filtros, cod_categoria_producto: cat.cod_categoria_producto })}
-                        className="px-3.5 py-1.5 rounded-xl transition-all"
-                        style={{
-                            fontSize: 12.5,
-                            fontWeight: 600,
-                            background: filtros.cod_categoria_producto === cat.cod_categoria_producto
-                                ? 'linear-gradient(135deg, #3C473A, #4e5849)'
-                                : 'white',
-                            color: filtros.cod_categoria_producto === cat.cod_categoria_producto ? 'white' : '#6B7280',
-                            border: filtros.cod_categoria_producto === cat.cod_categoria_producto ? 'none' : '1px solid #E5E7EB',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        {cat.nombre_cat}
-                    </button>
-                ))}
+const getChipClass = (active, isSize = false) =>
+    `text-xs font-semibold transition-all border ${
+        isSize ? 'px-3 py-1 rounded-lg' : 'px-3.5 py-1.5 rounded-xl'
+    } ${
+        active
+            ? 'bg-gradient-to-br from-oliva-700 to-oliva-600 text-white border-transparent shadow-sm'
+            : 'bg-white text-gray-500 border-gray-200 hover:border-oliva-300 hover:text-oliva-700 cursor-pointer'
+    }`;
 
-                {/* Sort */}
+export default function CatalogFilters({ categorias = [], tallas = [], filtros = {}, onFilter }) {
+    const tallasActivas = tallas.length > 0;
+    const mismaOpcion = (actual, esperado) => String(actual ?? '') === String(esperado ?? '');
+    const aplicarFiltro = (nuevosFiltros) => {
+        const filtrados = Object.fromEntries(
+            Object.entries({ ...nuevosFiltros, page: null }).filter(([, value]) => value !== null && value !== '' && value !== undefined),
+        );
+        onFilter(filtrados);
+    };
+
+    return (
+        <div className="flex flex-col gap-3 mb-7">
+            {/* Fila superior: título + orden */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#2B221E' }}>Nuestra Colección</h2>
                 <select
                     value={filtros.orden || ''}
-                    onChange={(e) => onFilter({ ...filtros, orden: e.target.value || null })}
+                    onChange={(e) => aplicarFiltro({ ...filtros, orden: e.target.value || null })}
                     className="px-3 py-1.5 rounded-xl"
-                    style={{
-                        fontSize: 12.5,
-                        color: '#374151',
-                        background: 'white',
-                        border: '1px solid #E5E7EB',
-                        outline: 'none',
-                        cursor: 'pointer',
-                    }}
+                    style={{ fontSize: 12.5, color: '#374151', background: 'white', border: '1px solid #E5E7EB', outline: 'none', cursor: 'pointer' }}
                 >
                     <option value="">Ordenar</option>
                     <option value="precio_asc">Precio: menor a mayor</option>
@@ -63,6 +37,53 @@ export default function CatalogFilters({ categorias = [], filtros = {}, onFilter
                     <option value="recientes">Más recientes</option>
                 </select>
             </div>
+
+            {/* Chips de categoría */}
+            <div className="flex items-center gap-2 flex-wrap">
+                <button
+                    type="button"
+                    onClick={() => aplicarFiltro({ ...filtros, cod_categoria_producto: null })}
+                    className={getChipClass(!filtros.cod_categoria_producto)}
+                >
+                    Todos
+                </button>
+                {categorias.map((cat) => (
+                    <button
+                        key={cat.cod_categoria_producto}
+                        type="button"
+                        onClick={() => aplicarFiltro({ ...filtros, cod_categoria_producto: cat.cod_categoria_producto })}
+                        className={getChipClass(mismaOpcion(filtros.cod_categoria_producto, cat.cod_categoria_producto))}
+                    >
+                        {cat.nombre_cat}
+                    </button>
+                ))}
+            </div>
+
+            {/* Chips de talla — solo si hay tallas disponibles */}
+            {tallasActivas && (
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span style={{ fontSize: 11.5, fontWeight: 600, color: '#9CA3AF', marginRight: 2 }}>
+                        Talla:
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => aplicarFiltro({ ...filtros, cod_talla_producto: null })}
+                        className={getChipClass(!filtros.cod_talla_producto, true)}
+                    >
+                        Todas
+                    </button>
+                    {tallas.map((talla) => (
+                        <button
+                            key={talla.cod_talla_producto}
+                            type="button"
+                            onClick={() => aplicarFiltro({ ...filtros, cod_talla_producto: talla.cod_talla_producto })}
+                            className={getChipClass(mismaOpcion(filtros.cod_talla_producto, talla.cod_talla_producto), true)}
+                        >
+                            {talla.codigo_talla_producto}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

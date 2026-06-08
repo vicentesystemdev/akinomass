@@ -15,13 +15,18 @@ class Inventario extends Model
 
     protected $primaryKey = 'cod_inventario';
 
-    protected $fillable = ['cod_producto', 'stock_actual_inv', 'stock_minimo_inv', 'ubicacion_inv', 'activo_inv'];
+    protected $fillable = ['cod_producto', 'cod_variante_producto', 'stock_actual_inv', 'stock_minimo_inv', 'ubicacion_inv', 'activo_inv'];
 
     protected $casts = ['activo_inv' => 'boolean'];
 
     public function producto(): BelongsTo
     {
         return $this->belongsTo(Producto::class, 'cod_producto', 'cod_producto');
+    }
+
+    public function variante(): BelongsTo
+    {
+        return $this->belongsTo(VarianteProducto::class, 'cod_variante_producto', 'cod_variante_producto');
     }
 
     public function movimientos(): HasMany

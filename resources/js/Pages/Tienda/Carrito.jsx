@@ -16,16 +16,16 @@ export default function Carrito({ carrito, auth }) {
         }
     };
 
-    const handleUpdateQuantity = (producto, cantidad) => {
+    const handleUpdateQuantity = (producto, cantidad, codVarianteProducto = null) => {
         if (cantidad <= 0) {
-            router.delete(`/tienda/carrito/items/${producto}`, { preserveScroll: true });
+            router.delete(`/tienda/carrito/items/${producto}`, { data: { cod_variante_producto: codVarianteProducto }, preserveScroll: true });
         } else {
-            router.patch(`/tienda/carrito/items/${producto}`, { cantidad }, { preserveScroll: true });
+            router.patch(`/tienda/carrito/items/${producto}`, { cantidad, cod_variante_producto: codVarianteProducto }, { preserveScroll: true });
         }
     };
 
-    const handleRemove = (producto) => {
-        router.delete(`/tienda/carrito/items/${producto}`, { preserveScroll: true });
+    const handleRemove = (producto, codVarianteProducto = null) => {
+        router.delete(`/tienda/carrito/items/${producto}`, { data: { cod_variante_producto: codVarianteProducto }, preserveScroll: true });
     };
 
     return (
@@ -80,9 +80,17 @@ export default function Carrito({ carrito, auth }) {
                                                 {item.sku_producto_dca && (
                                                     <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>SKU: {item.sku_producto_dca}</p>
                                                 )}
+                                                {item.variante?.talla ? (
+                                                    <p style={{ fontSize: 12, color: '#D77A61', fontWeight: 600, marginTop: 2 }}>
+                                                        Talla: {item.variante.talla.codigo_talla_producto}
+                                                    </p>
+                                                ) : null}
+                                                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 1 }}>
+                                                    Bs. {Number(Number(item.precio_unitario_dca).toFixed(1))} c/u
+                                                </p>
                                             </div>
                                             <button
-                                                onClick={() => handleRemove(item.cod_producto)}
+                                                onClick={() => handleRemove(item.cod_producto, item.cod_variante_producto)}
                                                 className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-50 transition-colors flex-shrink-0"
                                                 style={{ color: '#D1D5DB', background: 'none', border: 'none', cursor: 'pointer' }}
                                             >
@@ -90,27 +98,11 @@ export default function Carrito({ carrito, auth }) {
                                             </button>
                                         </div>
                                         <div className="flex items-center justify-between mt-3">
-                                            <div className="flex items-center gap-2 rounded-xl p-1" style={{ background: '#F3F4F6' }}>
-                                                <button
-                                                    onClick={() => handleUpdateQuantity(item.cod_producto, item.cantidad_dca - 1)}
-                                                    className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
-                                                    style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                >
-                                                    -
-                                                </button>
-                                                <span style={{ fontSize: 14, fontWeight: 700, color: '#2B221E', minWidth: 24, textAlign: 'center' }}>
-                                                    {item.cantidad_dca}
-                                                </span>
-                                                <button
-                                                    onClick={() => handleUpdateQuantity(item.cod_producto, item.cantidad_dca + 1)}
-                                                    className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white transition-colors"
-                                                    style={{ fontSize: 16, fontWeight: 700, color: '#374151', background: 'none', border: 'none', cursor: 'pointer' }}
-                                                >
-                                                    +
-                                                </button>
+                                            <div className="text-sm font-semibold text-gray-500">
+                                                Prenda única (Cant: 1)
                                             </div>
                                             <p style={{ fontSize: 16, fontWeight: 800, color: '#D77A61' }}>
-                                                Bs. {Number(item.subtotal_dca).toFixed(2)}
+                                                Bs. {Number(Number(item.subtotal_dca).toFixed(1))}
                                             </p>
                                         </div>
                                     </div>
@@ -125,11 +117,11 @@ export default function Carrito({ carrito, auth }) {
                                 <div className="space-y-2 mb-4">
                                     <div className="flex justify-between">
                                         <span style={{ fontSize: 13, color: '#6B7280' }}>Subtotal</span>
-                                        <span style={{ fontSize: 13, fontWeight: 600 }}>Bs. {subtotal.toFixed(2)}</span>
+                                        <span style={{ fontSize: 13, fontWeight: 600 }}>Bs. {Number(subtotal.toFixed(1))}</span>
                                     </div>
                                     <div className="flex justify-between pt-2 mt-1" style={{ borderTop: '1px solid #F3F4F6' }}>
                                         <span style={{ fontSize: 15, fontWeight: 800, color: '#2B221E' }}>Total</span>
-                                        <span style={{ fontSize: 20, fontWeight: 900, color: '#D77A61' }}>Bs. {total.toFixed(2)}</span>
+                                        <span style={{ fontSize: 20, fontWeight: 900, color: '#D77A61' }}>Bs. {Number(total.toFixed(1))}</span>
                                     </div>
                                 </div>
 

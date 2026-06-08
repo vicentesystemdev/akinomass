@@ -24,13 +24,22 @@ class ActualizarEstadoTrasPagoConfirmadoListener
         $pedidoTienda = $pagoTienda->checkoutSesion->pedidoTienda ?? null;
 
         if ($pedidoTienda) {
-            $pedidoTienda->update([
-                'estado_pte' => EstadoPedidoTiendaEnum::PAGADO,
-            ]);
+            $estadoActual = $pedidoTienda->estado_pte;
+
+            if ($estadoActual !== EstadoPedidoTiendaEnum::CONFIRMADO
+                && $estadoActual !== EstadoPedidoTiendaEnum::FACTURADO) {
+                $pedidoTienda->update([
+                    'estado_pte' => EstadoPedidoTiendaEnum::PAGADO,
+                ]);
+            }
         }
 
-        $pagoTienda->checkoutSesion->update([
-            'estado_che' => EstadoCheckoutSesionEnum::PAGO_CONFIRMADO,
-        ]);
+        $checkout = $pagoTienda->checkoutSesion;
+        if ($checkout && $checkout->estado_che !== EstadoCheckoutSesionEnum::PAGO_CONFIRMADO
+            && $checkout->estado_che !== EstadoCheckoutSesionEnum::COMPLETADO) {
+            $checkout->update([
+                'estado_che' => EstadoCheckoutSesionEnum::PAGO_CONFIRMADO,
+            ]);
+        }
     }
 }

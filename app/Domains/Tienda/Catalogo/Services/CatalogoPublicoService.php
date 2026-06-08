@@ -2,24 +2,31 @@
 
 namespace App\Domains\Tienda\Catalogo\Services;
 
-use App\Models\Inventario;
+use App\Domains\Tienda\Carrito\Services\StockDisponibleTiendaService;
 use App\Models\Producto;
+use App\Models\VarianteProducto;
 
 class CatalogoPublicoService
 {
+    public function __construct(
+        private StockDisponibleTiendaService $stockDisponibleService,
+    ) {}
+
     public function calcularStockBadge(Producto $producto): string
     {
         $inventario = $producto->inventario;
 
-        if (!$inventario || !$inventario->activo_inv) {
+        if (! $inventario || ! $inventario->activo_inv) {
             return 'no_disponible';
         }
 
-        if ($inventario->stock_actual_inv <= 0) {
+        $stockDisponible = $this->stockDisponibleService->obtenerStockDisponible($producto->cod_producto);
+
+        if ($stockDisponible <= 0) {
             return 'agotado';
         }
 
-        if ($inventario->stock_actual_inv <= $inventario->stock_minimo_inv) {
+        if ($stockDisponible <= $inventario->stock_minimo_inv) {
             return 'ultimo_stock';
         }
 
@@ -28,20 +35,17 @@ class CatalogoPublicoService
 
     public function obtenerStockDisponible(Producto $producto): int
     {
-        $inventario = $producto->inventario;
-
-        if (!$inventario || !$inventario->activo_inv) {
-            return 0;
-        }
-
-        return max(0, $inventario->stock_actual_inv);
+        return $this->stockDisponibleService->obtenerStockDisponible($producto->cod_producto);
     }
 
     public function estaDisponible(Producto $producto): bool
     {
         return $producto->estado_pro === 'activo'
-            && $producto->inventario
-            && $producto->inventario->activo_inv
-            && $producto->inventario->stock_actual_inv > 0;
+            && $this->obtenerStockDisponible($producto) > 0;
+    }
+
+    public function obtenerStockDisponibleVariante(VarianteProducto $variante): int
+    {
+        return $this->stockDisponibleService->obtenerStockDisponible($variante->cod_producto, $variante->cod_variante_producto);
     }
 }

@@ -3,6 +3,7 @@ import PageHeader from '@/Components/UI/PageHeader';
 import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import VariantsSection from './VariantsSection';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useRef, useCallback } from 'react';
 import { filterLetters, toUpper, filterNumeric } from '@/utils/formatters';
@@ -14,7 +15,7 @@ const estadoLabels = {
     descontinuado: 'Descontinuado',
 };
 
-export default function Edit({ producto, categorias, estados }) {
+export default function Edit({ producto, categorias, estados, tallas }) {
     const [preview, setPreview] = useState(null);
     const [dragActive, setDragActive] = useState(false);
     const [removeExisting, setRemoveExisting] = useState(false);
@@ -33,6 +34,14 @@ export default function Edit({ producto, categorias, estados }) {
         imagen_pro: null,
         eliminar_imagen: false,
         estado_pro: estadoValue || estados?.[0] || 'activo',
+        variantes: (producto?.variantes || []).map((variante) => ({
+            cod_variante_producto: variante.cod_variante_producto,
+            cod_talla_producto: variante.cod_talla_producto,
+            sku_variante_producto: variante.sku_variante_producto ?? '',
+            precio_venta_variante: variante.precio_venta_variante ?? '',
+            estado_variante_producto: variante.estado_variante_producto ?? 'activo',
+            activo_variante_producto: variante.activo_variante_producto ?? true,
+        })),
     });
 
     const handleFile = useCallback((file) => {
@@ -73,14 +82,46 @@ export default function Edit({ producto, categorias, estados }) {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const submit = () => {
-        const venta = parseFloat(form.data.precio_venta_pro);
-        const costo = parseFloat(form.data.precio_costo_pro);
+    const validateDecimal = (val) => {
+        if (val === '' || val === null || val === undefined) return true;
+        return /^\d+(\.\d)?$/.test(val.toString());
+    };
 
-        if (costo && venta < costo) {
+    const submit = () => {
+        form.clearErrors();
+
+        const venta = form.data.precio_venta_pro;
+        const costo = form.data.precio_costo_pro;
+
+        if (venta && !validateDecimal(venta)) {
+            form.setError('precio_venta_pro', 'El precio de venta no puede tener más de un decimal (ej: 10.5).');
+            return;
+        }
+
+        if (costo && !validateDecimal(costo)) {
+            form.setError('precio_costo_pro', 'El precio de costo no puede tener más de un decimal (ej: 10.5).');
+            return;
+        }
+
+        const ventaFloat = parseFloat(venta);
+        const costoFloat = parseFloat(costo);
+
+        if (costoFloat && ventaFloat < costoFloat) {
             form.setError('precio_venta_pro', 'El precio de venta no puede ser menor al precio de costo.');
             return;
         }
+
+        let hasVariantError = false;
+        if (form.data.variantes && form.data.variantes.length > 0) {
+            form.data.variantes.forEach((v, index) => {
+                if (v.precio_venta_variante && !validateDecimal(v.precio_venta_variante)) {
+                    form.setError(`variantes.${index}.precio_venta_variante`, 'El precio de la variante no puede tener más de un decimal (ej: 10.5).');
+                    hasVariantError = true;
+                }
+            });
+        }
+
+        if (hasVariantError) return;
 
         form.post(route('productos.update', producto.cod_producto));
     };
@@ -250,6 +291,10 @@ export default function Edit({ producto, categorias, estados }) {
                                 )}
                             </div>
                         </FormCard.Row>
+                    </FormCard.Section>
+
+                    <FormCard.Section title="Variantes y tallas">
+                        <VariantsSection form={form} tallas={tallas} baseSku={form.data.sku_pro} categorias={categorias} />
                     </FormCard.Section>
 
                     <FormCard.Section title="Imagen del Producto">

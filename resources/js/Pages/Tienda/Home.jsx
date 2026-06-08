@@ -6,7 +6,7 @@ import CatalogFilters from '@/Components/Tienda/CatalogFilters';
 import Pagination from '@/Components/UI/Pagination';
 import { ShoppingCart, Truck, Shield, RefreshCw, Sparkles, ArrowRight, Search } from 'lucide-react';
 
-export default function Home({ productos, categorias, filtros, auth }) {
+export default function Home({ productos, categorias, tallas = [], filtros, auth }) {
     const [search, setSearch] = useState(filtros?.q || '');
     const lista = productos?.data ?? productos ?? [];
 
@@ -85,7 +85,7 @@ export default function Home({ productos, categorias, filtros, auth }) {
                     />
                 </form>
 
-                <CatalogFilters categorias={categorias} filtros={filtros} onFilter={handleFilter} />
+                <CatalogFilters categorias={categorias} tallas={tallas} filtros={filtros} onFilter={handleFilter} />
                 <ProductGrid productos={lista} />
 
                 {productos?.last_page > 1 && (

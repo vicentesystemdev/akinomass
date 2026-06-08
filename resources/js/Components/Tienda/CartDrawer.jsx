@@ -127,6 +127,14 @@ export default function CartDrawer({ auth }) {
                                         {item.sku_producto_dca && (
                                             <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>SKU: {item.sku_producto_dca}</p>
                                         )}
+                                        {item.variante?.talla ? (
+                                            <p style={{ fontSize: 11, color: '#D77A61', fontWeight: 600, marginTop: 2 }}>
+                                                Talla: {item.variante.talla.codigo_talla_producto}
+                                            </p>
+                                        ) : null}
+                                        <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 1 }}>
+                                            Bs. {Number(item.precio_unitario_dca).toFixed(2)} c/u
+                                        </p>
                                         <div className="flex items-center justify-between mt-2">
                                             <p style={{ fontSize: 14, fontWeight: 700, color: '#D77A61' }}>
                                                 Bs. {Number(item.subtotal_dca).toFixed(2)}
@@ -135,7 +143,7 @@ export default function CartDrawer({ auth }) {
                                                 <button
                                                     type="button"
                                                     disabled={isUpdating}
-                                                    onClick={() => changeQuantity(item.cod_producto, item.cantidad_dca - 1)}
+                                                    onClick={() => changeQuantity(item.cod_producto, item.cantidad_dca - 1, item.cod_variante_producto)}
                                                     className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
                                                     style={{ background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
                                                 >
@@ -147,7 +155,7 @@ export default function CartDrawer({ auth }) {
                                                 <button
                                                     type="button"
                                                     disabled={isUpdating}
-                                                    onClick={() => changeQuantity(item.cod_producto, item.cantidad_dca + 1)}
+                                                    onClick={() => changeQuantity(item.cod_producto, item.cantidad_dca + 1, item.cod_variante_producto)}
                                                     className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
                                                     style={{ background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
                                                 >
@@ -159,7 +167,7 @@ export default function CartDrawer({ auth }) {
                                     <button
                                         type="button"
                                         disabled={isUpdating}
-                                        onClick={() => removeItem(item.cod_producto)}
+                                        onClick={() => removeItem(item.cod_producto, item.cod_variante_producto)}
                                         className="self-start hover:text-red-500 transition-colors disabled:opacity-50"
                                         style={{ color: '#D1D5DB', background: 'none', border: 'none', cursor: 'pointer' }}
                                         aria-label="Eliminar producto"

@@ -5,7 +5,6 @@ namespace App\Domains\Tienda\Carrito\Services;
 use App\Domains\Tienda\Carrito\Enums\EstadoCarritoEnum;
 use App\Models\Carrito;
 use App\Models\DetalleCarrito;
-use Illuminate\Support\Collection;
 
 class CarritoPersistenciaService
 {
@@ -42,6 +41,7 @@ class CarritoPersistenciaService
     {
         $existente = DetalleCarrito::where('cod_carrito', $carrito->cod_carrito)
             ->where('cod_producto', $itemData['cod_producto'])
+            ->when($itemData['cod_variante_producto'] ?? null, fn ($query, $codVariante) => $query->where('cod_variante_producto', $codVariante), fn ($query) => $query->whereNull('cod_variante_producto'))
             ->first();
 
         if ($existente) {
@@ -56,6 +56,7 @@ class CarritoPersistenciaService
         return DetalleCarrito::create([
             'cod_carrito' => $carrito->cod_carrito,
             'cod_producto' => $itemData['cod_producto'],
+            'cod_variante_producto' => $itemData['cod_variante_producto'] ?? null,
             'cantidad_dca' => $itemData['cantidad'],
             'precio_unitario_dca' => $itemData['precio_unitario'],
             'subtotal_dca' => $itemData['cantidad'] * $itemData['precio_unitario'],

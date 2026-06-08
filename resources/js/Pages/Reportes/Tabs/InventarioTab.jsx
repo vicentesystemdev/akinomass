@@ -1,12 +1,52 @@
 import SectionCard from '@/Components/UI/SectionCard';
 import TableWrapper from '@/Components/UI/TableWrapper';
 import EmptyState from '@/Components/UI/EmptyState';
+import PieChartComponent from '@/Components/Charts/PieChart';
+import VerticalBarChart from '@/Components/Charts/VerticalBarChart';
 
 export default function InventarioTab({ reportes }) {
     const stockBajo = reportes?.productos_stock_bajo || [];
 
     return (
         <div className="space-y-6">
+            {/* Gráficos de Inventario */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <SectionCard title="Productos por Categoría" subtitle="Distribución del total de productos">
+                    <div className="mt-2">
+                        <PieChartComponent
+                            data={reportes?.productos_por_categoria || []}
+                            dataKey="value"
+                            nameKey="name"
+                            height={240}
+                        />
+                    </div>
+                </SectionCard>
+
+                <SectionCard title="Stock por Categoría" subtitle="Stock físico total acumulado">
+                    <div className="mt-2">
+                        <VerticalBarChart
+                            data={reportes?.stock_por_categoria || []}
+                            dataKey="stock"
+                            labelKey="name"
+                            height={240}
+                        />
+                    </div>
+                </SectionCard>
+
+                <SectionCard title="Estructura de Productos" subtitle="Proporción con y sin variantes">
+                    <div className="mt-2">
+                        <PieChartComponent
+                            data={reportes?.productos_variantes_proporcion || []}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={50}
+                            height={240}
+                        />
+                    </div>
+                </SectionCard>
+            </div>
+
+            {/* Tabla de Alertas */}
             <SectionCard
                 title="Productos con Stock Bajo"
                 subtitle={`${stockBajo.length} productos por debajo del mínimo`}

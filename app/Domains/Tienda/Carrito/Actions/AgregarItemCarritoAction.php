@@ -5,10 +5,15 @@ namespace App\Domains\Tienda\Carrito\Actions;
 use App\Domains\Tienda\Carrito\DTOs\AgregarItemCarritoData;
 use App\Domains\Tienda\Carrito\Services\CarritoCalculoService;
 use App\Domains\Tienda\Carrito\Services\CarritoPersistenciaService;
+use App\Domains\Tienda\Carrito\Services\ReservaStockCarritoService;
+use App\Domains\Tienda\Carrito\Services\StockDisponibleTiendaService;
+use App\Domains\Tienda\Configuracion\Services\ConfiguracionTiendaService;
 use App\Models\Carrito;
 use App\Models\DetalleCarrito;
 use App\Models\Inventario;
 use App\Models\Producto;
+use App\Models\VarianteProducto;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AgregarItemCarritoAction
@@ -16,47 +21,107 @@ class AgregarItemCarritoAction
     public function __construct(
         private CarritoPersistenciaService $persistenciaService,
         private CarritoCalculoService $calculoService,
+        private StockDisponibleTiendaService $stockDisponibleService,
+        private ReservaStockCarritoService $reservaService,
+        private ConfiguracionTiendaService $configService,
     ) {}
 
     public function execute(Carrito $carrito, AgregarItemCarritoData $data): DetalleCarrito
     {
-        $producto = Producto::where('cod_producto', $data->codProducto)
-            ->where('estado_pro', 'activo')
-            ->first();
+        return DB::transaction(function () use ($carrito, $data) {
+            $producto = Producto::where('cod_producto', $data->codProducto)
+                ->where('estado_pro', 'activo')
+                ->lockForUpdate()
+                ->first();
 
-        if (!$producto) {
-            throw ValidationException::withMessages([
-                'cod_producto' => ['El producto no está disponible.'],
+            if (! $producto) {
+                throw ValidationException::withMessages([
+                    'cod_producto' => ['El producto no está disponible.'],
+                ]);
+            }
+
+            $variante = $data->codVarianteProducto
+                ? VarianteProducto::with('talla')->find($data->codVarianteProducto)
+                : null;
+
+            $inventario = Inventario::where('cod_producto', $data->codProducto)
+                ->when(
+                    $data->codVarianteProducto,
+                    fn ($q) => $q->where('cod_variante_producto', $data->codVarianteProducto),
+                    fn ($q) => $q->whereNull('cod_variante_producto')
+                )
+                ->where('activo_inv', true)
+                ->lockForUpdate()
+                ->first();
+
+            $stockFisico = $inventario ? (int) $inventario->stock_actual_inv : 0;
+            $stockReservado = $this->reservaService->sumarReservasActivasPorProducto($data->codProducto, $data->codVarianteProducto);
+            $stockDisponible = max(0, $stockFisico - $stockReservado);
+
+            if ($stockDisponible < $data->cantidad) {
+                throw ValidationException::withMessages([
+                    'cantidad' => ['Stock insuficiente. Disponible: '.$stockDisponible],
+                ]);
+            }
+
+            // Validar que para prendas únicas no se agregue más de 1 unidad total en el carrito
+            $esVirtual = str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-%'); // o 'GEN-CAT-'
+            if (! str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-')) {
+                $existenteInCart = DetalleCarrito::where('cod_carrito', $carrito->cod_carrito)
+                    ->where('cod_producto', $data->codProducto)
+                    ->when(
+                        $data->codVarianteProducto,
+                        fn ($q) => $q->where('cod_variante_producto', $data->codVarianteProducto),
+                        fn ($q) => $q->whereNull('cod_variante_producto')
+                    )
+                    ->first();
+
+                $cantidadResultante = ($existenteInCart ? (int) $existenteInCart->cantidad_dca : 0) + $data->cantidad;
+                if ($cantidadResultante > 1) {
+                    throw ValidationException::withMessages([
+                        'cantidad' => ['Cada prenda es única, no puedes tener más de 1 unidad de este producto en tu carrito.'],
+                    ]);
+                }
+            }
+
+            $itemsActuales = $this->persistenciaService->contarItems($carrito);
+            if ($itemsActuales >= 50) {
+                throw ValidationException::withMessages([
+                    'carrito' => ['El carrito ha alcanzado el límite máximo de 50 líneas.'],
+                ]);
+            }
+
+            $detalle = $this->persistenciaService->agregarDetalle($carrito, [
+                'cod_producto' => $data->codProducto,
+                'cod_variante_producto' => $data->codVarianteProducto,
+                'cantidad' => $data->cantidad,
+                'precio_unitario' => (float) ($variante?->precio_venta_variante ?? $producto->precio_venta_pro),
+                'nombre_snapshot' => $producto->nombre_pro,
+                'sku_snapshot' => $variante?->sku_variante_producto ?? $producto->sku_pro,
             ]);
-        }
 
-        $inventario = Inventario::where('cod_producto', $data->codProducto)
-            ->where('activo_inv', true)
-            ->first();
+            $cantidadTotal = $detalle->cantidad_dca;
 
-        if (!$inventario || $inventario->stock_actual_inv < $data->cantidad) {
-            throw ValidationException::withMessages([
-                'cantidad' => ['Stock insuficiente. Disponible: ' . ($inventario->stock_actual_inv ?? 0)],
-            ]);
-        }
+            $reservaExistente = $this->reservaService->obtenerReservaPorDetalle($detalle->cod_detalle_carrito);
 
-        $itemsActuales = $this->persistenciaService->contarItems($carrito);
-        if ($itemsActuales >= 50) {
-            throw ValidationException::withMessages([
-                'carrito' => ['El carrito ha alcanzado el límite máximo de 50 líneas.'],
-            ]);
-        }
+            if ($reservaExistente) {
+                $this->reservaService->actualizarCantidadReserva($reservaExistente, $cantidadTotal);
+            } else {
+                $this->reservaService->crearReserva(
+                    carrito: $carrito,
+                    codDetalleCarrito: $detalle->cod_detalle_carrito,
+                    codProducto: $data->codProducto,
+                    cantidad: $cantidadTotal,
+                    codVarianteProducto: $data->codVarianteProducto,
+                    userId: $carrito->user_id,
+                    sessionId: $carrito->session_id_car,
+                    ttlMinutos: $this->configService->obtenerTiempoReservaCarritoMinutos(),
+                );
+            }
 
-        $detalle = $this->persistenciaService->agregarDetalle($carrito, [
-            'cod_producto' => $data->codProducto,
-            'cantidad' => $data->cantidad,
-            'precio_unitario' => (float) $producto->precio_venta_pro,
-            'nombre_snapshot' => $producto->nombre_pro,
-            'sku_snapshot' => $producto->sku_pro,
-        ]);
+            $this->calculoService->recalcularSubtotales($carrito);
 
-        $this->calculoService->recalcularSubtotales($carrito);
-
-        return $detalle;
+            return $detalle;
+        });
     }
 }

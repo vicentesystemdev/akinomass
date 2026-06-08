@@ -51,4 +51,9 @@ class Carrito extends Model
     {
         return $this->hasMany(DetalleCarrito::class, 'cod_carrito', 'cod_carrito');
     }
+
+    public function reservas(): HasMany
+    {
+        return $this->hasMany(ReservaStockCarrito::class, 'cod_carrito', 'cod_carrito');
+    }
 }

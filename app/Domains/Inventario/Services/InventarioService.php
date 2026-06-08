@@ -12,17 +12,23 @@ class InventarioService
 {
     public function crearOActualizarInventario(array $data): Inventario
     {
+        $codVariante = $data['cod_variante_producto'] ?? null;
+        $valores = [
+            'cod_producto' => $data['cod_producto'],
+            'stock_minimo_inv' => $data['stock_minimo_inv'] ?? 0,
+            'ubicacion_inv' => $data['ubicacion_inv'] ?? 'Almacén 1',
+            'activo_inv' => $data['activo_inv'] ?? true,
+        ];
+
         return Inventario::updateOrCreate(
-            ['cod_producto' => $data['cod_producto']],
-            [
-                'stock_minimo_inv' => $data['stock_minimo_inv'] ?? 0,
-                'ubicacion_inv' => $data['ubicacion_inv'] ?? null,
-                'activo_inv' => $data['activo_inv'] ?? true,
-            ]
+            $codVariante
+                ? ['cod_variante_producto' => $codVariante]
+                : ['cod_producto' => $data['cod_producto'], 'cod_variante_producto' => null],
+            $valores,
         );
     }
 
-    public function registrarMovimiento(int $codProducto, TipoMovimientoInventarioEnum $tipo, int $cantidad, string $motivo, ?string $observacion, ?int $codUsuario, ?int $stockAjuste = null): Inventario
+    public function registrarMovimiento(int $codProducto, TipoMovimientoInventarioEnum $tipo, int $cantidad, string $motivo, ?string $observacion, ?int $codUsuario, ?int $stockAjuste = null, ?int $codVarianteProducto = null): Inventario
     {
         $movimientos = [[
             'cod_producto' => $codProducto,
@@ -32,6 +38,7 @@ class InventarioService
             'observacion' => $observacion,
             'cod_usuario' => $codUsuario,
             'stock_ajuste' => $stockAjuste,
+            'cod_variante_producto' => $codVarianteProducto,
         ]];
 
         return $this->registrarMovimientosBatch($movimientos)[0] ?? throw new RuntimeException('Error al registrar movimiento.');
@@ -39,27 +46,37 @@ class InventarioService
 
     public function registrarMovimientosBatch(array $movimientos): array
     {
-        if (empty($movimientos)) return [];
+        if (empty($movimientos)) {
+            return [];
+        }
 
         return DB::transaction(function () use ($movimientos) {
-            $productosIds = array_unique(array_column($movimientos, 'cod_producto'));
-
-            $inventarios = Inventario::whereIn('cod_producto', $productosIds)
-                ->get()
-                ->keyBy('cod_producto');
-
-            foreach ($productosIds as $codProducto) {
-                if (!isset($inventarios[$codProducto])) {
-                    $inv = Inventario::create(['cod_producto' => $codProducto, 'stock_actual_inv' => 0, 'stock_minimo_inv' => 0, 'activo_inv' => true]);
-                    $inventarios[$codProducto] = $inv;
-                }
-            }
-
             $entradasMovimiento = [];
             $resultados = [];
 
             foreach ($movimientos as $m) {
-                $inventario = $inventarios[$m['cod_producto']];
+                $codVariante = $m['cod_variante_producto'] ?? null;
+                $inventario = Inventario::query()
+                    ->where('cod_producto', $m['cod_producto'])
+                    ->when(
+                        $codVariante,
+                        fn ($query) => $query->where('cod_variante_producto', $codVariante),
+                        fn ($query) => $query->whereNull('cod_variante_producto'),
+                    )
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $inventario) {
+                    $inventario = Inventario::create([
+                        'cod_producto' => $m['cod_producto'],
+                        'cod_variante_producto' => $codVariante,
+                        'stock_actual_inv' => 0,
+                        'stock_minimo_inv' => 0,
+                        'ubicacion_inv' => 'Almacén 1',
+                        'activo_inv' => true,
+                    ]);
+                }
+
                 $stockAnterior = $inventario->stock_actual_inv;
                 $tipo = $m['tipo'];
                 $cantidad = $m['cantidad'];

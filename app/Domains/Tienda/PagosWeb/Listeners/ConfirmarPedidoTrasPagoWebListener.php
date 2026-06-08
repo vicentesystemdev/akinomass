@@ -26,6 +26,10 @@ class ConfirmarPedidoTrasPagoWebListener
             return;
         }
 
+        if ($pedido->estado_ped->value === 'confirmado') {
+            return;
+        }
+
         if ($pedido->estado_ped->value === 'borrador') {
             $this->confirmarPedidoAction->execute($pedido, null);
         }

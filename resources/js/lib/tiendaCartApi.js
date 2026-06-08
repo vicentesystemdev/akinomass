@@ -25,11 +25,12 @@ export async function fetchCarrito() {
     return data.carrito;
 }
 
-export async function addCarritoItem(codProducto, cantidad = 1) {
+export async function addCarritoItem(codProducto, cantidad = 1, codVarianteProducto = null) {
     try {
         const { data } = await client.post('/tienda/carrito/items', {
             cod_producto: codProducto,
             cantidad,
+            cod_variante_producto: codVarianteProducto,
         });
         return data.carrito;
     } catch (error) {
@@ -37,18 +38,18 @@ export async function addCarritoItem(codProducto, cantidad = 1) {
     }
 }
 
-export async function updateCarritoItem(codProducto, cantidad) {
+export async function updateCarritoItem(codProducto, cantidad, codVarianteProducto = null) {
     try {
-        const { data } = await client.patch(`/tienda/carrito/items/${codProducto}`, { cantidad });
+        const { data } = await client.patch(`/tienda/carrito/items/${codProducto}`, { cantidad, cod_variante_producto: codVarianteProducto });
         return data.carrito;
     } catch (error) {
         throw new Error(extractMessage(error));
     }
 }
 
-export async function removeCarritoItem(codProducto) {
+export async function removeCarritoItem(codProducto, codVarianteProducto = null) {
     try {
-        const { data } = await client.delete(`/tienda/carrito/items/${codProducto}`);
+        const { data } = await client.delete(`/tienda/carrito/items/${codProducto}`, { data: { cod_variante_producto: codVarianteProducto } });
         return data.carrito;
     } catch (error) {
         throw new Error(extractMessage(error));

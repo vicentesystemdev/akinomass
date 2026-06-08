@@ -17,7 +17,7 @@ class GenerarNumeroFacturaService
 
             if ($numero === null) {
                 $numero = Factura::where('numero_factura_fac', 'like', "FAC-{$anio}-%")
-                    ->selectRaw("MAX(CAST(SUBSTRING(numero_factura_fac FROM 9) AS INTEGER)) as max_num")
+                    ->selectRaw("MAX(CAST(SUBSTR(numero_factura_fac, 9) AS INTEGER)) as max_num")
                     ->value('max_num') ?? 0;
             }
 

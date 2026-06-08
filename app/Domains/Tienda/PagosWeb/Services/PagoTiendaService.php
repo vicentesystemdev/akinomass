@@ -8,6 +8,13 @@ use App\Models\PedidoTienda;
 
 class PagoTiendaService
 {
+    public function obtenerPorCodPago(string $codPago): ?PagoTienda
+    {
+        return PagoTienda::with('pago')
+            ->where('cod_pago', $codPago)
+            ->first();
+    }
+
     public function resolverPedidoTienda(int $codCheckoutSesion): ?PedidoTienda
     {
         return PedidoTienda::where('cod_checkout_sesion', $codCheckoutSesion)->first();

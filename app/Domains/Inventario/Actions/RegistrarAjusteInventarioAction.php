@@ -11,9 +11,19 @@ use App\Models\Inventario;
 class RegistrarAjusteInventarioAction
 {
     public function __construct(private readonly InventarioService $service, private RegistrarAuditoriaService $auditoriaService) {}
+
     public function execute(array $data, ?int $codUsuario): Inventario
     {
-        $inventario = $this->service->registrarMovimiento($data['cod_producto'], TipoMovimientoInventarioEnum::AJUSTE, 0, $data['motivo_mov'], $data['observacion_mov'] ?? null, $codUsuario, $data['stock_nuevo_mov']);
+        $inventario = $this->service->registrarMovimiento(
+            $data['cod_producto'],
+            TipoMovimientoInventarioEnum::AJUSTE,
+            0,
+            $data['motivo_mov'],
+            $data['observacion_mov'] ?? null,
+            $codUsuario,
+            $data['stock_nuevo_mov'],
+            $data['cod_variante_producto'] ?? null,
+        );
 
         $contexto = RegistrarAuditoriaData::fromRequest(request());
         $this->auditoriaService->registrarAccion(
