@@ -16,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\Auditoria\AuditoriaController;
+use App\Http\Controllers\Analitica\InteligenciaVentasController;
 use App\Http\Controllers\Tienda\AdminPedidoTiendaController;
 use App\Http\Controllers\Tienda\AdminPagoTiendaController;
 use App\Http\Controllers\Tienda\ConfiguracionTiendaController;
@@ -90,6 +91,18 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::resource('pagos', PagoController::class);
 
     Route::get('/reportes', ReporteController::class)->name('reportes.index');
+    Route::prefix('admin/inteligencia-ventas')->name('inteligencia-ventas.')->group(function () {
+        Route::get('/', [InteligenciaVentasController::class, 'index'])->name('index');
+        Route::get('/categorias', [InteligenciaVentasController::class, 'categorias'])->name('categorias');
+        Route::get('/productos', [InteligenciaVentasController::class, 'productos'])->name('productos');
+        Route::get('/abastecimiento', [InteligenciaVentasController::class, 'abastecimiento'])->name('abastecimiento');
+        Route::get('/canales', [InteligenciaVentasController::class, 'canales'])->name('canales');
+        Route::get('/conclusiones', [InteligenciaVentasController::class, 'conclusiones'])->name('conclusiones');
+        Route::get('/configuracion', [InteligenciaVentasController::class, 'configuracion'])->name('configuracion');
+        Route::post('/generar', [InteligenciaVentasController::class, 'generar'])->name('generar');
+        Route::delete('/limpiar', [InteligenciaVentasController::class, 'limpiar'])->name('limpiar');
+        Route::match(['put', 'patch'], '/configuracion', [InteligenciaVentasController::class, 'actualizarConfiguracion'])->name('configuracion.update');
+    });
     Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
     Route::post('/pagos/{pago}/confirmar', [PagoController::class, 'confirmar'])->name('pagos.confirmar');
     Route::post('/pagos/{pago}/observar', [PagoController::class, 'observar'])->name('pagos.observar');

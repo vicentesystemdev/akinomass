@@ -158,6 +158,17 @@ export default function AuthenticatedLayout({ header, children }) {
                     canView: hasPermission('reportes.ver'),
                 },
                 {
+                    label: 'Inteligencia de Ventas',
+                    routeName: 'inteligencia-ventas.index',
+                    icon: (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3a9 9 0 108.95 8H11V3z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12A9 9 0 0012 3v9h9z" />
+                        </svg>
+                    ),
+                    canView: hasPermission('reportes.ver'),
+                },
+                {
                     label: 'Auditoría',
                     routeName: 'auditoria.index',
                     icon: (
