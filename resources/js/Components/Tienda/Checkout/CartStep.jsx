@@ -1,4 +1,5 @@
 import { ShoppingCart, ChevronRight, Shield, Truck, RefreshCw, Clock } from 'lucide-react';
+import CountdownTimer from '@/Components/Tienda/CountdownTimer';
 
 export default function CartStep({ checkout, onNext }) {
     const carrito = checkout?.carrito;
@@ -69,7 +70,16 @@ export default function CartStep({ checkout, onNext }) {
                                 </p>
                                 <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3, lineHeight: 1.45 }}>
                                     {reservas.tiempo_restante_segundos > 0
-                                        ? `Quedan ${Math.ceil(reservas.tiempo_restante_segundos / 60)} min de reserva.`
+                                        ? (
+                                            <>
+                                                Quedan{' '}
+                                                <CountdownTimer
+                                                    seconds={reservas.tiempo_restante_segundos}
+                                                    expiredLabel="0s"
+                                                />{' '}
+                                                de reserva.
+                                            </>
+                                        )
                                         : reservas.mensaje_reserva}
                                 </p>
                             </div>

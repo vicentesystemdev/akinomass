@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import StorefrontLayout from '@/Layouts/StorefrontLayout';
+import CountdownTimer from '@/Components/Tienda/CountdownTimer';
 import ProgressStepper from '@/Components/Tienda/Checkout/ProgressStepper';
 import CartStep from '@/Components/Tienda/Checkout/CartStep';
 import ShippingStep from '@/Components/Tienda/Checkout/ShippingStep';
@@ -106,6 +107,39 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
         setServerError(null);
         setProcessing(true);
 
+        const submitPayment = () => {
+            const formData = new FormData();
+            formData.append('cod_checkout_sesion', checkout.cod_checkout_sesion);
+            formData.append('metodo_pago_pag', paymentMethod);
+            if (paymentData.referencia_pago) formData.append('referencia_pag', paymentData.referencia_pago);
+            if (paymentData.comprobante) formData.append('comprobante', paymentData.comprobante);
+
+            router.post(`/tienda/checkout/${token}/pago`, formData, {
+                preserveScroll: true,
+                forceFormData: true,
+                onSuccess: (pagoPage) => {
+                    if (pagoPage.props.pedido) {
+                        setPedido(pagoPage.props.pedido);
+                    }
+                    setStep(4);
+                },
+                onError: (errors) => {
+                    if (errors.comprobante) {
+                        setComprobanteError(
+                            Array.isArray(errors.comprobante) ? errors.comprobante[0] : errors.comprobante,
+                        );
+                    }
+                    setServerError(extractFirstError(errors) || 'No se pudo registrar el pago.');
+                },
+                onFinish: () => setProcessing(false),
+            });
+        };
+
+        if (checkoutEstado === 'pedido_generado' || pedido) {
+            submitPayment();
+            return;
+        }
+
         router.post(`/tienda/checkout/${token}/generar-pedido`, {
             cod_checkout_sesion: checkout.cod_checkout_sesion,
         }, {
@@ -113,32 +147,7 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
             onSuccess: (page) => {
                 const pedidoGenerado = page.props.pedido || null;
                 setPedido(pedidoGenerado);
-
-                const formData = new FormData();
-                formData.append('cod_checkout_sesion', checkout.cod_checkout_sesion);
-                formData.append('metodo_pago_pag', paymentMethod);
-                if (paymentData.referencia_pago) formData.append('referencia_pag', paymentData.referencia_pago);
-                if (paymentData.comprobante) formData.append('comprobante', paymentData.comprobante);
-
-                router.post(`/tienda/checkout/${token}/pago`, formData, {
-                    preserveScroll: true,
-                    forceFormData: true,
-                    onSuccess: (pagoPage) => {
-                        if (pagoPage.props.pedido) {
-                            setPedido(pagoPage.props.pedido);
-                        }
-                        setStep(4);
-                    },
-                    onError: (errors) => {
-                        if (errors.comprobante) {
-                            setComprobanteError(
-                                Array.isArray(errors.comprobante) ? errors.comprobante[0] : errors.comprobante,
-                            );
-                        }
-                        setServerError(extractFirstError(errors) || 'No se pudo registrar el pago.');
-                    },
-                    onFinish: () => setProcessing(false),
-                });
+                submitPayment();
             },
             onError: (errors) => {
                 setServerError(extractFirstError(errors) || 'No se pudo generar el pedido.');
@@ -186,13 +195,23 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                                 </div>
                                 <div>
                                     <p style={{ fontSize: 13, fontWeight: 800, color: '#2B221E' }}>
-                                        Checkout activo: {tiempoCheckout.tiempo_restante_formateado}
+                                        Checkout activo:{' '}
+                                        <CountdownTimer
+                                            seconds={tiempoCheckout.tiempo_restante_segundos}
+                                            expiredLabel="expirado"
+                                        />
                                     </p>
                                     <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3 }}>
                                         Tiempo configurado: {tiempoCheckout.ttl_minutos} min
                                         {reservas?.tiempo_restante_segundos > 0
-                                            ? ` · reserva de stock: ${Math.ceil(reservas.tiempo_restante_segundos / 60)} min`
+                                            ? ' · reserva de stock: '
                                             : ''}
+                                        {reservas?.tiempo_restante_segundos > 0 && (
+                                            <CountdownTimer
+                                                seconds={reservas.tiempo_restante_segundos}
+                                                expiredLabel="expirada"
+                                            />
+                                        )}
                                     </p>
                                 </div>
                             </div>

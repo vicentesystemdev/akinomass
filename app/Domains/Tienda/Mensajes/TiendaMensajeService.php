@@ -53,7 +53,7 @@ class TiendaMensajeService
             return false;
         }
 
-        return in_array($valorPago, ['observado', 'rechazado', 'pendiente']);
+        return in_array($valorPago, ['observado', 'rechazado']);
     }
 
     public function obtenerTiempoRestanteMinutos(Carbon $expiraEn): int

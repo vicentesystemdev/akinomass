@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Head, router, Link } from '@inertiajs/react';
 import StorefrontLayout from '@/Layouts/StorefrontLayout';
+import CountdownTimer from '@/Components/Tienda/CountdownTimer';
 import { AlertCircle, ArrowLeft, Clock, Shield, ShoppingCart, X } from 'lucide-react';
 
 function extractFirstError(errors) {
@@ -16,9 +17,6 @@ export default function Carrito({ carrito, reservas, auth }) {
     const total = carrito ? Number(carrito.total_car) : 0;
     const cartCount = items.reduce((sum, d) => sum + d.cantidad_dca, 0);
     const reservaActiva = (reservas?.cantidad_reservas_activas ?? 0) > 0;
-    const tiempoReserva = reservaActiva
-        ? reservas?.tiempo_restante_formateado
-        : `${reservas?.ttl_minutos ?? 20} min`;
 
     const handleCheckout = () => {
         setCheckoutError(null);
@@ -139,7 +137,15 @@ export default function Carrito({ carrito, reservas, auth }) {
                                     </div>
                                     <div>
                                         <p style={{ fontSize: 13, fontWeight: 800, color: '#2B221E' }}>
-                                            Reserva del carrito: {tiempoReserva}
+                                            Reserva del carrito:{' '}
+                                            {reservaActiva ? (
+                                                <CountdownTimer
+                                                    seconds={reservas?.tiempo_restante_segundos ?? 0}
+                                                    expiredLabel="expirada"
+                                                />
+                                            ) : (
+                                                `${reservas?.ttl_minutos ?? 20} min`
+                                            )}
                                         </p>
                                         <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3, lineHeight: 1.45 }}>
                                             {reservaActiva

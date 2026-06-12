@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { AlertCircle, ShoppingCart, X, Plus, Minus, Shield, Loader2 } from 'lucide-react';
+import { AlertCircle, Clock, ShoppingCart, X, Plus, Minus, Shield, Loader2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import CountdownTimer from '@/Components/Tienda/CountdownTimer';
 
 function extractFirstError(errors) {
     const first = Object.values(errors || {})[0];
@@ -18,6 +19,7 @@ export default function CartDrawer({ auth }) {
         changeQuantity,
         removeItem,
         updatingProductId,
+        reservas,
     } = useCart();
 
     const items = carrito?.detalles || [];
@@ -199,6 +201,19 @@ export default function CartDrawer({ auth }) {
 
                 {items.length > 0 && (
                     <div className="px-5 py-4" style={{ borderTop: '1px solid #F3F4F6' }}>
+                        {reservas && (
+                            <div className="flex items-start gap-2 p-3 rounded-xl mb-3" style={{ background: '#FDF6F0', border: '1px solid rgba(215,122,97,0.22)' }}>
+                                <Clock size={14} style={{ color: '#D77A61', marginTop: 1, flexShrink: 0 }} />
+                                <p style={{ fontSize: 12, color: '#544a45', fontWeight: 600, lineHeight: 1.45 }}>
+                                    Reserva:{' '}
+                                    {(reservas.cantidad_reservas_activas ?? 0) > 0 ? (
+                                        <CountdownTimer seconds={reservas.tiempo_restante_segundos} expiredLabel="expirada" />
+                                    ) : (
+                                        `${reservas.ttl_minutos ?? 20} min al iniciar reserva`
+                                    )}
+                                </p>
+                            </div>
+                        )}
                         {checkoutError && (
                             <div className="flex items-start gap-2 p-3 rounded-xl mb-3" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                                 <AlertCircle size={14} style={{ color: '#DC2626', marginTop: 1, flexShrink: 0 }} />

@@ -15,8 +15,6 @@ use App\Models\Pedido;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class PagoWebController extends Controller
 {
@@ -51,7 +49,7 @@ class PagoWebController extends Controller
         ObtenerPagoClienteAction $action,
         Request $request,
         TiendaMensajeService $mensajeService,
-    ): Response|JsonResponse {
+    ): RedirectResponse|JsonResponse {
         $pagoTienda = $action->execute($request->user()->id, $pedido->cod_pedido);
 
         if (!$pagoTienda) {
@@ -81,20 +79,7 @@ class PagoWebController extends Controller
             ]);
         }
 
-        return Inertia::render('Tienda/Cuenta/PagoShow', [
-            'pago' => $pagoTienda,
-            'pedido' => $pedido,
-            'comprobantes' => $comprobantes,
-            'mensaje_estado' => $pedidoTienda
-                ? $mensajeService->obtenerMensajePedido($pedidoTienda->estado_pte)
-                : null,
-            'puede_resubir_comprobante' => $pedidoTienda
-                ? $mensajeService->puedeResubirComprobante(
-                    $pedidoTienda->estado_pte,
-                    $pagoTienda->pago->estado_pago_pag
-                )
-                : false,
-        ]);
+        return redirect()->route('tienda.cuenta.pedido.show', $pedido->cod_pedido);
     }
 
     public function resubir(
@@ -102,6 +87,10 @@ class PagoWebController extends Controller
         PagoTienda $pagoTienda,
         ResubirComprobantePagoTiendaAction $action,
     ): RedirectResponse|JsonResponse {
+        if ((int) $pagoTienda->user_id !== (int) $request->user()->id) {
+            abort(403);
+        }
+
         $request->validate([
             'comprobante' => ['required', 'file', 'max:5120', 'mimes:jpg,jpeg,png,pdf'],
         ]);

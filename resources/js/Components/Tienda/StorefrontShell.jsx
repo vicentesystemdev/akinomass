@@ -43,9 +43,9 @@ function StorefrontShellInner({ children, auth }) {
     );
 }
 
-export default function StorefrontShell({ children, auth, initialCarrito, openCartOnMount = false }) {
+export default function StorefrontShell({ children, auth, initialCarrito, initialReservas, openCartOnMount = false }) {
     return (
-        <CartProvider auth={auth} initialCarrito={initialCarrito} openCartOnMount={openCartOnMount}>
+        <CartProvider auth={auth} initialCarrito={initialCarrito} initialReservas={initialReservas} openCartOnMount={openCartOnMount}>
             <StorefrontShellInner auth={auth}>{children}</StorefrontShellInner>
         </CartProvider>
     );

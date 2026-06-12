@@ -3,8 +3,9 @@ import { addCarritoItem, removeCarritoItem, updateCarritoItem } from '@/lib/tien
 
 const CartContext = createContext(null);
 
-export function CartProvider({ children, auth, initialCarrito = null, openCartOnMount = false }) {
+export function CartProvider({ children, auth, initialCarrito = null, initialReservas = null, openCartOnMount = false }) {
     const [carrito, setCarrito] = useState(initialCarrito);
+    const [reservas, setReservas] = useState(initialReservas);
     const [cartOpen, setCartOpen] = useState(false);
     const [busy, setBusy] = useState(false);
     const [updatingProductId, setUpdatingProductId] = useState(null);
@@ -15,6 +16,10 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
     useEffect(() => {
         setCarrito(initialCarrito ?? null);
     }, [initialCarrito]);
+
+    useEffect(() => {
+        setReservas(initialReservas ?? null);
+    }, [initialReservas]);
 
     useEffect(() => {
         if (openCartOnMount) {
@@ -50,8 +55,9 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
         async (codProducto, cantidad = 1, { openDrawer = false, silent = false, codVarianteProducto = null } = {}) => {
             setBusy(true);
             try {
-                const updated = await addCarritoItem(codProducto, cantidad, codVarianteProducto);
-                setCarrito(updated);
+                const response = await addCarritoItem(codProducto, cantidad, codVarianteProducto);
+                setCarrito(response.carrito);
+                setReservas(response.reservas ?? null);
                 pulseBadge();
                 if (!silent) {
                     showToast('Producto agregado al carrito');
@@ -59,7 +65,7 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
                 if (openDrawer) {
                     setCartOpen(true);
                 }
-                return updated;
+                return response.carrito;
             } catch (error) {
                 showToast(error.message || 'Error al agregar', 'error');
                 throw error;
@@ -74,11 +80,12 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
         async (codProducto, cantidad, codVarianteProducto = null) => {
             setUpdatingProductId(codProducto);
             try {
-                const updated =
+                const response =
                     cantidad <= 0
                         ? await removeCarritoItem(codProducto, codVarianteProducto)
                         : await updateCarritoItem(codProducto, cantidad, codVarianteProducto);
-                setCarrito(updated);
+                setCarrito(response.carrito);
+                setReservas(response.reservas ?? null);
                 pulseBadge();
             } catch (error) {
                 showToast(error.message || 'Error al actualizar', 'error');
@@ -93,8 +100,9 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
         async (codProducto, codVarianteProducto = null) => {
             setUpdatingProductId(codProducto);
             try {
-                const updated = await removeCarritoItem(codProducto, codVarianteProducto);
-                setCarrito(updated);
+                const response = await removeCarritoItem(codProducto, codVarianteProducto);
+                setCarrito(response.carrito);
+                setReservas(response.reservas ?? null);
                 showToast('Producto eliminado');
             } catch (error) {
                 showToast(error.message || 'Error al eliminar', 'error');
@@ -108,6 +116,7 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
     const value = useMemo(
         () => ({
             carrito,
+            reservas,
             cartOpen,
             cartCount,
             busy,
@@ -124,6 +133,7 @@ export function CartProvider({ children, auth, initialCarrito = null, openCartOn
         }),
         [
             carrito,
+            reservas,
             cartOpen,
             cartCount,
             busy,
