@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('sku_producto_dca', 100)->nullable();
             $table->timestamps();
 
-            $table->unique(['cod_carrito', 'cod_producto']);
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->unique(['cod_carrito', 'cod_producto']);
+            }
         });
     }
 

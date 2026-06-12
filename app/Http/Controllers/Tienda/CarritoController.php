@@ -20,7 +20,6 @@ use App\Models\Producto;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class CarritoController extends Controller
@@ -33,7 +32,7 @@ class CarritoController extends Controller
         TiendaMensajeService $mensajeService,
     ): Response|JsonResponse|RedirectResponse {
         $carrito = $this->resolverCarrito($request, $service);
-        $carrito = $carrito ? $carrito->load('detalles.producto') : null;
+        $carrito = $carrito ? $carrito->load(['detalles.producto', 'detalles.variante.talla']) : null;
 
         if ($request->expectsJson()) {
             $data = ['carrito' => $carrito];
@@ -84,7 +83,7 @@ class CarritoController extends Controller
         $data = AgregarItemCarritoData::fromArray($formRequest->validated());
 
         $detalle = $action->execute($carrito, $data);
-        $carrito = $carrito->fresh()->load('detalles');
+        $carrito = $carrito->fresh()->load(['detalles.variante.talla']);
 
         if ($request->expectsJson()) {
             $reservasActivas = $reservaService->reservasActivasPorCarrito($carrito);
@@ -123,7 +122,7 @@ class CarritoController extends Controller
     ): RedirectResponse|JsonResponse {
         $carrito = $this->resolverCarrito($request, $service);
 
-        if (!$carrito) {
+        if (! $carrito) {
             if ($request->expectsJson()) {
                 return response()->json(['mensaje' => 'Carrito no encontrado.'], 404);
             }
@@ -133,12 +132,13 @@ class CarritoController extends Controller
 
         $detalle = DetalleCarrito::where('cod_carrito', $carrito->cod_carrito)
             ->where('cod_producto', $producto->cod_producto)
+            ->when($request->integer('cod_variante_producto'), fn ($query, $codVariante) => $query->where('cod_variante_producto', $codVariante), fn ($query) => $query->whereNull('cod_variante_producto'))
             ->firstOrFail();
 
         $action->execute($detalle, $formRequest->validated('cantidad'));
 
         if ($request->expectsJson()) {
-            $carritoFresh = $carrito->fresh()->load('detalles');
+            $carritoFresh = $carrito->fresh()->load(['detalles.variante.talla']);
             $reservasActivas = $reservaService->reservasActivasPorCarrito($carritoFresh);
             $reservaMasAntigua = $carritoFresh->reservas()
                 ->where('estado_res', 'activa')
@@ -172,7 +172,7 @@ class CarritoController extends Controller
     ): RedirectResponse|JsonResponse {
         $carrito = $this->resolverCarrito($request, $service);
 
-        if (!$carrito) {
+        if (! $carrito) {
             if ($request->expectsJson()) {
                 return response()->json(['mensaje' => 'Carrito no encontrado.'], 404);
             }
@@ -182,12 +182,13 @@ class CarritoController extends Controller
 
         $detalle = DetalleCarrito::where('cod_carrito', $carrito->cod_carrito)
             ->where('cod_producto', $producto->cod_producto)
+            ->when($request->integer('cod_variante_producto'), fn ($query, $codVariante) => $query->where('cod_variante_producto', $codVariante), fn ($query) => $query->whereNull('cod_variante_producto'))
             ->firstOrFail();
 
         $action->execute($detalle);
 
         if ($request->expectsJson()) {
-            $carritoFresh = $carrito->fresh()->load('detalles');
+            $carritoFresh = $carrito->fresh()->load(['detalles.variante.talla']);
             $reservasActivas = $reservaService->reservasActivasPorCarrito($carritoFresh);
 
             return response()->json([
@@ -209,7 +210,7 @@ class CarritoController extends Controller
     ): RedirectResponse|JsonResponse {
         $carrito = $this->resolverCarrito($request, $service);
 
-        if (!$carrito) {
+        if (! $carrito) {
             if ($request->expectsJson()) {
                 return response()->json(['mensaje' => 'Carrito no encontrado.'], 404);
             }
@@ -245,7 +246,7 @@ class CarritoController extends Controller
     {
         $carrito = $this->resolverCarrito($request, $service);
 
-        if (!$carrito) {
+        if (! $carrito) {
             $userId = $request->user()?->id;
             $sessionId = $request->user() ? null : $this->sessionIdCarritoInvitado($request);
             $codCliente = $request->user()?->cuentaCliente?->cod_cliente;

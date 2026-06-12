@@ -38,6 +38,9 @@ export default function CartStep({ checkout, onNext }) {
                             {item.sku_producto_dca && (
                                 <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>SKU: {item.sku_producto_dca}</p>
                             )}
+                            {item.variante?.talla && (
+                                <p style={{ fontSize: 12, color: '#D77A61', marginTop: 2 }}>Talla: {item.variante.talla.codigo_talla_producto}</p>
+                            )}
                             <div className="flex items-center justify-between mt-3">
                                 <div className="flex items-center gap-2 rounded-xl p-1" style={{ background: '#F3F4F6' }}>
                                     <span style={{ fontSize: 14, fontWeight: 700, color: '#2B221E', padding: '0 8px' }}>

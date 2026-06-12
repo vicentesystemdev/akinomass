@@ -50,6 +50,7 @@ export default function PedidoShow({ auth, pedidoTienda, pedido, pago, factura }
                         <div key={detalle.cod_detalle_pedido} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid #F3F4F6' }}>
                             <div>
                                 <p style={{ fontSize: 13, fontWeight: 600, color: '#2B221E' }}>{detalle.producto?.nombre_pro || `Producto #${detalle.cod_producto}`}</p>
+                                {detalle.variante?.talla && <p style={{ fontSize: 12, color: '#D77A61' }}>Talla: {detalle.variante.talla.codigo_talla_producto}</p>}
                                 <p style={{ fontSize: 12, color: '#9CA3AF' }}>×{detalle.cantidad_det} · Bs. {Number(detalle.precio_unitario_det).toFixed(2)} c/u</p>
                             </div>
                             <p style={{ fontSize: 14, fontWeight: 700, color: '#2B221E' }}>Bs. {Number(detalle.subtotal_det).toFixed(2)}</p>

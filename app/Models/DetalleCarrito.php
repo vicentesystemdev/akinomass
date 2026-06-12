@@ -17,6 +17,7 @@ class DetalleCarrito extends Model
     protected $fillable = [
         'cod_carrito',
         'cod_producto',
+        'cod_variante_producto',
         'cantidad_dca',
         'precio_unitario_dca',
         'subtotal_dca',
@@ -41,5 +42,10 @@ class DetalleCarrito extends Model
     public function producto(): BelongsTo
     {
         return $this->belongsTo(Producto::class, 'cod_producto', 'cod_producto');
+    }
+
+    public function variante(): BelongsTo
+    {
+        return $this->belongsTo(VarianteProducto::class, 'cod_variante_producto', 'cod_variante_producto');
     }
 }

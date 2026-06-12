@@ -4,6 +4,7 @@ namespace App\Domains\Tienda\Catalogo\Services;
 
 use App\Domains\Tienda\Carrito\Services\StockDisponibleTiendaService;
 use App\Models\Producto;
+use App\Models\VarianteProducto;
 
 class CatalogoPublicoService
 {
@@ -15,7 +16,7 @@ class CatalogoPublicoService
     {
         $inventario = $producto->inventario;
 
-        if (!$inventario || !$inventario->activo_inv) {
+        if (! $inventario || ! $inventario->activo_inv) {
             return 'no_disponible';
         }
 
@@ -41,5 +42,10 @@ class CatalogoPublicoService
     {
         return $producto->estado_pro === 'activo'
             && $this->obtenerStockDisponible($producto) > 0;
+    }
+
+    public function obtenerStockDisponibleVariante(VarianteProducto $variante): int
+    {
+        return $this->stockDisponibleService->obtenerStockDisponible($variante->cod_producto, $variante->cod_variante_producto);
     }
 }

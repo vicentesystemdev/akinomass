@@ -385,4 +385,59 @@ class ReporteComercialRepository
             ->where('estado_pago_pag', EstadoPagoEnum::PAGADO->value)
             ->sum('monto_pag');
     }
+
+    public function productosPorCategoria(): array
+    {
+        return DB::table('categorias_producto as c')
+            ->leftJoin('productos as p', 'p.cod_categoria_producto', '=', 'c.cod_categoria_producto')
+            ->selectRaw('c.nombre_cat as name, COUNT(p.cod_producto) as value')
+            ->groupBy('c.cod_categoria_producto', 'c.nombre_cat')
+            ->orderByDesc('value')
+            ->get()
+            ->map(fn ($item) => [
+                'name' => $item->name,
+                'value' => (int) $item->value,
+            ])
+            ->all();
+    }
+
+    public function stockPorCategoria(): array
+    {
+        return DB::table('categorias_producto as c')
+            ->join('productos as p', 'p.cod_categoria_producto', '=', 'c.cod_categoria_producto')
+            ->join('inventarios as i', 'i.cod_producto', '=', 'p.cod_producto')
+            ->selectRaw('c.nombre_cat as name, SUM(i.stock_actual_inv) as total_stock')
+            ->groupBy('c.cod_categoria_producto', 'c.nombre_cat')
+            ->orderByDesc('total_stock')
+            ->get()
+            ->map(fn ($item) => [
+                'name' => $item->name,
+                'stock' => (int) $item->total_stock,
+            ])
+            ->all();
+    }
+
+    public function productosConYSinVariantes(): array
+    {
+        $conVariantes = DB::table('productos')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('variantes_producto')
+                    ->whereColumn('variantes_producto.cod_producto', 'productos.cod_producto');
+            })
+            ->count();
+
+        $sinVariantes = DB::table('productos')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('variantes_producto')
+                    ->whereColumn('variantes_producto.cod_producto', 'productos.cod_producto');
+            })
+            ->count();
+
+        return [
+            ['name' => 'Con variantes', 'value' => $conVariantes],
+            ['name' => 'Sin variantes', 'value' => $sinVariantes],
+        ];
+    }
 }

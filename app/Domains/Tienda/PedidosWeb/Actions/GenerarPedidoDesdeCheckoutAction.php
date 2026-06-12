@@ -31,7 +31,7 @@ class GenerarPedidoDesdeCheckoutAction
             ->where('cod_checkout_sesion', $data->codCheckoutSesion)
             ->first();
 
-        if (!$checkoutSesion) {
+        if (! $checkoutSesion) {
             throw ValidationException::withMessages([
                 'checkout' => ['La sesión de checkout no existe.'],
             ]);
@@ -45,7 +45,7 @@ class GenerarPedidoDesdeCheckoutAction
 
         $cuentaCliente = CuentaCliente::where('user_id', $userId)->first();
 
-        if (!$cuentaCliente) {
+        if (! $cuentaCliente) {
             throw ValidationException::withMessages([
                 'usuario' => ['No tiene una cuenta de cliente activa.'],
             ]);
@@ -53,7 +53,7 @@ class GenerarPedidoDesdeCheckoutAction
 
         $carrito = $checkoutSesion->carrito;
 
-        if (!$carrito || $carrito->detalles->isEmpty()) {
+        if (! $carrito || $carrito->detalles->isEmpty()) {
             throw ValidationException::withMessages([
                 'carrito' => ['El carrito está vacío.'],
             ]);
@@ -61,12 +61,13 @@ class GenerarPedidoDesdeCheckoutAction
 
         foreach ($carrito->detalles as $detalle) {
             $inventario = Inventario::where('cod_producto', $detalle->cod_producto)
+                ->when($detalle->cod_variante_producto, fn ($query, $codVariante) => $query->where('cod_variante_producto', $codVariante), fn ($query) => $query->whereNull('cod_variante_producto'))
                 ->where('activo_inv', true)
                 ->first();
 
-            if (!$inventario || $inventario->stock_actual_inv < $detalle->cantidad_dca) {
+            if (! $inventario || $inventario->stock_actual_inv < $detalle->cantidad_dca) {
                 throw ValidationException::withMessages([
-                    'stock' => ['Stock insuficiente para el producto: ' . ($detalle->nombre_producto_dca ?? $detalle->cod_producto)],
+                    'stock' => ['Stock insuficiente para el producto: '.($detalle->nombre_producto_dca ?? $detalle->cod_producto)],
                 ]);
             }
         }

@@ -3,18 +3,12 @@ import PageHeader from '@/Components/UI/PageHeader';
 import FormCard from '@/Components/UI/FormCard';
 import PrimaryActionButton from '@/Components/UI/PrimaryActionButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import VariantsSection from './VariantsSection';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useRef, useCallback } from 'react';
 import { filterLetters, toUpper, filterNumeric } from '@/utils/formatters';
 
-const estadoLabels = {
-    activo: 'Activo',
-    inactivo: 'Inactivo',
-    agotado: 'Agotado',
-    descontinuado: 'Descontinuado',
-};
-
-export default function Create({ categorias, estados }) {
+export default function Create({ categorias, tallas }) {
     const [preview, setPreview] = useState(null);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
@@ -27,7 +21,8 @@ export default function Create({ categorias, estados }) {
         precio_costo_pro: '',
         sku_pro: '',
         imagen_pro: null,
-        estado_pro: estados?.[0] ?? 'activo',
+        estado_pro: 'activo',
+        variantes: [],
     });
 
     const handleFile = useCallback((file) => {
@@ -64,14 +59,46 @@ export default function Create({ categorias, estados }) {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const submit = () => {
-        const venta = parseFloat(form.data.precio_venta_pro);
-        const costo = parseFloat(form.data.precio_costo_pro);
+    const validateDecimal = (val) => {
+        if (val === '' || val === null || val === undefined) return true;
+        return /^\d+(\.\d)?$/.test(val.toString());
+    };
 
-        if (costo && venta < costo) {
+    const submit = () => {
+        form.clearErrors();
+
+        const venta = form.data.precio_venta_pro;
+        const costo = form.data.precio_costo_pro;
+
+        if (venta && !validateDecimal(venta)) {
+            form.setError('precio_venta_pro', 'El precio de venta no puede tener más de un decimal (ej: 10.5).');
+            return;
+        }
+
+        if (costo && !validateDecimal(costo)) {
+            form.setError('precio_costo_pro', 'El precio de costo no puede tener más de un decimal (ej: 10.5).');
+            return;
+        }
+
+        const ventaFloat = parseFloat(venta);
+        const costoFloat = parseFloat(costo);
+
+        if (costoFloat && ventaFloat < costoFloat) {
             form.setError('precio_venta_pro', 'El precio de venta no puede ser menor al precio de costo.');
             return;
         }
+
+        let hasVariantError = false;
+        if (form.data.variantes && form.data.variantes.length > 0) {
+            form.data.variantes.forEach((v, index) => {
+                if (v.precio_venta_variante && !validateDecimal(v.precio_venta_variante)) {
+                    form.setError(`variantes.${index}.precio_venta_variante`, 'El precio de la variante no puede tener más de un decimal (ej: 10.5).');
+                    hasVariantError = true;
+                }
+            });
+        }
+
+        if (hasVariantError) return;
 
         form.post(route('productos.store'));
     };
@@ -152,48 +179,27 @@ export default function Create({ categorias, estados }) {
                     </FormCard.Section>
 
                     <FormCard.Section title="Clasificación">
-                        <FormCard.Row>
-                            <div>
-                                <label className={labelClass}>
-                                    Categoría <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    value={form.data.cod_categoria_producto ?? ''}
-                                    onChange={(e) => form.setData('cod_categoria_producto', e.target.value)}
-                                    className={`${inputClass} ${form.errors.cod_categoria_producto ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                                >
-                                    <option value="">Seleccionar categoría</option>
-                                    {categorias.map((c) => (
-                                        <option key={c.cod_categoria_producto} value={c.cod_categoria_producto}>
-                                            {c.nombre_cat}
-                                        </option>
-                                    ))}
-                                </select>
-                                {form.errors.cod_categoria_producto && (
-                                    <p className={errorClass}>{form.errors.cod_categoria_producto}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label className={labelClass}>
-                                    Estado <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    value={form.data.estado_pro ?? ''}
-                                    onChange={(e) => form.setData('estado_pro', e.target.value)}
-                                    className={`${inputClass} ${form.errors.estado_pro ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                                >
-                                    {estados.map((estado) => (
-                                        <option key={estado} value={estado}>
-                                            {estadoLabels[estado] || estado}
-                                        </option>
-                                    ))}
-                                </select>
-                                {form.errors.estado_pro && (
-                                    <p className={errorClass}>{form.errors.estado_pro}</p>
-                                )}
-                            </div>
-                        </FormCard.Row>
+                        <div>
+                            <label className={labelClass}>
+                                Categoría <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={form.data.cod_categoria_producto ?? ''}
+                                onChange={(e) => form.setData('cod_categoria_producto', e.target.value)}
+                                className={`${inputClass} ${form.errors.cod_categoria_producto ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                            >
+                                <option value="">Seleccionar categoría</option>
+                                {categorias.map((c) => (
+                                    <option key={c.cod_categoria_producto} value={c.cod_categoria_producto}>
+                                        {c.nombre_cat}
+                                    </option>
+                                ))}
+                            </select>
+                            {form.errors.cod_categoria_producto && (
+                                <p className={errorClass}>{form.errors.cod_categoria_producto}</p>
+                            )}
+                            <p className="mt-2 text-xs text-gray-500">El producto se creará con estado activo.</p>
+                        </div>
                     </FormCard.Section>
 
                     <FormCard.Section title="Precios">
@@ -241,6 +247,10 @@ export default function Create({ categorias, estados }) {
                                 )}
                             </div>
                         </FormCard.Row>
+                    </FormCard.Section>
+
+                    <FormCard.Section title="Variantes y tallas">
+                        <VariantsSection form={form} tallas={tallas} baseSku={form.data.sku_pro} categorias={categorias} />
                     </FormCard.Section>
 
                     <FormCard.Section title="Imagen del Producto">

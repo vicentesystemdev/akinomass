@@ -10,7 +10,9 @@ use App\Domains\Tienda\Carrito\Services\StockDisponibleTiendaService;
 use App\Domains\Tienda\Configuracion\Services\ConfiguracionTiendaService;
 use App\Models\Carrito;
 use App\Models\DetalleCarrito;
+use App\Models\Inventario;
 use App\Models\Producto;
+use App\Models\VarianteProducto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -32,18 +34,54 @@ class AgregarItemCarritoAction
                 ->lockForUpdate()
                 ->first();
 
-            if (!$producto) {
+            if (! $producto) {
                 throw ValidationException::withMessages([
                     'cod_producto' => ['El producto no está disponible.'],
                 ]);
             }
 
-            $stockDisponible = $this->stockDisponibleService->obtenerStockDisponible($data->codProducto);
+            $variante = $data->codVarianteProducto
+                ? VarianteProducto::with('talla')->find($data->codVarianteProducto)
+                : null;
+
+            $inventario = Inventario::where('cod_producto', $data->codProducto)
+                ->when(
+                    $data->codVarianteProducto,
+                    fn ($q) => $q->where('cod_variante_producto', $data->codVarianteProducto),
+                    fn ($q) => $q->whereNull('cod_variante_producto')
+                )
+                ->where('activo_inv', true)
+                ->lockForUpdate()
+                ->first();
+
+            $stockFisico = $inventario ? (int) $inventario->stock_actual_inv : 0;
+            $stockReservado = $this->reservaService->sumarReservasActivasPorProducto($data->codProducto, $data->codVarianteProducto);
+            $stockDisponible = max(0, $stockFisico - $stockReservado);
 
             if ($stockDisponible < $data->cantidad) {
                 throw ValidationException::withMessages([
-                    'cantidad' => ['Stock insuficiente. Disponible: ' . $stockDisponible],
+                    'cantidad' => ['Stock insuficiente. Disponible: '.$stockDisponible],
                 ]);
+            }
+
+            // Validar que para prendas únicas no se agregue más de 1 unidad total en el carrito
+            $esVirtual = str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-%'); // o 'GEN-CAT-'
+            if (! str_starts_with($producto->sku_pro ?? '', 'GEN-CAT-')) {
+                $existenteInCart = DetalleCarrito::where('cod_carrito', $carrito->cod_carrito)
+                    ->where('cod_producto', $data->codProducto)
+                    ->when(
+                        $data->codVarianteProducto,
+                        fn ($q) => $q->where('cod_variante_producto', $data->codVarianteProducto),
+                        fn ($q) => $q->whereNull('cod_variante_producto')
+                    )
+                    ->first();
+
+                $cantidadResultante = ($existenteInCart ? (int) $existenteInCart->cantidad_dca : 0) + $data->cantidad;
+                if ($cantidadResultante > 1) {
+                    throw ValidationException::withMessages([
+                        'cantidad' => ['Cada prenda es única, no puedes tener más de 1 unidad de este producto en tu carrito.'],
+                    ]);
+                }
             }
 
             $itemsActuales = $this->persistenciaService->contarItems($carrito);
@@ -55,10 +93,11 @@ class AgregarItemCarritoAction
 
             $detalle = $this->persistenciaService->agregarDetalle($carrito, [
                 'cod_producto' => $data->codProducto,
+                'cod_variante_producto' => $data->codVarianteProducto,
                 'cantidad' => $data->cantidad,
-                'precio_unitario' => (float) $producto->precio_venta_pro,
+                'precio_unitario' => (float) ($variante?->precio_venta_variante ?? $producto->precio_venta_pro),
                 'nombre_snapshot' => $producto->nombre_pro,
-                'sku_snapshot' => $producto->sku_pro,
+                'sku_snapshot' => $variante?->sku_variante_producto ?? $producto->sku_pro,
             ]);
 
             $cantidadTotal = $detalle->cantidad_dca;
@@ -73,6 +112,7 @@ class AgregarItemCarritoAction
                     codDetalleCarrito: $detalle->cod_detalle_carrito,
                     codProducto: $data->codProducto,
                     cantidad: $cantidadTotal,
+                    codVarianteProducto: $data->codVarianteProducto,
                     userId: $carrito->user_id,
                     sessionId: $carrito->session_id_car,
                     ttlMinutos: $this->configService->obtenerTiempoReservaCarritoMinutos(),

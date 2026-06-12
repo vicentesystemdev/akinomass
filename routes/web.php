@@ -11,9 +11,12 @@ use App\Http\Controllers\Inventario\InventarioController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\Comercial\LiveSalesController;
+use App\Http\Controllers\Comercial\VentaRedController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\Auditoria\AuditoriaController;
+use App\Http\Controllers\Analitica\InteligenciaVentasController;
 use App\Http\Controllers\Tienda\AdminPedidoTiendaController;
 use App\Http\Controllers\Tienda\AdminPagoTiendaController;
 use App\Http\Controllers\Tienda\ConfiguracionTiendaController;
@@ -41,7 +44,7 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::patch('/plantillas-mensaje/{plantillas_mensaje}/toggle', [PlantillaMensajeController::class, 'toggle'])->name('plantillas-mensaje.toggle');
     Route::patch('/leads/{lead}/estado', [LeadController::class, 'updateEstado'])->name('leads.update-estado');
     Route::post('/leads/{lead}/convertir', [LeadController::class, 'convertir'])->name('leads.convertir');
-    Route::resource('categorias-producto', CategoriaProductoController::class)->except(['show', 'destroy']);
+    Route::resource('categorias-producto', CategoriaProductoController::class)->except(['destroy']);
     Route::resource('productos', ProductoController::class)->except(['show', 'destroy']);
 
     Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
@@ -58,6 +61,23 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::post('/pedidos/{pedido}/confirmar', [PedidoController::class, 'confirmar'])->name('pedidos.confirmar');
     Route::post('/pedidos/{pedido}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
 
+    Route::prefix('admin/ventas-redes')->name('ventas-redes.')->group(function () {
+        Route::get('/', [VentaRedController::class, 'index'])->name('index');
+        Route::get('/create', [VentaRedController::class, 'create'])->name('create');
+        Route::post('/', [VentaRedController::class, 'store'])->name('store');
+        Route::get('/{ventaRed}', [VentaRedController::class, 'show'])->name('show');
+        Route::get('/{ventaRed}/edit', [VentaRedController::class, 'edit'])->name('edit');
+        Route::match(['put', 'patch'], '/{ventaRed}', [VentaRedController::class, 'update'])->name('update');
+        Route::delete('/{ventaRed}', [VentaRedController::class, 'destroy'])->name('destroy');
+        Route::post('/{ventaRed}/detalles', [VentaRedController::class, 'agregarDetalle'])->name('detalles.store');
+        Route::patch('/{ventaRed}/detalles/{detalle}', [VentaRedController::class, 'actualizarDetalle'])->name('detalles.update');
+        Route::delete('/{ventaRed}/detalles/{detalle}', [VentaRedController::class, 'eliminarDetalle'])->name('detalles.destroy');
+        Route::patch('/{ventaRed}/estado', [VentaRedController::class, 'cambiarEstado'])->name('estado');
+        Route::post('/{ventaRed}/confirmar', [VentaRedController::class, 'confirmar'])->name('confirmar');
+        Route::post('/{ventaRed}/convertir-lead-cliente', [VentaRedController::class, 'convertirLeadCliente'])->name('convertir-lead-cliente');
+        Route::post('/{ventaRed}/convertir-checkout', [VentaRedController::class, 'convertirCheckout'])->name('convertir-checkout');
+        Route::post('/{ventaRed}/convertir-pedido', [VentaRedController::class, 'convertirPedido'])->name('convertir-pedido');
+    });
 
     Route::resource('live-sales', LiveSalesController::class);
     Route::patch('/live-sales/{live_sale}/estado', [LiveSalesController::class, 'cambiarEstado'])->name('live-sales.cambiar-estado');
@@ -71,6 +91,19 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
     Route::resource('pagos', PagoController::class);
 
     Route::get('/reportes', ReporteController::class)->name('reportes.index');
+    Route::prefix('admin/inteligencia-ventas')->name('inteligencia-ventas.')->group(function () {
+        Route::get('/', [InteligenciaVentasController::class, 'index'])->name('index');
+        Route::get('/categorias', [InteligenciaVentasController::class, 'categorias'])->name('categorias');
+        Route::get('/productos', [InteligenciaVentasController::class, 'productos'])->name('productos');
+        Route::get('/abastecimiento', [InteligenciaVentasController::class, 'abastecimiento'])->name('abastecimiento');
+        Route::get('/canales', [InteligenciaVentasController::class, 'canales'])->name('canales');
+        Route::get('/conclusiones', [InteligenciaVentasController::class, 'conclusiones'])->name('conclusiones');
+        Route::get('/configuracion', [InteligenciaVentasController::class, 'configuracion'])->name('configuracion');
+        Route::post('/generar', [InteligenciaVentasController::class, 'generar'])->name('generar');
+        Route::delete('/limpiar', [InteligenciaVentasController::class, 'limpiar'])->name('limpiar');
+        Route::match(['put', 'patch'], '/configuracion', [InteligenciaVentasController::class, 'actualizarConfiguracion'])->name('configuracion.update');
+    });
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
     Route::post('/pagos/{pago}/confirmar', [PagoController::class, 'confirmar'])->name('pagos.confirmar');
     Route::post('/pagos/{pago}/observar', [PagoController::class, 'observar'])->name('pagos.observar');
     Route::post('/pagos/{pago}/rechazar', [PagoController::class, 'rechazar'])->name('pagos.rechazar');

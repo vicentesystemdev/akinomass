@@ -19,6 +19,7 @@ class ReservaStockCarrito extends Model
         'cod_carrito',
         'cod_detalle_carrito',
         'cod_producto',
+        'cod_variante_producto',
         'user_id',
         'session_id_res',
         'cantidad_res',
@@ -51,6 +52,11 @@ class ReservaStockCarrito extends Model
     public function producto(): BelongsTo
     {
         return $this->belongsTo(Producto::class, 'cod_producto', 'cod_producto');
+    }
+
+    public function variante(): BelongsTo
+    {
+        return $this->belongsTo(VarianteProducto::class, 'cod_variante_producto', 'cod_variante_producto');
     }
 
     public function user(): BelongsTo

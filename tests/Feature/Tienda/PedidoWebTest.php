@@ -4,7 +4,6 @@ namespace Tests\Feature\Tienda;
 
 use App\Domains\Tienda\Carrito\Enums\EstadoCarritoEnum;
 use App\Domains\Tienda\Checkout\Enums\EstadoCheckoutSesionEnum;
-use App\Domains\Tienda\PedidosWeb\Enums\EstadoPedidoTiendaEnum;
 use App\Models\CanalVenta;
 use App\Models\Carrito;
 use App\Models\CategoriaProducto;
@@ -12,18 +11,24 @@ use App\Models\CheckoutSesion;
 use App\Models\Cliente;
 use App\Models\CuentaCliente;
 use App\Models\DetalleCarrito;
+use App\Models\DetallePedido;
 use App\Models\Inventario;
 use App\Models\Producto;
+use App\Models\TallaProducto;
 use App\Models\TipoFlujoComercial;
 use App\Models\User;
+use App\Models\VarianteProducto;
 
 class PedidoWebTest extends TiendaTestCase
 {
-
     private User $user;
+
     private Cliente $cliente;
+
     private CuentaCliente $cuentaCliente;
+
     private Carrito $carrito;
+
     private CheckoutSesion $checkoutSesion;
 
     protected function setUp(): void
@@ -89,7 +94,7 @@ class PedidoWebTest extends TiendaTestCase
 
     public function test_generar_pedido_requiere_auth(): void
     {
-        $response = $this->postJson('/tienda/checkout/' . $this->checkoutSesion->token_che . '/generar-pedido');
+        $response = $this->postJson('/tienda/checkout/'.$this->checkoutSesion->token_che.'/generar-pedido');
 
         $response->assertStatus(401);
     }
@@ -98,7 +103,7 @@ class PedidoWebTest extends TiendaTestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->postJson('/tienda/checkout/' . $this->checkoutSesion->token_che . '/generar-pedido', [
+        $response = $this->postJson('/tienda/checkout/'.$this->checkoutSesion->token_che.'/generar-pedido', [
             'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
         ]);
 
@@ -112,7 +117,7 @@ class PedidoWebTest extends TiendaTestCase
 
         $this->actingAs($this->user);
 
-        $response = $this->postJson('/tienda/checkout/' . $this->checkoutSesion->token_che . '/generar-pedido', [
+        $response = $this->postJson('/tienda/checkout/'.$this->checkoutSesion->token_che.'/generar-pedido', [
             'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
         ]);
 
@@ -135,5 +140,39 @@ class PedidoWebTest extends TiendaTestCase
         $response = $this->getJson('/tienda/mis-pedidos/1');
 
         $response->assertStatus(404);
+    }
+
+    public function test_pedido_persiste_variante_seleccionada(): void
+    {
+        $detalleCarrito = $this->carrito->detalles()->firstOrFail();
+        $talla = TallaProducto::create([
+            'codigo_talla_producto' => 'M',
+            'nom_talla_producto' => 'M',
+            'tipo_talla_producto' => 'ropa',
+            'orden_talla_producto' => 1,
+            'activo_talla_producto' => true,
+        ]);
+        $variante = VarianteProducto::create([
+            'cod_producto' => $detalleCarrito->cod_producto,
+            'cod_talla_producto' => $talla->cod_talla_producto,
+            'sku_variante_producto' => 'TEST-001-M',
+            'estado_variante_producto' => 'activo',
+            'activo_variante_producto' => true,
+        ]);
+        Inventario::create([
+            'cod_producto' => $detalleCarrito->cod_producto,
+            'cod_variante_producto' => $variante->cod_variante_producto,
+            'stock_actual_inv' => 10,
+            'stock_minimo_inv' => 0,
+            'activo_inv' => true,
+        ]);
+        $detalleCarrito->update(['cod_variante_producto' => $variante->cod_variante_producto]);
+
+        $this->actingAs($this->user);
+        $this->postJson('/tienda/checkout/'.$this->checkoutSesion->token_che.'/generar-pedido', [
+            'cod_checkout_sesion' => $this->checkoutSesion->cod_checkout_sesion,
+        ])->assertStatus(200);
+
+        $this->assertTrue(DetallePedido::where('cod_variante_producto', $variante->cod_variante_producto)->exists());
     }
 }
