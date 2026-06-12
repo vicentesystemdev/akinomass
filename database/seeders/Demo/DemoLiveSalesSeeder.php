@@ -19,29 +19,29 @@ class DemoLiveSalesSeeder extends Seeder
 {
     public function run(): void
     {
-        $usuario = User::where('email', 'vendedor.demo@akinomass.test')->first();
+        $usuario = User::where('email', 'vendedor@akinomass.local')->first();
         $canalTikTok = CanalVenta::where('codigo_can', 'tiktok_live')->value('cod_canal_venta');
         $flujoLive = TipoFlujoComercial::where('codigo_tip', 'venta_en_vivo')->value('cod_tipo_flujo_comercial');
 
         $sesionFinalizada = SesionLive::updateOrCreate(
-            ['titulo_ses' => 'Live Demo Equipos Streaming - Abril'],
+            ['titulo_ses' => 'Live Colección Otoño/Invierno - AKI NO MASS'],
             [
                 'fecha_inicio_ses' => now()->subDays(10)->setTime(19, 0),
                 'fecha_fin_ses' => now()->subDays(10)->setTime(20, 30),
                 'estado_ses' => EstadoSesionLiveEnum::FINALIZADA->value,
-                'resumen_ses' => 'Sesión de demostración finalizada con buena interacción y consultas de kits.',
+                'resumen_ses' => 'Presentación de nuevas chamarras y vestidos de temporada. Excelente interacción y consultas.',
                 'cod_canal_venta' => $canalTikTok,
                 'cod_usuario_responsable' => $usuario?->id,
             ],
         );
 
         $sesionProgramada = SesionLive::updateOrCreate(
-            ['titulo_ses' => 'Live Demo Ofertas de Temporada - Mayo'],
+            ['titulo_ses' => 'Live Liquidación de Stock de Temporada'],
             [
                 'fecha_inicio_ses' => now()->addDays(2)->setTime(20, 0),
                 'fecha_fin_ses' => null,
                 'estado_ses' => EstadoSesionLiveEnum::PROGRAMADA->value,
-                'resumen_ses' => 'Sesión programada para productos con bajo stock y promociones.',
+                'resumen_ses' => 'Transmisión especial para liquidación de jeans mom fit y poleras básicas.',
                 'cod_canal_venta' => $canalTikTok,
                 'cod_usuario_responsable' => $usuario?->id,
             ],
@@ -50,10 +50,10 @@ class DemoLiveSalesSeeder extends Seeder
         $productos = Producto::query()->pluck('cod_producto', 'sku_pro');
 
         $productosLive = [
-            [$sesionFinalizada->cod_sesion_live, 'DEMO-KIT-001', 1, 499],
-            [$sesionFinalizada->cod_sesion_live, 'DEMO-AUD-001', 2, 315],
-            [$sesionProgramada->cod_sesion_live, 'DEMO-ILU-002', 1, 260],
-            [$sesionProgramada->cod_sesion_live, 'DEMO-KIT-002', 2, 850],
+            [$sesionFinalizada->cod_sesion_live, 'ROPA-VES-005', 1, 160], // Vestido Casual Floreado
+            [$sesionFinalizada->cod_sesion_live, 'ROPA-CHA-004', 2, 200], // Chamarra Jean Clásica
+            [$sesionProgramada->cod_sesion_live, 'ROPA-JEA-002', 1, 180], // Jean Mom Fit Azul
+            [$sesionProgramada->cod_sesion_live, 'ROPA-POL-001', 2, 75],  // Polera Oversize Básica
         ];
 
         foreach ($productosLive as [$codSesion, $sku, $orden, $precio]) {
@@ -62,20 +62,20 @@ class DemoLiveSalesSeeder extends Seeder
                 [
                     'orden_proliv' => $orden,
                     'precio_live_proliv' => $precio,
-                    'observacion_proliv' => 'Precio promocional demo para live.',
+                    'observacion_proliv' => 'Precio especial promocional exclusivo para Live.',
                 ],
             );
         }
 
         $leadLive = Lead::updateOrCreate(
-            ['correo_lea' => 'interesada.live.demo@correo.test'],
+            ['correo_lea' => 'camila.arce@akinomass.local'],
             [
-                'nombre_lea' => 'Camila Arce',
-                'alias_lea' => '@camilalive',
+                'nombre_lea' => 'Camila Arce Prado',
+                'alias_lea' => '@camila_ap',
                 'telefono_lea' => '70999999',
-                'producto_interes_lea' => 'Kit streaming básico',
-                'observacion_lea' => 'Lead convertido desde interacción en sesión live demo.',
-                'estado_lea' => EstadoLeadEnum::CONTACTADO->value,
+                'producto_interes_lea' => 'Vestido Casual Floreado',
+                'observacion_lea' => 'Lead de WhatsApp convertido desde interacciones en el Live de Otoño.',
+                'estado_lea' => EstadoLeadEnum::INTERESADO->value,
                 'fecha_seguimiento_lea' => now()->addDay()->toDateString(),
                 'cod_canal_venta' => $canalTikTok,
                 'cod_tipo_flujo_comercial' => $flujoLive,
@@ -84,9 +84,9 @@ class DemoLiveSalesSeeder extends Seeder
         );
 
         $interacciones = [
-            ['sesion' => $sesionFinalizada, 'sku' => 'DEMO-KIT-001', 'alias' => '@camilalive', 'nombre' => 'Camila Arce', 'telefono' => '70999999', 'estado' => EstadoInteraccionLiveEnum::CONVERTIDO_LEAD->value, 'lead' => $leadLive->cod_lead, 'obs' => 'Solicitó catálogo y fue convertida a lead.'],
-            ['sesion' => $sesionFinalizada, 'sku' => 'DEMO-AUD-001', 'alias' => '@edgarsonido', 'nombre' => 'Edgar Ruiz', 'telefono' => '70121212', 'estado' => EstadoInteraccionLiveEnum::CONTACTADO->value, 'lead' => null, 'obs' => 'Interesado en precio por volumen.'],
-            ['sesion' => $sesionProgramada, 'sku' => 'DEMO-ILU-002', 'alias' => '@luzpro', 'nombre' => 'Nadia Flores', 'telefono' => null, 'estado' => EstadoInteraccionLiveEnum::NUEVO->value, 'lead' => null, 'obs' => 'Recordatorio para contactar durante la sesión programada.'],
+            ['sesion' => $sesionFinalizada, 'sku' => 'ROPA-VES-005', 'alias' => '@camila_ap', 'nombre' => 'Camila Arce Prado', 'telefono' => '70999999', 'estado' => EstadoInteraccionLiveEnum::CONVERTIDO_LEAD->value, 'lead' => $leadLive->cod_lead, 'obs' => 'Pidió talla S del Vestido Floreado. Convertida a Lead.'],
+            ['sesion' => $sesionFinalizada, 'sku' => 'ROPA-CHA-004', 'alias' => '@edgar_ruiz', 'nombre' => 'Edgar Ruiz', 'telefono' => '71212121', 'estado' => EstadoInteraccionLiveEnum::CONTACTADO->value, 'lead' => null, 'obs' => 'Preguntó por tallas L en Chamarra Jean.'],
+            ['sesion' => $sesionProgramada, 'sku' => 'ROPA-JEA-002', 'alias' => '@nadia_f', 'nombre' => 'Nadia Flores', 'telefono' => null, 'estado' => EstadoInteraccionLiveEnum::NUEVO->value, 'lead' => null, 'obs' => 'Dejó comentario indicando que se unirá a la transmisión.'],
         ];
 
         foreach ($interacciones as $interaccion) {

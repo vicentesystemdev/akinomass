@@ -11,11 +11,12 @@ class DemoUsuariosSeeder extends Seeder
     public function run(): void
     {
         $usuarios = [
-            ['name' => 'Administrador Demo', 'email' => 'admin.demo@akinomass.test', 'rol' => 'Administrador'],
-            ['name' => 'Supervisor Comercial Demo', 'email' => 'supervisor.demo@akinomass.test', 'rol' => 'Supervisor Comercial'],
-            ['name' => 'Vendedor Demo', 'email' => 'vendedor.demo@akinomass.test', 'rol' => 'Vendedor'],
-            ['name' => 'Encargado Inventario Demo', 'email' => 'inventario.demo@akinomass.test', 'rol' => 'Encargado de Inventario'],
-            ['name' => 'Analista Demo', 'email' => 'analista.demo@akinomass.test', 'rol' => 'Analista'],
+            ['name' => 'Alejandro Siles', 'email' => 'admin@akinomass.local', 'rol' => 'Administrador'],
+            ['name' => 'Gabriela Quiroga', 'email' => 'supervisor@akinomass.local', 'rol' => 'Supervisor Comercial'],
+            ['name' => 'Beto Fernández', 'email' => 'vendedor@akinomass.local', 'rol' => 'Vendedor'],
+            ['name' => 'Carlos Mamani', 'email' => 'inventario@akinomass.local', 'rol' => 'Encargado de Inventario'],
+            ['name' => 'Daniela Flores', 'email' => 'pedidos@akinomass.local', 'rol' => 'Encargado de Pedidos'],
+            ['name' => 'Elena Choque', 'email' => 'analista@akinomass.local', 'rol' => 'Analista'],
         ];
 
         foreach ($usuarios as $usuarioData) {

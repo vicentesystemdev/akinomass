@@ -10,6 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         if (DB::getDriverName() === 'pgsql') {
+            DB::statement("DROP TYPE IF EXISTS tipo_accion_auditoria");
             DB::statement("CREATE TYPE tipo_accion_auditoria AS ENUM (
                 'insert', 'update', 'delete',
                 'login', 'logout',
