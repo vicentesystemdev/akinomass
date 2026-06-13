@@ -23,7 +23,10 @@ class ProductoController extends Controller
         $this->authorize('productos.ver');
 
         $query = Producto::with(['categoria', 'inventarios', 'variantes.talla', 'variantes.inventarios'])
-            ->where('sku_pro', 'not like', 'GEN-CAT-%');
+            ->where(function ($q) {
+                $q->where('sku_pro', 'not like', 'GEN-CAT-%')
+                  ->orWhereNull('sku_pro');
+            });
 
         if ($request->filled('q')) {
             $q = $request->input('q');
@@ -41,12 +44,36 @@ class ProductoController extends Controller
             $query->where('estado_pro', $request->input('estado_pro'));
         }
 
-        $productos = $query->latest('cod_producto')->paginate(16)->withQueryString();
+        if ($request->filled('stock')) {
+            $stockFilter = $request->input('stock');
+            if ($stockFilter === 'con_stock') {
+                $query->whereHas('inventarios', function ($q) {
+                    $q->where('stock_actual_inv', '>', 0);
+                });
+            } elseif ($stockFilter === 'sin_stock') {
+                $query->whereDoesntHave('inventarios', function ($q) {
+                    $q->where('stock_actual_inv', '>', 0);
+                });
+            } elseif ($stockFilter === 'bajo_stock') {
+                $query->whereHas('inventarios', function ($q) {
+                    $q->whereColumn('stock_actual_inv', '<', 'stock_minimo_inv');
+                });
+            }
+        }
+
+        $perPage = $request->input('per_page', 16);
+        if ($perPage === 'all') {
+            $perPage = 1000;
+        } else {
+            $perPage = is_numeric($perPage) ? (int)$perPage : 16;
+        }
+
+        $productos = $query->latest('cod_producto')->paginate($perPage)->withQueryString();
 
         return Inertia::render('Productos/Index', [
             'productos' => $productos,
             'categorias' => CategoriaProducto::where('activo_cat', true)->get(),
-            'filters' => $request->only(['q', 'cod_categoria_producto', 'estado_pro']),
+            'filters' => $request->only(['q', 'cod_categoria_producto', 'estado_pro', 'stock', 'per_page']),
         ]);
     }
 

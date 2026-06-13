@@ -14,6 +14,33 @@ class StoreVentaRedRequest extends FormRequest
         return $this->user()?->can('pedidos.crear') ?? false;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'cod_lead' => $this->input('cod_lead') ?: null,
+            'cod_cliente' => $this->input('cod_cliente') ?: null,
+            'cod_canal_venta' => $this->input('cod_canal_venta') ?: null,
+            'cod_tipo_flujo_comercial' => $this->input('cod_tipo_flujo_comercial') ?: null,
+            'cod_usuario_responsable' => $this->input('cod_usuario_responsable') ?: null,
+        ]);
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $codLead = $this->input('cod_lead');
+            $codCliente = $this->input('cod_cliente');
+
+            if (empty($codLead) && empty($codCliente)) {
+                $validator->errors()->add('contacto', 'Debe seleccionar un lead o un cliente.');
+            }
+
+            if (!empty($codLead) && !empty($codCliente)) {
+                $validator->errors()->add('contacto', 'Debe seleccionar solo un contacto: lead o cliente, no ambos.');
+            }
+        });
+    }
+
     public function rules(): array
     {
         return [
@@ -27,7 +54,7 @@ class StoreVentaRedRequest extends FormRequest
             'referencia_origen' => ['nullable', 'string', 'max:255'],
             'observacion' => ['nullable', 'string'],
             'descuento' => ['nullable', 'numeric', 'min:0'],
-            'detalles' => ['nullable', 'array'],
+            'detalles' => ['required', 'array', 'min:1'],
             'detalles.*.cod_producto' => ['required_with:detalles', 'exists:productos,cod_producto'],
             'detalles.*.cod_variante_producto' => ['nullable', 'exists:variantes_producto,cod_variante_producto'],
             'detalles.*.cod_talla_producto' => ['nullable', 'exists:tallas_producto,cod_talla_producto'],

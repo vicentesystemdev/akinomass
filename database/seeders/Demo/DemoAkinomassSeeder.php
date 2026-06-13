@@ -29,6 +29,7 @@ class DemoAkinomassSeeder extends Seeder
             DemoClientesLeadsSeeder::class,
             DemoProductosInventarioSeeder::class,
             DemoVariantesSeeder::class,
+            DemoMovimientosInventarioSeeder::class,
             DemoLiveSalesSeeder::class,
             DemoPedidosPagosSeeder::class,
 

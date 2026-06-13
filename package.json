@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "lucide-react": "^1.16.0",
-        "recharts": "^2.12.7"
+        "recharts": "^2.12.7",
+        "sweetalert2": "^11.26.25"
     }
 }

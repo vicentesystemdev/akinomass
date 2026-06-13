@@ -27,6 +27,8 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
     const [search, setSearch] = useState(filters.q || '');
     const [filterCategoria, setFilterCategoria] = useState(filters.cod_categoria_producto || '');
     const [filterEstado, setFilterEstado] = useState(filters.estado_pro || '');
+    const [filterStock, setFilterStock] = useState(filters.stock || '');
+    const [perPage, setPerPage] = useState(filters.per_page || '16');
 
     const productosData = productos.data || [];
 
@@ -35,6 +37,8 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
             q: search,
             cod_categoria_producto: filterCategoria,
             estado_pro: filterEstado,
+            stock: filterStock,
+            per_page: perPage,
             ...newParams,
         };
 
@@ -54,6 +58,8 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
         setSearch('');
         setFilterCategoria('');
         setFilterEstado('');
+        setFilterStock('');
+        setPerPage('16');
         router.get(route('productos.index'));
     };
 
@@ -88,8 +94,8 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
             <div className="space-y-6">
                 {/* Filtros */}
                 <SectionCard>
-                    <div className="flex flex-col md:flex-row gap-4 items-end">
-                        <div className="flex-1 w-full">
+                    <div className="flex flex-wrap gap-4 items-end">
+                        <div className="flex-1 min-w-[200px] w-full">
                             <label className="block text-xs font-medium text-cafe-600 mb-1">Buscar por Nombre o SKU</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -106,7 +112,7 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
                             </div>
                         </div>
 
-                        <div className="w-full md:w-48">
+                        <div className="w-full sm:w-48">
                             <label className="block text-xs font-medium text-cafe-600 mb-1">Categoría</label>
                             <select
                                 value={filterCategoria}
@@ -125,7 +131,7 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
                             </select>
                         </div>
 
-                        <div className="w-full md:w-48">
+                        <div className="w-full sm:w-48">
                             <label className="block text-xs font-medium text-cafe-600 mb-1">Estado</label>
                             <select
                                 value={filterEstado}
@@ -142,16 +148,51 @@ export default function Index({ productos = { data: [] }, categorias = [], filte
                             </select>
                         </div>
 
-                        <div className="flex gap-2 w-full md:w-auto shrink-0 justify-end">
+                        <div className="w-full sm:w-48">
+                            <label className="block text-xs font-medium text-cafe-600 mb-1">Stock</label>
+                            <select
+                                value={filterStock}
+                                onChange={(e) => {
+                                    setFilterStock(e.target.value);
+                                    applyFilters({ stock: e.target.value });
+                                }}
+                                className="w-full rounded-xl border-gray-300 text-sm py-2.5 px-3 focus:border-terracota-500 focus:ring-terracota-500 transition-all duration-200"
+                            >
+                                <option value="">Todos</option>
+                                <option value="con_stock">Con Stock</option>
+                                <option value="sin_stock">Sin Stock</option>
+                                <option value="bajo_stock">Bajo Stock</option>
+                            </select>
+                        </div>
+
+                        <div className="w-full sm:w-48">
+                            <label className="block text-xs font-medium text-cafe-600 mb-1">Mostrar</label>
+                            <select
+                                value={perPage}
+                                onChange={(e) => {
+                                    setPerPage(e.target.value);
+                                    applyFilters({ per_page: e.target.value });
+                                }}
+                                className="w-full rounded-xl border-gray-300 text-sm py-2.5 px-3 focus:border-terracota-500 focus:ring-terracota-500 transition-all duration-200"
+                            >
+                                <option value="8">8 por pág.</option>
+                                <option value="16">16 por pág.</option>
+                                <option value="32">32 por pág.</option>
+                                <option value="64">64 por pág.</option>
+                                <option value="all">Mostrar Todos</option>
+                            </select>
+                        </div>
+
+                        <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end ml-auto">
                             <button
                                 onClick={clearFilters}
-                                className="px-4 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium transition-colors duration-200 w-full md:w-auto"
+                                className="px-4 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium transition-colors duration-200 w-full sm:w-auto"
                             >
                                 Limpiar
                             </button>
                             <button
                                 onClick={() => applyFilters()}
-                                className="px-5 py-2.5 bg-terracota-600 hover:bg-terracota-750 text-white rounded-xl text-sm font-medium transition-colors duration-200 w-full md:w-auto"
+                                className="px-5 py-2.5 bg-terracota-600 hover:bg-terracota-750 text-white rounded-xl text-sm font-medium transition-colors duration-200 w-full sm:w-auto"
                             >
                                 Filtrar
                             </button>
