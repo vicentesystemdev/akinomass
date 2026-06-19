@@ -72,7 +72,13 @@
 
 ## 7. Configuración técnica relevante
 
-- **Vite & React**: Configuración de `vite.config.js` adaptada para soportar plugins de React y el refresco dinámico en Inertia.
+- **Vite & React**: `vite.config.js` ahora usa `loadEnv` para leer `APP_URL` del `.env` dinámicamente y configurar el `origin` y `hmr.host` en función del dominio activo. Puerto fijo: `5173`.
+- **Entorno local de desarrollo**:
+    - Servidor: **Laragon** (nginx, puerto 80). Dominio local: `http://akinomass.test`.
+    - `APP_URL=http://akinomass.test` en `.env`.
+    - `127.0.0.1 akinomass.net` agregado al `hosts` de Windows (dominio alternativo preservado).
+    - No se usa `php artisan serve`; Laragon gestiona el servidor PHP.
+    - Comandos en ejecución permanente: `npm run dev` (Vite HMR) y `php artisan queue:work redis`.
 - **Dependencias principales** (`package.json`):
     - `vite` ^8.0.0
     - `@vitejs/plugin-react` ^6.0.2
@@ -118,3 +124,36 @@ Este sistema posee un backend moderno y estructurado que combina la agilidad de 
     - Dashboard interactivo `Logs/Index` que consulta de manera eficiente (`tail`) los logs generados en `storage/logs/` y enmascara datos sensibles de configuración.
 - **Testing y QA**:
     - Incorporación de tests feature robustos bajo `tests/Feature/Admin/` (`InteligenciaVentasTest`, `VentasRedesTest`, `InventarioTest`, etc.) y optimización de tests de storefront.
+
+---
+
+## 12. Cambios recientes (resumen estructural)
+
+### Periodo: commits del 2026-06-12 al 2026-06-19 (Fase Tienda Online — Arreglos, Configuración Admin y Entorno)
+
+#### Storefront — Mejoras en flujo de compra (`59f7832`, `3a39aaf`)
+- **Carrito (`CarritoController` + `CartDrawer.jsx`)**: Refactorización del controlador de carrito; el `CartDrawer` ahora muestra variantes y tallas correctamente, con manejo de stock reservado visible en tiempo real.
+- **Checkout (`CheckoutController` + `Checkout/Index.jsx`)**: Mejoras en el flujo de pasos del checkout — validación de datos de envío robustecida (`IniciarCheckoutAction`) y manejo de expiración de reservas.
+- **Pago web (`PagoWebController`)**: Ajustes en el registro y resubida de comprobantes de pago desde la cuenta del cliente.
+- **Pedidos del cliente (`PedidoWebController` + `Cuenta/PedidoShow.jsx` + `Cuenta/Pedidos.jsx`)**: Vista detallada del pedido completamente rediseñada; listado de pedidos con estados y acciones visibles. Actions `ListarPedidosClienteAction` y `ObtenerPedidoClienteAction` refactorizadas.
+- **`CountdownTimer.jsx`**: Componente de cuenta regresiva integrado en el checkout y carrito, consumiendo `carrito_reservas` del middleware `HandleInertiaRequests`.
+- **Migración**: `add_estado_pte_length_on_pedidos_tienda_table` — campo `estado_pte` ampliado en la tabla de pedidos de tienda.
+
+#### Admin Tienda — Nueva página de configuración (`59f7832`)
+- **`Tienda/Admin/Configuracion.jsx`**: Página de administración de configuración de tienda con controles para tiempo de reserva de carrito, métodos de pago, datos de envío, etc.
+- **`ConfiguracionTiendaController`** y **`ConfiguracionTiendaService`** actualizados para persistir todas las opciones de configuración correctamente.
+- Rutas de configuración protegidas con permisos Spatie: `configuracion_tienda.ver` y `configuracion_tienda.editar`.
+
+#### Seeders — Datos de demostración mejorados (`b3ac6f0`)
+- **`DemoClientesLeadsSeeder`**: Ampliado con más clientes y leads con datos bolivianos realistas.
+- **`DemoPedidosPagosSeeder`**: Mayor volumen de pedidos y pagos en distintos estados para pruebas más completas.
+- **`DemoProductosInventarioSeeder`** y **`DemoVariantesSeeder`**: Más productos con variantes y stock inicial variado.
+- **`InteligenciaVentasDemoSeeder`**: Reducido y simplificado para mayor velocidad de seed.
+- **`DemoUsuariosSeeder`**: Ajustes menores en datos de usuarios de demostración.
+
+#### Entorno de desarrollo — Configuración de dominio local (`2026-06-19`)
+- **`vite.config.js`**: Migrado a función con `loadEnv` para leer `APP_URL` dinámicamente. `origin` y `hmr.host` se derivan automáticamente del hostname en `APP_URL`.
+- **`APP_URL`**: Establecido en `http://akinomass.test` — dominio gestionado por Laragon (nginx, puerto 80).
+- **`hosts` de Windows**: Entrada `127.0.0.1 akinomass.net` agregada como dominio alternativo.
+- **`php artisan serve` eliminado** del flujo de desarrollo: Laragon reemplaza al servidor integrado de PHP.
+- **Puerto Vite**: `5173` (exclusivo de este proyecto cuando corre en solitario).
