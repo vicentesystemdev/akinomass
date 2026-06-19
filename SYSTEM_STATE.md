@@ -78,7 +78,8 @@
     - `APP_URL=http://akinomass.test` en `.env`.
     - `127.0.0.1 akinomass.net` agregado al `hosts` de Windows (dominio alternativo preservado).
     - No se usa `php artisan serve`; Laragon gestiona el servidor PHP.
-    - Comandos en ejecución permanente: `npm run dev` (Vite HMR) y `php artisan queue:work redis`.
+    - `composer dev` y `composer dev:laragon` ejecutan cola, Pail y Vite sin levantar un servidor PHP.
+    - `composer dev:serve` conserva `php artisan serve` únicamente como alternativa explícita.
 - **Dependencias principales** (`package.json`):
     - `vite` ^8.0.0
     - `@vitejs/plugin-react` ^6.0.2
@@ -157,3 +158,36 @@ Este sistema posee un backend moderno y estructurado que combina la agilidad de 
 - **`hosts` de Windows**: Entrada `127.0.0.1 akinomass.net` agregada como dominio alternativo.
 - **`php artisan serve` eliminado** del flujo de desarrollo: Laragon reemplaza al servidor integrado de PHP.
 - **Puerto Vite**: `5173` (exclusivo de este proyecto cuando corre en solitario).
+
+## 13. Integridad del flujo de confirmación de pagos
+
+- Los pagos administrativos publican `PagoConfirmadoEvent` y son atendidos por
+  `ConfirmarPedidoTrasPagoAdminListener`.
+- El listener administrativo aplica una guard clause sobre `PagoTienda`; por tanto,
+  no confirma ni descuenta inventario perteneciente al storefront.
+- La aceptación de un pago de tienda descuenta el stock una sola vez dentro de
+  `AceptarPagoPedidoTiendaAction` mediante `DescontarStockDefinitivoPedidoWebAction`.
+- Antes de publicar `PagoConfirmadoEvent`, el pedido administrativo queda en estado
+  `confirmado`. El listener web evita volver a ejecutar la confirmación cuando detecta
+  ese estado.
+- La segunda aceptación del mismo pago se rechaza y la prueba automatizada verifica
+  que el inventario permanezca con un único descuento.
+
+## 14. Recursos externos y alcance del runtime
+
+- `.agents/skills/` contiene instrucciones y referencias para asistentes de desarrollo.
+  No es cargado por Laravel, Inertia, Vite ni por los procesos de producción.
+- `E-commerce_frontend_design_modules/` es un prototipo exportado desde Figma con
+  componentes de referencia. No forma parte del árbol ejecutado desde `resources/js/`
+  ni del build principal de AKINOMASS.
+- Ambos directorios se mantienen temporalmente por trazabilidad académica y de diseño.
+  Para el PR hacia `develop`, se recomienda excluirlos del alcance o trasladarlos en
+  un cambio separado a `docs/referencias/`, previa validación del equipo.
+
+## 15. Validación pre-PR del 19 de junio de 2026
+
+- Migración y seed completos sobre PostgreSQL: correctos.
+- Suite automatizada: 212 pruebas y 614 aserciones, sin fallos.
+- Build de producción con Vite 8: correcto.
+- Autoload optimizado de Composer: correcto y sin clases omitidas por PSR-4.
+- Rutas de tienda, administración de tienda e inteligencia de ventas: verificadas.

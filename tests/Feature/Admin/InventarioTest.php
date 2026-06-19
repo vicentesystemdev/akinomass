@@ -16,21 +16,28 @@ class InventarioTest extends AdminTestCase
 {
     public function test_registrar_entrada_aumenta_stock(): void
     {
-        [$producto] = $this->crearProductoConStock(5);
+        $categoria = $this->crearCategoria();
+        $producto = $this->crearProducto($categoria);
+        $this->crearInventario($producto, 5);
 
         $this->actingAs($this->admin);
 
-        $response = $this->post(route('inventario.entrada'), [
-            'cod_producto' => $producto->cod_producto,
-            'cantidad_mov' => 10,
+        $response = $this->post(route('inventario.ajuste'), [
+            'cod_categoria_producto' => $categoria->cod_categoria_producto,
+            'tipo_ajuste' => 'entrada_fardo',
+            'cantidad' => 10,
             'motivo_mov' => 'compra',
             'observacion_mov' => 'Compra a proveedor',
         ]);
 
         $response->assertRedirect();
 
-        $inventario = Inventario::where('cod_producto', $producto->cod_producto)->first();
-        $this->assertEquals(15, $inventario->stock_actual_inv);
+        $stockTotal = Inventario::whereHas(
+            'producto',
+            fn ($query) => $query->where('cod_categoria_producto', $categoria->cod_categoria_producto),
+        )->sum('stock_actual_inv');
+
+        $this->assertEquals(15, $stockTotal);
     }
 
     public function test_registrar_salida_descuenta_stock(): void
@@ -74,60 +81,69 @@ class InventarioTest extends AdminTestCase
 
     public function test_ajuste_cambia_stock_a_valor_especifico(): void
     {
-        [$producto] = $this->crearProductoConStock(10);
+        $categoria = $this->crearCategoria();
 
         $this->actingAs($this->admin);
 
         $response = $this->post(route('inventario.ajuste'), [
-            'cod_producto' => $producto->cod_producto,
-            'stock_nuevo_mov' => 25,
+            'cod_categoria_producto' => $categoria->cod_categoria_producto,
+            'tipo_ajuste' => 'ajuste_conteo',
+            'cantidad' => 25,
             'motivo_mov' => 'inventario_fisico',
             'observacion_mov' => 'Ajuste por conteo físico',
         ]);
 
         $response->assertRedirect();
 
-        $inventario = Inventario::where('cod_producto', $producto->cod_producto)->first();
+        $inventario = Inventario::whereHas(
+            'producto',
+            fn ($query) => $query->where('sku_pro', 'GEN-CAT-'.$categoria->cod_categoria_producto),
+        )->firstOrFail();
+
         $this->assertEquals(25, $inventario->stock_actual_inv);
     }
 
     public function test_ajuste_rechaza_stock_negativo_con_mensaje_en_espanol(): void
     {
-        [$producto] = $this->crearProductoConStock(10);
+        $categoria = $this->crearCategoria();
         $this->actingAs($this->admin);
 
         $response = $this->post(route('inventario.ajuste'), [
-            'cod_producto' => $producto->cod_producto,
-            'stock_nuevo_mov' => -1,
+            'cod_categoria_producto' => $categoria->cod_categoria_producto,
+            'tipo_ajuste' => 'ajuste_conteo',
+            'cantidad' => -1,
             'motivo_mov' => 'ajuste',
         ]);
 
         $response->assertSessionHasErrors([
-            'stock_nuevo_mov' => 'El nuevo stock no puede ser negativo.',
+            'cantidad' => 'La cantidad no puede ser negativa.',
         ]);
     }
 
     public function test_movimiento_crea_registro_en_movimientos_inventario(): void
     {
-        [$producto] = $this->crearProductoConStock(10);
+        $categoria = $this->crearCategoria();
 
         $this->actingAs($this->admin);
 
-        $this->post(route('inventario.entrada'), [
-            'cod_producto' => $producto->cod_producto,
-            'cantidad_mov' => 5,
+        $this->post(route('inventario.ajuste'), [
+            'cod_categoria_producto' => $categoria->cod_categoria_producto,
+            'tipo_ajuste' => 'entrada_fardo',
+            'cantidad' => 5,
             'motivo_mov' => 'compra',
         ]);
 
-        $inventario = Inventario::where('cod_producto', $producto->cod_producto)->first();
+        $producto = \App\Models\Producto::where('sku_pro', 'GEN-CAT-'.$categoria->cod_categoria_producto)
+            ->firstOrFail();
+        $inventario = Inventario::where('cod_producto', $producto->cod_producto)->firstOrFail();
 
         $this->assertDatabaseHas('movimientos_inventario', [
             'cod_inventario' => $inventario->cod_inventario,
             'cod_producto' => $producto->cod_producto,
             'tipo_movimiento_mov' => TipoMovimientoInventarioEnum::ENTRADA->value,
             'cantidad_mov' => 5,
-            'stock_anterior_mov' => 10,
-            'stock_nuevo_mov' => 15,
+            'stock_anterior_mov' => 0,
+            'stock_nuevo_mov' => 5,
         ]);
     }
 
@@ -289,19 +305,22 @@ class InventarioTest extends AdminTestCase
         $this->assertEquals(1, Inventario::where('cod_variante_producto', $variante->cod_variante_producto)->count());
     }
 
-    public function test_ajuste_por_variante_crea_y_actualiza_inventario_correcto(): void
+    public function test_movimiento_por_variante_crea_y_actualiza_inventario_correcto(): void
     {
         [$producto, $inventarioBase] = $this->crearProductoConStock(10);
         $variante = $this->crearVariante($producto);
 
-        $response = $this->actingAs($this->admin)->post(route('inventario.ajuste'), [
-            'cod_producto' => $producto->cod_producto,
-            'cod_variante_producto' => $variante->cod_variante_producto,
-            'stock_nuevo_mov' => 7,
-            'motivo_mov' => 'Conteo por talla',
-        ]);
+        app(InventarioService::class)->registrarMovimiento(
+            codProducto: $producto->cod_producto,
+            tipo: TipoMovimientoInventarioEnum::AJUSTE,
+            cantidad: 0,
+            motivo: 'Conteo por talla',
+            observacion: null,
+            codUsuario: $this->admin->id,
+            stockAjuste: 7,
+            codVarianteProducto: $variante->cod_variante_producto,
+        );
 
-        $response->assertRedirect();
         $inventarioVariante = Inventario::where('cod_variante_producto', $variante->cod_variante_producto)->firstOrFail();
 
         $this->assertEquals(7, $inventarioVariante->stock_actual_inv);

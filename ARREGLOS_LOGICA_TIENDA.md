@@ -643,9 +643,12 @@ Validar que las nuevas funcionalidades no rompan el módulo tienda ni el back-of
 ### Verificación final
 
 ```
-Tests:    84 passed (177 assertions)
-Duration: ~60s
+Tests del módulo tienda documentados en esta matriz: PASS
+Suite completa pre-PR: 212 passed (614 assertions)
 ```
+
+La cifra anterior de 84 pruebas correspondía a una etapa intermedia del módulo.
+La validación del 19 de junio de 2026 ejecutó la suite completa del repositorio.
 
 ---
 
@@ -902,18 +905,15 @@ private static function mensajes(): array {
 
 ```bash
 # Migraciones
-php artisan migrate
-
-# Seed de configuración
-php artisan db:seed --class=ConfiguracionTiendaSeeder
+php artisan migrate:fresh --seed
 
 # Tests
-php artisan test --filter=Tienda
+php artisan test
 
 # Rutas
 php artisan route:list --path=tienda
 php artisan route:list --path=admin/tienda
-php artisan route:list --path=configuraciones/tienda
+php artisan route:list --path=admin/inteligencia-ventas
 
 # Frontend build
 npm run build
@@ -923,11 +923,11 @@ npm run build
 
 | Item | Estado |
 |------|--------|
-| Tests | 84/84 pasando |
-| Build | Exitoso |
-| Migraciones | Todas ejecutadas |
-| Seeders | ConfiguracionTiendaSeeder ejecutado |
-| Rutas | Todas definidas |
+| Tests | 212/212 pasando; 614 aserciones |
+| Build | Exitoso con Vite 8 |
+| Migraciones | `migrate:fresh --seed` exitoso en PostgreSQL |
+| Seeders | Seed completo de demostración ejecutado |
+| Rutas | Tienda, administración de tienda e inteligencia de ventas verificadas |
 | Permisos | Spatie permissions configurados |
 | Eventos | Wired en TiendaServiceProvider |
 

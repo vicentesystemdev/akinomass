@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Policies;
 
+use App\Models\AuditoriaSis;
 use App\Models\User;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class AuditoriaPolicy
 {

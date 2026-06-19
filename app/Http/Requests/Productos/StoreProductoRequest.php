@@ -24,7 +24,7 @@ class StoreProductoRequest extends FormRequest
             ],
             'nombre_pro' => ['required', 'string', 'max:255'],
             'descripcion_pro' => ['nullable', 'string'],
-            'precio_venta_pro' => ['required', 'numeric', 'gt:0', 'gte:precio_costo_pro', 'regex:/^\d+(\.\d)?$/'],
+            'precio_venta_pro' => ['required', 'numeric', 'gt:0', 'regex:/^\d+(\.\d)?$/'],
             'precio_costo_pro' => ['nullable', 'numeric', 'gt:0', 'regex:/^\d+(\.\d)?$/'],
             'sku_pro' => ['nullable', 'string', 'max:100', Rule::unique('productos', 'sku_pro')],
             'imagen_pro' => $this->hasFile('imagen_pro')
@@ -51,6 +51,18 @@ class StoreProductoRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                if (
+                    $this->filled('precio_costo_pro')
+                    && is_numeric($this->input('precio_venta_pro'))
+                    && is_numeric($this->input('precio_costo_pro'))
+                    && (float) $this->input('precio_venta_pro') < (float) $this->input('precio_costo_pro')
+                ) {
+                    $validator->errors()->add(
+                        'precio_venta_pro',
+                        'El precio de venta debe ser mayor o igual al precio de costo.',
+                    );
+                }
+
                 $variantes = $this->input('variantes', []);
                 $tallas = [];
                 $skus = [];

@@ -155,12 +155,16 @@ Cada PR a `develop` con: `php artisan migrate:status`, `npm run build`, checklis
 
 ## Criterio de cierre del programa
 
-- [ ] Visitante ve catálogo sin login.
-- [ ] Carrito invitado en Redis con TTL.
-- [ ] Registro asigna rol Cliente + `cuentas_cliente` + `clientes`.
-- [ ] Checkout crea pedido/pago en tablas existentes + tablas puente.
-- [ ] Staff puede confirmar pago y pedido desde back-office.
-- [ ] Factura emitida tras confirmación.
-- [ ] Cliente ve sus pedidos en área privada.
-- [ ] `npm run build` exitoso.
-- [ ] Sin modificar migraciones ya ejecutadas de tablas legacy.
+- [x] Visitante navega el catálogo público sin autenticación.
+- [x] Carrito invitado y autenticado con persistencia, reservas y TTL.
+- [x] Registro e inicio de sesión del cliente con rol `Cliente` y vínculo de cuenta.
+- [x] Checkout genera pedido y pago mediante las tablas de negocio y tablas puente.
+- [x] Cliente consulta sus pedidos y el detalle de cada compra.
+- [x] Cliente registra y resube comprobantes de pago.
+- [x] Facturación automática posterior a la confirmación del pago.
+- [x] Administración de pedidos y pagos de tienda desde el back-office.
+- [x] Build de producción validado en la revisión pre-PR del 19 de junio de 2026.
+- [x] Compatibilidad preservada con las tablas legacy mediante migraciones incrementales.
+
+Validación registrada en `dev/vicente`: `npm run build` completado correctamente
+con Vite 8.

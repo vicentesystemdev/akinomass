@@ -78,7 +78,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            $perm = Permission::firstOrCreate(
+            Permission::firstOrCreate(
                 ['name' => $permission, 'guard_name' => 'web']
             );
         }
@@ -150,17 +150,6 @@ class RolesAndPermissionsSeeder extends Seeder
                 'inventario.ver',
                 'inventario.ajustar',
                 'inventario.movimientos',
-                'dashboard.ver',
-            ],
-            'Encargado de Pedidos' => [
-                'clientes.ver',
-                'pedidos.ver',
-                'pedidos.editar',
-                'pedidos.confirmar',
-                'pedidos.cancelar',
-                'pagos.ver',
-                'productos.ver',
-                'inventario.ver',
                 'dashboard.ver',
             ],
             'Analista' => [

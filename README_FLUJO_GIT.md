@@ -16,11 +16,31 @@
 - No trabajar directamente en develop salvo integración.
 - Cada módulo debe desarrollarse en una rama feature.
 - Todo cambio importante debe pasar por Pull Request.
+- El entorno local oficial usa Laragon con `http://akinomass.test`; no requiere
+  `php artisan serve`.
+- `composer dev` inicia cola, logs y Vite. `composer dev:serve` queda disponible
+  solo como alternativa explícita.
 - Antes de hacer PR ejecutar:
 
-php artisan migrate:status
-npm run build
+```bash
+composer dump-autoload
 php artisan config:clear
+php artisan migrate:fresh --seed
+php artisan test
+npm run build
+php artisan route:list --path=tienda
+php artisan route:list --path=admin/tienda
+php artisan route:list --path=admin/inteligencia-ventas
+```
+
+## Recursos de referencia fuera del runtime
+
+- `.agents/skills/`: material de apoyo para asistentes de desarrollo.
+- `E-commerce_frontend_design_modules/`: prototipo de diseño exportado desde Figma.
+
+Estos directorios no forman parte del runtime Laravel/Inertia. Conviene excluirlos
+del PR funcional hacia `develop` o moverlos a `docs/referencias/` mediante un PR
+documental separado, después de acordarlo con el equipo.
 
 ## Convención de ramas
 

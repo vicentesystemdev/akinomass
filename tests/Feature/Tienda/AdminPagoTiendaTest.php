@@ -173,15 +173,21 @@ class AdminPagoTiendaTest extends TiendaTestCase
 
     public function test_qa19_aceptar_pago_dos_veces_no_duplica(): void
     {
+        $inventario = Inventario::where('cod_producto', $this->pago->pedido->detalles->first()->cod_producto)
+            ->firstOrFail();
+
         $this->actingAs($this->admin)->postJson(
             "/admin/tienda/pagos/{$this->pago->cod_pago}/aceptar"
-        );
+        )->assertOk();
+
+        $this->assertSame(8, (int) $inventario->fresh()->stock_actual_inv);
 
         $response = $this->actingAs($this->admin)->postJson(
             "/admin/tienda/pagos/{$this->pago->cod_pago}/aceptar"
         );
 
         $response->assertStatus(422);
+        $this->assertSame(8, (int) $inventario->fresh()->stock_actual_inv);
     }
 
     public function test_usuario_sin_permiso_no_puede_aceptar_pago(): void
