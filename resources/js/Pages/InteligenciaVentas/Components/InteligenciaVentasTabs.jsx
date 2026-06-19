@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Boxes, Gauge, LayoutDashboard, Lightbulb, PackageSearch, Settings, Tags } from 'lucide-react';
+import { Boxes, Gauge, LayoutDashboard, Lightbulb, PackageSearch, Settings, Tags, TrendingUp, UsersRound } from 'lucide-react';
 
 const tabs = [
     { label: 'Resumen', routeName: 'inteligencia-ventas.index', icon: LayoutDashboard },
@@ -7,6 +7,8 @@ const tabs = [
     { label: 'Productos', routeName: 'inteligencia-ventas.productos', icon: PackageSearch },
     { label: 'Abastecimiento', routeName: 'inteligencia-ventas.abastecimiento', icon: Boxes },
     { label: 'Canales', routeName: 'inteligencia-ventas.canales', icon: Gauge },
+    { label: 'Segmentacion', routeName: 'inteligencia-ventas.segmentacion-clientes', icon: UsersRound },
+    { label: 'Regresion lineal', routeName: 'inteligencia-ventas.tendencias-regresion', icon: TrendingUp },
     { label: 'Conclusiones', routeName: 'inteligencia-ventas.conclusiones', icon: Lightbulb },
     { label: 'Configuracion', routeName: 'inteligencia-ventas.configuracion', icon: Settings },
 ];

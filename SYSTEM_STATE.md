@@ -191,3 +191,64 @@ Este sistema posee un backend moderno y estructurado que combina la agilidad de 
 - Build de producción con Vite 8: correcto.
 - Autoload optimizado de Composer: correcto y sin clases omitidas por PSR-4.
 - Rutas de tienda, administración de tienda e inteligencia de ventas: verificadas.
+
+## 16. Machine Learning implementado
+
+### Segmentación de clientes mediante K-Means
+
+El módulo `InteligenciaVentas` incorpora segmentación no supervisada con un
+algoritmo K-Means implementado en PHP, sin librerías externas de aprendizaje
+automático. El número predeterminado de grupos es `k = 3` y puede configurarse
+entre 2 y 6 desde la interfaz.
+
+Las variables utilizadas son:
+
+- cantidad de pedidos confirmados;
+- monto total comprado;
+- ticket promedio;
+- días desde la última compra;
+- frecuencia de compra;
+- cantidad de productos distintos;
+- porcentaje de pedidos pagados.
+
+Antes del agrupamiento se aplica normalización Min-Max. La inicialización de
+centroides es determinista para que el mismo conjunto histórico produzca una
+salida reproducible durante pruebas y defensa académica. Los clusters se
+interpretan con etiquetas comerciales como cliente frecuente de alto valor,
+cliente ocasional, cliente nuevo o de baja actividad y cliente en riesgo.
+
+### Predicción de tendencias mediante regresión lineal
+
+La pantalla de tendencias calcula una regresión lineal simple sobre series
+semanales o mensuales:
+
+```text
+y = a + bx
+```
+
+Donde `x` es el índice temporal, `y` representa unidades o monto vendido, `b`
+es la pendiente y `a` el intercepto. El resultado incluye proyección del
+siguiente periodo, dirección de tendencia, porcentaje estimado de crecimiento,
+coeficiente `R²`, nivel de confianza y recomendación de abastecimiento.
+
+Ambos análisis consideran pedidos confirmados y pagos aceptados. Se excluyen
+pedidos cancelados y pagos rechazados. Sus resultados son estimaciones para
+apoyo a decisiones comerciales y no predicciones absolutas.
+
+## 17. Dataset demo de defensa académica
+
+Para la demostración práctica del sistema y de la innovación científica ante el tribunal de defensa, el sistema cuenta con un dataset demo estructurado e independiente, sembrado a través de [DemoAkinomassDefensaSeeder.php](file:///c:/dev/apps/akinomass/database/seeders/Demo/DemoAkinomassDefensaSeeder.php).
+
+- **Tamaño de la base**: 7 usuarios demo, 245 clientes, 150 leads, 50 productos, 246 variantes, 1150 pedidos, 1150 pagos, 100 sesiones de live, 1200 interacciones, 150 pedidos de tienda y 150 facturas.
+- **Módulos alimentados**: CRM (leads/clientes), Inventario (stock físico/salidas/movimientos), Comercial (pedidos/pagos), Tienda Online (checkouts/pedidos tienda/pagos tienda/comprobantes) e Inteligencia de Ventas (ML).
+- **Imágenes demo locales**: El catálogo de defensa incluye imágenes locales generadas para productos, compatibles con la tienda online y el panel administrativo.
+- **Periodo histórico**: Del 1 de julio de 2025 al 19 de junio de 2026 (sin fechas futuras, evitando recencia negativa).
+- **Patrones comerciales y estacionalidad**:
+  - *Jeans cargo*: Tendencia lineal de ventas creciente.
+  - *Poleras oversize*: Crecimiento moderado estable.
+  - *Chamarras*: Picos de venta estacionales de invierno (mayo/junio 2026 y julio 2025).
+  - *Liquidación*: Tendencia lineal decreciente.
+- **Utilidad académica**:
+  - *Clustering (K-Means)*: Agrupa deterministamente a los clientes en tres clusters nítidos y analizables (Alto valor, Ocasionales, En riesgo/Baja actividad).
+  - *Regresión lineal*: Demuestra proyecciones crecientes, estables y decrecientes realistas, alimentando alertas críticas y sugerencias de compra para mercadería.
+

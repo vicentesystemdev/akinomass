@@ -26,3 +26,5 @@ Homestead.yaml
 Thumbs.db
 /storage/logs
 /bootstrap/cache/*.php
+/storage/app/public/demo
+

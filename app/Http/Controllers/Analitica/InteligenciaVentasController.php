@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Analitica;
 
 use App\Domains\InteligenciaVentas\Actions\ActualizarConfiguracionInteligenciaVentasAction;
+use App\Domains\InteligenciaVentas\Actions\AnalizarSegmentacionClientesAction;
+use App\Domains\InteligenciaVentas\Actions\AnalizarTendenciaVentasAction;
 use App\Domains\InteligenciaVentas\Actions\GenerarPrediccionVentasAction;
 use App\Domains\InteligenciaVentas\Actions\LimpiarPrediccionesVentasAction;
 use App\Domains\InteligenciaVentas\Actions\ListarAnalisisCanalesAction;
@@ -15,6 +17,8 @@ use App\Domains\InteligenciaVentas\Repositories\ConfiguracionInteligenciaVentasR
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InteligenciaVentas\ActualizarConfiguracionInteligenciaVentasRequest;
 use App\Http\Requests\InteligenciaVentas\GenerarPrediccionVentasRequest;
+use App\Http\Requests\InteligenciaVentas\SegmentacionClientesRequest;
+use App\Http\Requests\InteligenciaVentas\TendenciaVentasRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -111,6 +115,26 @@ class InteligenciaVentasController extends Controller
         return Inertia::render('InteligenciaVentas/Configuracion', [
             'titulo' => 'Configuracion de Inteligencia de Ventas',
             'configuracion' => $repository->activa(),
+        ]);
+    }
+
+    public function segmentacionClientes(
+        SegmentacionClientesRequest $request,
+        AnalizarSegmentacionClientesAction $action,
+    ): Response {
+        return Inertia::render('InteligenciaVentas/SegmentacionClientes', [
+            'titulo' => 'Segmentación de Clientes mediante K-Means',
+            'segmentacion' => $action->execute($request->validated()),
+        ]);
+    }
+
+    public function tendenciasRegresion(
+        TendenciaVentasRequest $request,
+        AnalizarTendenciaVentasAction $action,
+    ): Response {
+        return Inertia::render('InteligenciaVentas/TendenciasRegresion', [
+            'titulo' => 'Tendencias de Ventas mediante Regresión Lineal',
+            'tendencia' => $action->execute($request->validated()),
         ]);
     }
 

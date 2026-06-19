@@ -97,6 +97,8 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
         Route::get('/productos', [InteligenciaVentasController::class, 'productos'])->name('productos');
         Route::get('/abastecimiento', [InteligenciaVentasController::class, 'abastecimiento'])->name('abastecimiento');
         Route::get('/canales', [InteligenciaVentasController::class, 'canales'])->name('canales');
+        Route::get('/segmentacion-clientes', [InteligenciaVentasController::class, 'segmentacionClientes'])->name('segmentacion-clientes');
+        Route::get('/tendencias-regresion', [InteligenciaVentasController::class, 'tendenciasRegresion'])->name('tendencias-regresion');
         Route::get('/conclusiones', [InteligenciaVentasController::class, 'conclusiones'])->name('conclusiones');
         Route::get('/configuracion', [InteligenciaVentasController::class, 'configuracion'])->name('configuracion');
         Route::post('/generar', [InteligenciaVentasController::class, 'generar'])->name('generar');

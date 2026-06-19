@@ -933,4 +933,24 @@ npm run build
 
 ---
 
+## 16. Machine Learning implementado
+
+Aunque estas funciones pertenecen al módulo `InteligenciaVentas`, se integran
+con la tienda y el back-office porque consumen el historial consolidado de
+clientes, pedidos, pagos y detalles vendidos.
+
+1. **K-Means para segmentación de clientes**: agrupa perfiles mediante pedidos,
+   monto comprado, ticket promedio, recencia, frecuencia, variedad de productos
+   y porcentaje de pagos aceptados. Las variables se normalizan con Min-Max.
+2. **Regresión lineal simple para tendencias**: utiliza la ecuación
+   `y = a + bx` sobre periodos semanales o mensuales y calcula pendiente,
+   intercepto, proyección siguiente, `R²`, confianza y recomendación.
+3. **Restricción metodológica**: los resultados apoyan la decisión de compra y
+   relacionamiento comercial; no sustituyen el criterio administrativo ni
+   representan predicciones absolutas.
+4. **Datos válidos**: pedidos confirmados con pagos aceptados y sus detalles
+   históricos. Se excluyen pedidos cancelados y pagos rechazados.
+
+---
+
 *Documento generado automáticamente desde la implementación de los sprints incrementales del módulo Tienda Online.*

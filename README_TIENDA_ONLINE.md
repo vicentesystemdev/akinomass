@@ -168,3 +168,22 @@ Cada PR a `develop` con: `php artisan migrate:status`, `npm run build`, checklis
 
 Validación registrada en `dev/vicente`: `npm run build` completado correctamente
 con Vite 8.
+
+---
+
+## Integración con Machine Learning comercial
+
+El historial generado por la tienda alimenta dos herramientas del módulo
+`InteligenciaVentas`:
+
+- segmentación de clientes mediante K-Means con normalización Min-Max;
+- predicción de tendencias mediante regresión lineal simple `y = a + bx`.
+
+Se utilizan pedidos confirmados, pagos aceptados y detalles de venta. Los
+resultados son estimaciones para apoyar fidelización y abastecimiento, no
+predicciones absolutas.
+
+> [!NOTE]
+> El dataset demo de defensa académica (`DemoAkinomassDefensaSeeder`) alimenta de manera integral la tienda online (incluyendo imágenes demo locales generadas para el catálogo de productos para reforzar la presentación visual), pagos, pedidos y facturación interna para evidenciar el flujo completo B2C en la demostración académica del sistema.
+
+
