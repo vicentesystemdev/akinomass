@@ -2,142 +2,119 @@
 
 ## 1. Resumen general
 
-- Proyecto: Laravel 13 + Inertia React + Vite.
-- Backend: PHP 8.3, Laravel 13, PostgreSQL, Redis.
-- Frontend: React 18 con Inertia, Vite como bundler, Tailwind CSS.
-- Arquitectura: mezcla de MVC tradicional con elementos de dominio (Actions, Services, Repositories, Enums) en `app/Domains`.
+- **Proyecto**: Laravel 13 + Inertia React + Vite.
+- **Backend**: PHP 8.3, Laravel 13, PostgreSQL, Redis.
+- **Frontend**: React 18 con Inertia, Vite como bundler, Tailwind CSS.
+- **Arquitectura**: mezcla de MVC tradicional con elementos de DDD y lógica de dominio (Actions, Services, Repositories, Enums, DTOs) organizados bajo `app/Domains`.
 
 ## 2. Estructura principal
 
-- `app/Http/Controllers/`: controladores HTTP que reciben formularios y retornan páginas Inertia.
-- `app/Http/Requests/`: validación de peticiones con FormRequest.
-- `app/Domains/`: lógica de dominio organizada por áreas (Comercial, Inventario, CRM, etc.).
-    - Cada dominio usa subcarpetas de `Actions`, `Services`, `Repositories`, `Enums`, `DTOs`.
-- `app/Models/`: modelos Eloquent que representan entidades principales.
-- `resources/js/Pages/`: páginas React usadas por Inertia.
-- `resources/views/app.blade.php`: plantilla Blade principal con `@viteReactRefresh`, `@vite` y `@inertia`.
-- `database/seeders/`: seeders de datos, incluyendo un subdirectorio `Demo` para datos de demo.
+- `app/Http/Controllers/`: Controladores HTTP que reciben peticiones y retornan páginas de Inertia o redirecciones.
+- `app/Http/Requests/`: Validaciones fuertemente tipadas de entrada usando FormRequests.
+- `app/Domains/`: Lógica de dominio organizada por áreas (Comercial, Inventario, CRM, Tienda, InteligenciaVentas, VentasRedes, Auditoria, Reportes).
+    - Cada dominio utiliza subcarpetas de `Actions`, `Services`, `Repositories`, `Enums` y `DTOs` para mantener la separación de responsabilidades.
+- `app/Models/`: Modelos Eloquent principales que representan las entidades del negocio.
+- `resources/js/Pages/`: Componentes y vistas de React renderizados por Inertia.
+- `resources/views/app.blade.php`: Plantilla Blade principal que carga el bundle de React + Vite (`@viteReactRefresh`, `@vite`, `@inertia`).
+- `database/seeders/`: Seeders de la base de datos divididos en seeders base del sistema y un subdirectorio `Demo` para datos de demostración y pruebas rápidas.
 
-## 3. Flujo de pedido actual (ejemplo representativo)
+## 3. Flujos de negocio actuales
 
-- `PedidoController` recibe la petición y valida con `StorePedidoRequest`.
-- Se delega a una Action: `CrearPedidoAction`.
-- La Action orquesta la creación y usa `PedidoService` para calcular totales y persistir detalles.
-- `PedidoService` también contiene lógica de confirmación y cancelación de pedidos, verificando stock y registrando movimientos de inventario.
-- El modelo `Pedido` y la relación `detalles()` persisten datos con Eloquent.
+### Flujo de Tienda Online (Storefront)
+- El cliente navega por el catálogo público y añade productos (y sus variantes/tallas) al carrito.
+- Al añadir ítems, se genera una reserva temporal de stock (`ReservaStockCarrito`) que previene que otros usuarios agoten el producto.
+- En el frontend, se muestra un temporizador de cuenta regresiva (`CountdownTimer`). Si la reserva expira sin concretar la compra, el stock vuelve a estar disponible.
+- Al proceder al checkout, el cliente ingresa datos de envío y pago, se confirma la transacción a través de `PagoWebController` y se genera el pedido final (`PedidoWebController`).
 
-## 4. Patrón de diseño observados
+### Flujo de Ventas por Redes Sociales
+- Un vendedor registra prospectos provenientes de redes sociales (mensajes privados, comentarios, WhatsApp, marketplace) a través del panel de administración (`VentaRedController`).
+- Se crea una venta en estado borrador vinculada a un lead o cliente.
+- El vendedor añade detalles de la venta (productos y sus variantes específicas).
+- El sistema permite realizar la conversión directa del flujo:
+    - Convertir el lead de la red social en cliente formal de la plataforma.
+    - Convertir la venta en una sesión de checkout online para que el cliente la complete.
+    - Convertir la venta directamente en un pedido confirmado de administración.
 
-- Se usa un patrón de separación controller/action/service.
-- `Actions` son orquestadores de casos de uso.
-- `Services` son responsables de reglas de negocio y validaciones de estado.
-- `Repositories` existen como directorio, pero en gran parte no están llenos o no son usados extensivamente en el código inspeccionado.
-- `DTOs` existe como carpeta, pero no hay implementaciones visibles; los datos limpios viajan en arrays validados.
+### Flujo de Inteligencia de Ventas (Predicciones)
+- El administrador accede al dashboard de Inteligencia de Ventas (`InteligenciaVentasController`).
+- Al ejecutar el proceso de análisis, el sistema procesa las ventas históricas de un periodo determinado (por ejemplo, últimos 30, 60 o 90 días).
+- Se calculan métricas de demanda relativa por producto y categoría comparándolas con promedios del sistema.
+- Utilizando una matriz de transición de demanda de Markov, se predice el comportamiento de la demanda para el próximo ciclo.
+- A partir de estas predicciones, el sistema genera recomendaciones inteligentes de abastecimiento, niveles de riesgo de rotura de stock, y justificaciones detalladas en lenguaje natural.
+
+## 4. Patrones de diseño observados
+
+- **Service / Action / Repository Pattern**: Las `Actions` orquestan los casos de uso específicos y autocontenidos, los `Services` encapsulan las reglas y cálculos complejos de negocio, y los `Repositories` aíslan las consultas Eloquent de la lógica de dominio.
+- **DTOs (Data Transfer Objects)**: Implementados extensivamente en los nuevos dominios (`InteligenciaVentas` y `VentasRedes`) para estructurar de manera limpia y tipada las entradas y salidas de datos, mitigando el uso de arrays asociativos genéricos.
+- **Enums respaldados (Backed Enums)**: Uso intensivo de Enums PHP para modelar estados (estados de venta, tipos de interacciones de redes, estados de demanda, prioridades de abastecimiento y niveles de riesgo de stock).
 
 ## 5. Componentes clave de dominio
 
-- `app/Domains/Comercial/Pedidos/`: gestión de pedidos, con acciones y servicios.
-- `app/Domains/Inventario/`: manejo de inventario y movimientos.
-- `app/Domains/Reportes/`: repositorios y servicios para reportes.
-- `app/Domains/CRM/`, `Catalogo/`, `Dashboard/`: ramas de dominio con funcionalidades específicas.
+- `app/Domains/Tienda/`: Manejo del carrito de compras, checkout, registro de pagos y pedidos del storefront público.
+- `app/Domains/VentasRedes/`: Gestión completa del proceso comercial iniciado en canales sociales y su respectiva conversión a pedidos o clientes.
+- `app/Domains/InteligenciaVentas/`: Motor analítico de proyecciones de demanda, análisis de canales dominantes, matrices de transición e indicaciones de reabastecimiento.
+- `app/Domains/Inventario/`: Lógica de movimientos, ajustes y stock disponible físico y reservado, ahora adaptado al soporte de variantes de productos.
+- `app/Domains/Comercial/Pedidos/`: Gestión tradicional de pedidos administrativos de la empresa.
+- `app/Domains/Auditoria/`: Registro detallado de acciones administrativas y de sistema, con soporte de visualización de diferencias (`diffs`) en la UI.
 
 ## 6. Estado actual de la lógica
 
 ### Fortalezas
-
-- Separación clara de responsabilidades en varias capas.
-- Uso de validaciones FormRequest para peticiones de entrada.
-- Acceso a datos a través de Eloquent con relaciones explícitas.
-- Inercia React implementado con páginas React y una plantilla Blade moderna.
-- Seeders demo organizados y ejecutables a través de `DatabaseSeeder`.
+- **Madurez de arquitectura modular**: Los módulos de `InteligenciaVentas` y `VentasRedes` sirven como referencia de DDD limpio (uso riguroso de Actions, DTOs y Repositories).
+- **Soporte de Variantes y Tallas**: El sistema soporta productos complejos con variaciones en tallas, vinculadas a registros específicos de inventario y movimientos.
+- **Reservas Temporales y Robustas**: Control dinámico de inventario intermedio que protege el stock durante el flujo de checkout, evitando sobreventas.
+- **Dashboard de Monitoreo de Logs**: Consola visual para administradores que carga y filtra en tiempo real los registros de Laravel, aplicando máscaras automáticas para proteger contraseñas y datos sensibles.
+- **Suite de Pruebas Automatizadas**: Amplia cobertura de tests de integración para asegurar que las reglas críticas de descuento de stock, carrito y transiciones de estados funcionen correctamente.
 
 ### Debilidades / áreas de mejora
-
-- `DTOs` y `Repositories` no están plenamente materializados: hay carpetas vacías o poco usadas.
-- Algunas decisiones de persistencia todavía mezclan lógica de dominio con Eloquent directo (por ejemplo, `PedidoService` actualiza, crea y borra detalles directamente).
-- El flujo de validación/transformación no usa objetos de transferencia fuertemente tipados; se usan arrays validados.
-- El directorio de dominio no está completamente consistente: hay servicios que mezclan lógica de estado y persistencia.
-- La integración Vite/React puede ser frágil si la configuración de plugins no es correcta (orden de plugins en `vite.config.js`).
+- **Heterogeneidad en Dominios Antiguos**: Los dominios iniciales (como pedidos generales y CRM) aún usan arrays validados en lugar de DTOs y realizan consultas Eloquent directas dentro de los controladores o servicios.
+- **Persistencia dispersa**: Todavía existen servicios que mezclan lógica de orquestación con llamadas directas de escritura Eloquent en lugar de centralizarlas en sus respectivos Repositories.
 
 ## 7. Configuración técnica relevante
 
-- `vite.config.js` usa `@vitejs/plugin-react` y `laravel-vite-plugin`.
-- `package.json` contiene:
+- **Vite & React**: Configuración de `vite.config.js` adaptada para soportar plugins de React y el refresco dinámico en Inertia.
+- **Dependencias principales** (`package.json`):
     - `vite` ^8.0.0
     - `@vitejs/plugin-react` ^6.0.2
     - `laravel-vite-plugin` ^3.0.0
-    - `react` ^18.2.0
-    - `react-dom` ^18.2.0
-- `resources/views/app.blade.php` carga `resources/js/app.jsx` y las páginas Inertia dinámicas.
+    - `react` y `react-dom` ^18.2.0
 
 ## 8. Observaciones sobre consistencia del sistema
 
-- Buen avance hacia un diseño modular de dominio, pero no es un DDD puro porque la persistencia y la orquestación aún están dispersas.
-- El sistema combina una estructura moderna (`app/Domains`) con convenciones Laravel tradicionales (`app/Http/`, `app/Models/`).
-- La capa de datos está basada en Eloquent; no hay un adaptador de persistencia claramente aislado.
-- Las semillas de datos demo están presentes y el seeder principal puede invocarlas.
+- El proyecto ha avanzado exitosamente hacia un desarrollo guiado por el dominio. Los nuevos componentes son modulares, fáciles de testear y se aíslan correctamente de la capa HTTP.
+- El soporte para variantes de productos agrega una complejidad que está bien manejada a través del campo `cod_variante_producto` en la tabla de inventarios, sin romper la compatibilidad con productos simples.
 
 ## 9. Recomendaciones objetivas
 
-1. Formalizar los DTOs si se quiere mejorar la calidad de los datos entre Request/Action/Service.
-2. Usar repositorios reales para encapsular consultas Eloquent y mantener `Services` libres de detalles de persistencia.
-3. Revisar la configuración de Vite y el orden de plugins para asegurar compilación React correcta.
-4. Mantener las validaciones `FormRequest` y centralizar los casos de uso en `Actions`.
-5. Fortalecer la coherencia de `app/Domains` usando nombres y responsabilidades consistentes.
+1. **Refactorizar módulos tradicionales**: Migrar el flujo de pedidos antiguos de administración y el módulo CRM a la arquitectura de DTOs y Repositorios ya probada en `VentasRedes`.
+2. **Consolidar el Servicio de Stock**: Garantizar que cualquier decremento o incremento del inventario se centralice en `InventarioService` para prevenir inconsistencias al mezclar flujos de tienda web con ventas manuales de administración.
+3. **Optimización y caché en predicciones**: El cálculo de la matriz de transición y tendencias puede ser intensivo en base de datos. Se sugiere cachear temporalmente los resultados por periodo o delegar la tarea a colas de trabajo si la escala de datos aumenta.
 
 ## 10. Conclusión
 
-Este sistema tiene una base sólida: Laravel moderno, Inertia React y una separación de dominios clara. La lógica de pedidos y la estructura condicional ya están encaminadas, pero todavía hay espacio para mejorar la consistencia en la capa de dominio y para reforzar la separación entre reglas de negocio, persistencia y transferencia de datos.
+Este sistema posee un backend moderno y estructurado que combina la agilidad de Laravel con la robustez de patrones de DDD. La introducción de la Inteligencia de Ventas y el flujo de ventas por Redes Sociales consolidan la plataforma como una herramienta administrativa y comercial potente.
+
+---
 
 ## 11. Cambios recientes (resumen estructural)
 
-- Periodo: commits entre 2026-05-30 y 2026-06-08
-- Objetivo: integración y ampliación del módulo de tienda (catalogo, carrito, checkout, pagos), mejoras de catálogo y auditoría, y soportes de variantes/tallas.
+### Periodo: commits del 2026-06-08 al 2026-06-12 (Fase Inteligencia de Ventas, Ventas por Redes y Consola de Logs)
 
-- Cambios principales en la estructura del backend (`app/`):
-    - Nuevo/actualizado dominio `app/Domains/Tienda/` con submódulos:
-        - `Carrito`: acciones (`AgregarItemCarritoAction`, `ActualizarCantidadCarritoAction`, `VaciarCarritoAction`, `ExpirarReservasCarritoAction`), DTOs y servicios de persistencia y reserva de stock.
-        - `Catalogo`: acciones públicas, repositorio público y servicios para listado/consulta de productos públicos.
-        - `Checkout`: acciones y servicios para iniciar, cancelar y expirar checkouts; integración con reserva/extensión de reservas.
-        - `PagosWeb` y `PedidosWeb`: acciones y listeners para aceptar/rechazar pagos, descontar stock definitivo, y generar pedidos desde checkout.
-    - Ampliaciones en `app/Domains/Catalogo/Productos/` y `app/Domains/Comercial/Pedidos/` (acciones de crear/actualizar producto y crear/confirmar/confirmar pedidos).
-    - Nuevos servicios en `app/Domains/Inventario/` para manejo y consulta de inventarios por categoría y protección de inventarios de variantes.
-    - Nuevo módulo de auditoría en `app/Domains/Auditoria/` con DTOs, listeners y servicios para registrar auditoría de eventos relevantes.
-
-- Nuevos modelos y cambios en `app/Models/`:
-    - `VarianteProducto`, `TallaProducto` (para soporte de variantes y tallas).
-    - `ReservaStockCarrito`, `Carrito`, `PagoTienda`, `ConfiguracionTienda`, `ComprobantePagoTienda`, `AuditoriaSis`, entre otros.
-
-- Migraciones y seeders añadidos:
-    - Migraciones para tallas y variantes de producto, reservas de stock de carrito, configuraciones de tienda, comprobantes de pago, auditoría, y ajustes relacionados con variantes.
-    - Seeders: `TallaProductoSeeder`, `ConfiguracionTiendaSeeder`, `DemoVariantesSeeder` (nuevo), y actualizaciones en `DatabaseSeeder`.
-
-- Cambios en controladores y requests HTTP:
-    - Nuevos controladores: `Tienda` (CarritoController, CatalogoPublicoController, AdminPagoTiendaController, AdminPedidoTiendaController), `Catalogo` (ProductoController, CategoriaProductoController), `AuditoriaController`.
-    - Nuevos y actualizados `FormRequest` para productos, categorías, inventario y tienda (ej. `StoreProductoRequest`, `UpdateProductoRequest`, `AjustarInventarioRequest`, `AgregarItemCarritoRequest`).
-
-- Frontend (React/Inertia) — `resources/js/`:
-    - Nuevas páginas y componentes para la tienda: `Carrito`, `Catalogo`, `ProductoShow`, `Home`, `Checkout` y componentes de `CartDrawer`, `ProductCard`, `CatalogFilters`, `StorefrontHeader/Foot er`.
-    - Soporte UI para auditoría: componentes `AuditoriaTable`, `AuditoriaDetailCard`, `AuditoriaDiffViewer`.
-    - Hooks y utilidades nuevos: `useInertiaPoll`, `useListHighlight`, `tiendaCartApi` y formateadores actualizados.
-
-- Rutas y bootstrap:
-    - Se añadieron/actualizaron rutas en `routes/tienda.php`, `routes/web.php` y `routes/console.php` para exponer los nuevos endpoints de tienda y auditoría.
-    - `bootstrap/providers.php` y providers específicos de dominios (`TiendaServiceProvider`, `ComercialServiceProvider`, `AuditoriaServiceProvider`) actualizados.
-
-- Ajustes de build/configuración:
-    - `vite.config.js` adaptado para los cambios en frontend.
-
-- Tests y QA:
-    - Añadidos múltiples tests feature relacionados con tienda, carrito, pagos, inventario y admin (tests/Feature/Tienda/_, tests/Feature/Admin/_).
-
-- Notas sobre impacto y recomendaciones inmediatas:
-    - La estructura del dominio `Tienda` madura rápidamente: conviene consolidar los servicios de persistencia (`CarritoPersistenciaService`, `ReservaStockCarritoService`) y definir claramente qué responsabilidad queda en services vs repositories.
-    - Las migraciones nuevas requieren ejecución en entornos de desarrollo/pruebas y coordinación con seeders (`php artisan migrate` + `db:seed`).
-    - Revisar `vite.config.js` en despliegues para asegurar que los assets del storefront se compilan correctamente.
-
-Si quieres, puedo:
-
-- Insertar una lista explícita de commits (hash + mensaje) en esta sección.
-- Añadir un listado por archivo modificado (agrupado por tipo: models, migrations, controllers, frontend).
-- Ejecutar `php artisan migrate` y `php artisan db:seed` en un ambiente controlado (necesitaré confirmación y acceso a la DB).
+- **Módulo de Inteligencia de Ventas (Predicciones)**:
+    - Creación del dominio `app/Domains/InteligenciaVentas/` con todas sus capas (Actions de generación/limpieza, DTOs de resultados y abastecimiento, Enums de demanda y riesgo, y Repositories dedicados).
+    - Creación de las vistas React y pestañas de navegación para: Categorías, Productos (con filtros avanzados), Canales de venta, Recomendaciones de Abastecimiento y Conclusiones automáticas.
+    - Modelos `PrediccionVenta` y `ConfiguracionInteligenciaVentas` con sus respectivas migraciones de tablas de base de datos.
+- **Módulo de Ventas por Redes Sociales**:
+    - Creación del dominio `app/Domains/VentasRedes/` (Actions para CRUD de la venta y sus detalles, DTOs estructurados y Repositories de integración).
+    - Acciones clave de conversión: convertir lead a cliente formal en CRM, generar URL de checkout e iniciar pedidos directos.
+    - Páginas React para administración: listado con filtros, formulario de creación y edición, y vista detallada del flujo comercial (`Show`).
+- **Soporte de Variantes y Tallas**:
+    - Nuevos modelos `VarianteProducto` y `TallaProducto`.
+    - Modificación de la tabla `inventarios` para incluir el campo `cod_variante_producto`.
+    - Adaptación del storefront (detalle de producto, drawer de carrito y flujo de checkout) para manejar combinaciones de variantes de manera segura.
+- **Temporizador de Stock en Checkout**:
+    - Componente React `CountdownTimer` en el storefront para avisar sobre el tiempo restante de las reservas de stock en carrito.
+- **Consola de Visualización de Logs**:
+    - Dashboard interactivo `Logs/Index` que consulta de manera eficiente (`tail`) los logs generados en `storage/logs/` y enmascara datos sensibles de configuración.
+- **Testing y QA**:
+    - Incorporación de tests feature robustos bajo `tests/Feature/Admin/` (`InteligenciaVentasTest`, `VentasRedesTest`, `InventarioTest`, etc.) y optimización de tests de storefront.
