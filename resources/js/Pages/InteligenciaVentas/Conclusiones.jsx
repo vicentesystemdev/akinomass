@@ -41,6 +41,8 @@ export default function Conclusiones({ conclusiones = {} }) {
     const noAbastecer = conclusiones.no_abastecer ?? [];
     const temporada = conclusiones.temporada;
     const opciones = conclusiones.opciones ?? { categorias: [], canales: [] };
+    const productosMonitoreo = conclusiones.productos_monitoreo ?? [];
+    const totalPredicciones = conclusiones.total_predicciones ?? 0;
 
     const updateFilter = (key, value) => {
         const next = { ...filters, [key]: value };
@@ -107,6 +109,28 @@ export default function Conclusiones({ conclusiones = {} }) {
                 </div>
             </SectionCard>
 
+            {/* Aviso si no hay predicciones analizadas */}
+            {totalPredicciones === 0 ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-5 shadow-sm mb-4">
+                    <h3 className="text-base font-bold text-red-900 flex items-center gap-2">
+                        <ShieldAlert className="h-5 w-5 text-red-700" />
+                        No existen predicciones generadas
+                    </h3>
+                    <p className="mt-2 text-sm text-red-800">
+                        No se encontraron registros de predicciones en la base de datos para los criterios seleccionados. Por favor, ejecute el analisis de Inteligencia de Ventas desde el panel principal.
+                    </p>
+                </div>
+            ) : (
+                <div className="rounded-xl border border-cafe-200 bg-crema-100 p-4 shadow-sm mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-cafe-800 font-semibold">
+                    <span>Predicciones analizadas en este periodo: <strong>{totalPredicciones} productos</strong></span>
+                    {resumen.unidades_sugeridas === 0 && (
+                        <span className="rounded-full bg-green-100 border border-green-200 px-3 py-1 text-xs font-bold text-green-800">
+                            Inventario suficiente (Compra no requerida)
+                        </span>
+                    )}
+                </div>
+            )}
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <MetricCard title="Inversion recomendada" value={formatBOB(resumen.inversion_recomendada)} icon={Banknote} tone="terracota" />
                 <MetricCard title="Ganancia estimada" value={formatBOB(resumen.ganancia_estimada)} icon={CircleDollarSign} tone="green" />
@@ -115,87 +139,141 @@ export default function Conclusiones({ conclusiones = {} }) {
                 <MetricCard title="Categoria prioritaria" value={resumen.categoria_prioritaria ?? '-'} icon={Layers} tone="cyan" />
                 <MetricCard title="Riesgo general" value={resumen.riesgo_general ?? '-'} icon={ShieldAlert} tone={riskTone(resumen.riesgo_general)} />
                 <MetricCard title="Canal relevante" value={resumen.canal_relevante ?? '-'} icon={RadioTower} tone="oliva" />
-                <MetricCard title="Decision ejecutiva" value="Compra guiada" subtitle="prioridad de abastecimiento" icon={PackageCheck} tone="terracota" />
+                <MetricCard title="Decision ejecutiva" value={resumen.unidades_sugeridas > 0 ? "Compra guiada" : "Compra controlada"} subtitle={resumen.unidades_sugeridas > 0 ? "prioridad de abastecimiento" : "monitorear stock"} icon={PackageCheck} tone="terracota" />
             </div>
 
             <SectionCard title="Conclusion general">
                 <p className="max-w-4xl text-sm leading-6 text-cafe-700">{conclusiones.conclusion_general}</p>
             </SectionCard>
 
-            <SectionCard title="Escenarios de inversion">
-                <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-                    {escenarios.map((escenario) => (
-                        <ScenarioCard key={escenario.clave} escenario={escenario} />
-                    ))}
-                </div>
-            </SectionCard>
+            {resumen.unidades_sugeridas > 0 ? (
+                <>
+                    <SectionCard title="Escenarios de inversion">
+                        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                            {escenarios.map((escenario) => (
+                                <ScenarioCard key={escenario.clave} escenario={escenario} />
+                            ))}
+                        </div>
+                    </SectionCard>
 
-            <SectionCard title="Productos recomendados" noPadding>
-                <TableWrapper className="rounded-none border-0 shadow-none">
-                    <TableWrapper.Header>
-                        <TableWrapper.HeaderCell>Producto</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell>Categoria</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Conservadora</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Recomendada</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Agresiva</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Costo estimado</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Ingreso estimado</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Ganancia</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell>Riesgo</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell>Motivo</TableWrapper.HeaderCell>
-                    </TableWrapper.Header>
-                    <TableWrapper.Body>
-                        {productos.length > 0 ? productos.map((producto) => (
-                            <TableWrapper.Row key={producto.cod_prediccion_venta}>
-                                <TableWrapper.Cell className="font-semibold text-cafe-900">{producto.producto}</TableWrapper.Cell>
-                                <TableWrapper.Cell>{producto.categoria}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatNumber(producto.cantidad_conservadora)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right" className="font-bold text-terracota-700">{formatNumber(producto.cantidad_recomendada)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatNumber(producto.cantidad_agresiva)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">
-                                    <div>
-                                        <span>{formatBOB(producto.costo_estimado_total)}</span>
-                                        {producto.costo_estimado && <p className="text-[11px] text-amber-700">Costo referencial</p>}
-                                    </div>
-                                </TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatBOB(producto.ingreso_estimado)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatBOB(producto.ganancia_estimada)}</TableWrapper.Cell>
-                                <TableWrapper.Cell><RiskPill value={producto.riesgo} /></TableWrapper.Cell>
-                                <TableWrapper.Cell className="max-w-sm whitespace-normal">{producto.motivo ?? 'Producto con oportunidad de abastecimiento por proyeccion comercial y cobertura estimada.'}</TableWrapper.Cell>
-                            </TableWrapper.Row>
-                        )) : (
-                            <TableWrapper.EmptyRow colSpan={10} message="No hay productos con recomendacion de compra para los filtros actuales." />
-                        )}
-                    </TableWrapper.Body>
-                </TableWrapper>
-            </SectionCard>
+                    <SectionCard title="Productos recomendados" noPadding>
+                        <TableWrapper className="rounded-none border-0 shadow-none">
+                            <TableWrapper.Header>
+                                <TableWrapper.HeaderCell>Producto</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Categoria</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Conservadora</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Recomendada</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Agresiva</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Costo estimado</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Ingreso estimado</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Ganancia</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Riesgo</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Motivo</TableWrapper.HeaderCell>
+                            </TableWrapper.Header>
+                            <TableWrapper.Body>
+                                {productos.length > 0 ? productos.map((producto) => (
+                                    <TableWrapper.Row key={producto.cod_prediccion_venta}>
+                                        <TableWrapper.Cell className="font-semibold text-cafe-900">{producto.producto}</TableWrapper.Cell>
+                                        <TableWrapper.Cell>{producto.categoria}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatNumber(producto.cantidad_conservadora)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right" className="font-bold text-terracota-700">{formatNumber(producto.cantidad_recomendada)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatNumber(producto.cantidad_agresiva)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">
+                                            <div>
+                                                <span>{formatBOB(producto.costo_estimado_total)}</span>
+                                                {producto.costo_estimado && <p className="text-[11px] text-amber-700">Costo referencial</p>}
+                                            </div>
+                                        </TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatBOB(producto.ingreso_estimado)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatBOB(producto.ganancia_estimada)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell><RiskPill value={producto.riesgo} /></TableWrapper.Cell>
+                                        <TableWrapper.Cell className="max-w-sm whitespace-normal">{producto.motivo ?? 'Producto con oportunidad de abastecimiento por proyeccion comercial y cobertura estimada.'}</TableWrapper.Cell>
+                                    </TableWrapper.Row>
+                                )) : (
+                                    <TableWrapper.EmptyRow colSpan={10} message="No hay productos con recomendacion de compra para los filtros actuales." />
+                                )}
+                            </TableWrapper.Body>
+                        </TableWrapper>
+                    </SectionCard>
 
-            <SectionCard title="Categorias recomendadas" noPadding>
-                <TableWrapper className="rounded-none border-0 shadow-none">
-                    <TableWrapper.Header>
-                        <TableWrapper.HeaderCell>Categoria</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Unidades sugeridas</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Inversion aproximada</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell align="right">Ganancia estimada</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell>Prioridad</TableWrapper.HeaderCell>
-                        <TableWrapper.HeaderCell>Motivo</TableWrapper.HeaderCell>
-                    </TableWrapper.Header>
-                    <TableWrapper.Body>
-                        {categorias.length > 0 ? categorias.map((categoria) => (
-                            <TableWrapper.Row key={categoria.categoria}>
-                                <TableWrapper.Cell className="font-semibold text-cafe-900">{categoria.categoria}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatNumber(categoria.unidades_sugeridas)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatBOB(categoria.inversion_aproximada)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatBOB(categoria.ganancia_estimada)}</TableWrapper.Cell>
-                                <TableWrapper.Cell><RecomendacionBadge value={categoria.prioridad === 'Alta prioridad' ? 'alta' : 'media'} /></TableWrapper.Cell>
-                                <TableWrapper.Cell className="max-w-md whitespace-normal">{categoria.motivo}</TableWrapper.Cell>
-                            </TableWrapper.Row>
-                        )) : (
-                            <TableWrapper.EmptyRow colSpan={6} message="No hay categorias recomendadas para abastecimiento." />
-                        )}
-                    </TableWrapper.Body>
-                </TableWrapper>
-            </SectionCard>
+                    <SectionCard title="Categorias recomendadas" noPadding>
+                        <TableWrapper className="rounded-none border-0 shadow-none">
+                            <TableWrapper.Header>
+                                <TableWrapper.HeaderCell>Categoria</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Unidades sugeridas</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Inversion aproximada</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Ganancia estimada</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Prioridad</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Motivo</TableWrapper.HeaderCell>
+                            </TableWrapper.Header>
+                            <TableWrapper.Body>
+                                {categorias.length > 0 ? categorias.map((categoria) => (
+                                    <TableWrapper.Row key={categoria.categoria}>
+                                        <TableWrapper.Cell className="font-semibold text-cafe-900">{categoria.categoria}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatNumber(categoria.unidades_sugeridas)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatBOB(categoria.inversion_aproximada)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell align="right">{formatBOB(categoria.ganancia_estimada)}</TableWrapper.Cell>
+                                        <TableWrapper.Cell><RecomendacionBadge value={categoria.prioridad === 'Alta prioridad' ? 'alta' : 'media'} /></TableWrapper.Cell>
+                                        <TableWrapper.Cell className="max-w-md whitespace-normal">{categoria.motivo}</TableWrapper.Cell>
+                                    </TableWrapper.Row>
+                                )) : (
+                                    <TableWrapper.EmptyRow colSpan={6} message="No hay categorias recomendadas para abastecimiento." />
+                                )}
+                            </TableWrapper.Body>
+                        </TableWrapper>
+                    </SectionCard>
+                </>
+            ) : totalPredicciones > 0 ? (
+                <>
+                    {/* Escenario B: Unidades sugeridas = 0 pero existen predicciones */}
+                    <div className="rounded-xl border border-green-200 bg-green-50/50 p-6 shadow-sm mb-4">
+                        <h3 className="text-base font-bold text-green-950">Decision ejecutiva: Mantener compra controlada</h3>
+                        <p className="mt-2 text-sm text-green-900 leading-relaxed">
+                            No se recomienda compra inmediata de mercaderia. Las existencias actuales en inventario cubren la proyeccion del periodo y el stock de seguridad dinamico. Se aconseja canalizar liquidez hacia el monitoreo de los siguientes productos clave con demanda relativa destacada o tendencia creciente.
+                        </p>
+                    </div>
+
+                    <SectionCard title="Productos sugeridos para monitoreo preventivo" noPadding>
+                        <TableWrapper className="rounded-none border-0 shadow-none">
+                            <TableWrapper.Header>
+                                <TableWrapper.HeaderCell>Producto</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Categoria</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Stock actual</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Stock seguridad</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Proyeccion ventas</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Indice demanda</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell align="right">Tendencia</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Estado proyectado</TableWrapper.HeaderCell>
+                                <TableWrapper.HeaderCell>Riesgo</TableWrapper.HeaderCell>
+                            </TableWrapper.Header>
+                            <TableWrapper.Body>
+                                {productosMonitoreo.length > 0 ? productosMonitoreo.map((p) => {
+                                    const trendVal = Number(p.tendencia_porcentual || 0);
+                                    let trendClass = 'text-gray-500 font-semibold';
+                                    if (trendVal > 0) trendClass = 'text-green-700 font-semibold';
+                                    if (trendVal < 0) trendClass = 'text-red-700 font-semibold';
+
+                                    return (
+                                        <TableWrapper.Row key={p.producto}>
+                                            <TableWrapper.Cell className="font-semibold text-cafe-900">{p.producto}</TableWrapper.Cell>
+                                            <TableWrapper.Cell>{p.categoria}</TableWrapper.Cell>
+                                            <TableWrapper.Cell align="right">{formatNumber(p.stock_actual)}</TableWrapper.Cell>
+                                            <TableWrapper.Cell align="right">{formatNumber(p.stock_seguridad_dinamico)}</TableWrapper.Cell>
+                                            <TableWrapper.Cell align="right">{formatNumber(p.ventas_estimadas_proximo_periodo)}</TableWrapper.Cell>
+                                            <TableWrapper.Cell align="right">{formatDecimal(p.indice_demanda_relativa, 2)}</TableWrapper.Cell>
+                                            <TableWrapper.Cell align="right" className={trendClass}>{formatSignedPercent(p.tendencia_porcentual)}</TableWrapper.Cell>
+                                            <TableWrapper.Cell className="capitalize">{p.estado_demanda_predicho}</TableWrapper.Cell>
+                                            <TableWrapper.Cell><RiskPill value={p.nivel_riesgo_stock ?? p.riesgo} /></TableWrapper.Cell>
+                                        </TableWrapper.Row>
+                                    );
+                                }) : (
+                                    <TableWrapper.EmptyRow colSpan={9} message="No hay productos destacados bajo monitoreo preventivo." />
+                                )}
+                            </TableWrapper.Body>
+                        </TableWrapper>
+                    </SectionCard>
+                </>
+            ) : null}
 
             <SectionCard title="No abastecer por ahora" noPadding>
                 <TableWrapper className="rounded-none border-0 shadow-none">
@@ -214,7 +292,18 @@ export default function Conclusiones({ conclusiones = {} }) {
                                 <TableWrapper.Cell>{producto.categoria}</TableWrapper.Cell>
                                 <TableWrapper.Cell align="right">{formatNumber(producto.stock_actual)}</TableWrapper.Cell>
                                 <TableWrapper.Cell align="right">{formatNumber(producto.proyeccion)}</TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatDecimal(producto.rotacion_stock, 2)}</TableWrapper.Cell>
+                                <TableWrapper.Cell align="right">
+                                    {Number(producto.rotacion_stock) >= 999 ? (
+                                        <span
+                                            className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold bg-red-50 text-red-700 border-red-100 cursor-help"
+                                            title="Ventas registradas sin stock disponible"
+                                        >
+                                            Stock agotado
+                                        </span>
+                                    ) : (
+                                        formatDecimal(producto.rotacion_stock, 2)
+                                    )}
+                                </TableWrapper.Cell>
                                 <TableWrapper.Cell className="max-w-md whitespace-normal">{producto.motivo}</TableWrapper.Cell>
                             </TableWrapper.Row>
                         )) : (

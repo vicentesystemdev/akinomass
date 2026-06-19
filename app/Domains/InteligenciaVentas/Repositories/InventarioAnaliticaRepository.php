@@ -13,4 +13,11 @@ class InventarioAnaliticaRepository
             ->where('activo_inv', true)
             ->sum('stock_actual_inv'));
     }
+
+    public function stockTotalProducto(int $codProducto): int
+    {
+        return (int) Inventario::where('cod_producto', $codProducto)
+            ->where('activo_inv', true)
+            ->sum('stock_actual_inv');
+    }
 }

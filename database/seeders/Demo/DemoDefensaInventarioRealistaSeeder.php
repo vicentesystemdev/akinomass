@@ -23,9 +23,13 @@ class DemoDefensaInventarioRealistaSeeder extends Seeder
         foreach ($productos as $producto) {
             $variantes = VarianteProducto::where('cod_producto', $producto->cod_producto)->get();
 
+            $sku = $producto->sku_pro;
+            $lowStockSkus = ['JC-01', 'JC-03', 'PO-01', 'PO-04', 'BL-01', 'VE-01', 'CH-02', 'CD-01', 'FA-01', 'PA-02', 'AC-02', 'AC-04', 'LI-01', 'LI-03'];
+            $isLowStock = in_array($sku, $lowStockSkus);
+
             if ($variantes->isEmpty()) {
                 // Producto sin variantes (como Accesorios)
-                $stockInicial = 250; // Gran stock inicial para accesorios
+                $stockInicial = $isLowStock ? rand(2, 6) : 250; // Gran stock inicial para accesorios
                 $stockMinimo = 10;
                 $ubicacion = 'Almacén Accesorios B-1';
 
@@ -71,7 +75,10 @@ class DemoDefensaInventarioRealistaSeeder extends Seeder
                     $stockInicial = 100; // default
                     $stockMinimo = 5;
 
-                    if ($categoria === 'Jeans cargo') {
+                    if ($isLowStock) {
+                        $stockInicial = rand(1, 4);
+                        $stockMinimo = 5;
+                    } elseif ($categoria === 'Jeans cargo') {
                         $stockInicial = 130; // Más stock para soportar alta demanda
                         $stockMinimo = 8;
                     } elseif ($categoria === 'Chamarras') {

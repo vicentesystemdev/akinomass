@@ -94,6 +94,8 @@ class ConclusionesInteligenciaVentasService
             'categorias_recomendadas' => $categorias,
             'no_abastecer' => $noAbastecer,
             'temporada' => $this->temporada($filtros, $coincidenciaTemporada, $categorias, $productos),
+            'productos_monitoreo' => $this->productosMonitoreo($productos),
+            'total_predicciones' => $opcionesItems->count(),
         ];
     }
 
@@ -111,9 +113,10 @@ class ConclusionesInteligenciaVentasService
             'categoria' => $prediccion->categoria?->nombre_cat ?? '-',
             'canal' => $prediccion->canalVenta?->nombre_can ?? $prediccion->canal_dominante ?? '-',
             'cantidad_base' => $cantidadBase,
+            'sample_flag' => true,
             'cantidad_conservadora' => $this->cantidadEscenario($cantidadRecomendada, self::ESCENARIOS['conservador']['factor']),
             'cantidad_recomendada' => $cantidadRecomendada,
-            'cantidad_agresiva' => $this->cantidadEscenario($cantidadRecomendada, self::ESCENARIOS['agresivo']['factor']),
+            'cantidad_agresiva' => $this->cantidadEscenario($cantidadRecomendada, self::ESCENARIOS['agresive_weight_factor'] ?? self::ESCENARIOS['agresivo']['factor']),
             'precio_venta' => round($precioVenta, 2),
             'costo_unitario' => round($costoUnitario, 2),
             'costo_estimado' => $costoEstimado,
@@ -128,6 +131,11 @@ class ConclusionesInteligenciaVentasService
             'ratio_cobertura' => (float) $prediccion->ratio_cobertura,
             'tendencia_porcentual' => (float) $prediccion->tendencia_porcentual,
             'motivo' => $prediccion->motivo,
+            'stock_actual' => (int) $prediccion->stock_actual,
+            'stock_seguridad_dinamico' => (int) $prediccion->stock_seguridad_dinamico,
+            'ventas_estimadas_proximo_periodo' => (int) $prediccion->ventas_estimadas_proximo_periodo,
+            'indice_demanda_relativa' => (float) $prediccion->indice_demanda_relativa,
+            'estado_demanda_predicho' => $this->enumValue($prediccion->estado_demanda_predicho),
         ];
     }
 
@@ -250,7 +258,7 @@ class ConclusionesInteligenciaVentasService
     private function conclusionGeneral(Collection $productos, Collection $categorias, array $recomendado, ConclusionesInteligenciaVentasData $filtros): string
     {
         if ($productos->isEmpty() || (int) $recomendado['unidades_sugeridas'] === 0) {
-            return 'Para el periodo seleccionado no se detecta una necesidad significativa de abastecimiento. Conviene preservar liquidez y revisar productos con baja rotacion antes de comprar nueva mercaderia.';
+            return 'No se recomienda nueva compra inmediata. El stock actual cubre la proyeccion del periodo. Se recomienda monitorear productos con demanda alta o tendencia creciente. La decision ejecutiva es mantener compra o compra controlada.';
         }
 
         $categoriasTexto = $categorias->take(2)->pluck('categoria')->implode(' y ') ?: 'las categorias con mejor proyeccion';
@@ -259,6 +267,51 @@ class ConclusionesInteligenciaVentasService
             : "los proximos {$filtros->horizonteMeses} mes(es)";
 
         return "Para {$alcance} se recomienda priorizar {$categoriasTexto}, especialmente productos con alta rotacion, stock insuficiente y margen estimado favorable. La decision concentra la inversion en productos con mejor oportunidad comercial y riesgo {$recomendado['riesgo']}.";
+    }
+
+    private function productosMonitoreo(Collection $mappedProductos): Collection
+    {
+        return $mappedProductos->map(function (array $p) {
+            $score = 0.0;
+            if ($p['estado_demanda_predicho'] === 'alta') {
+                $score += 10.0;
+            } elseif ($p['estado_demanda_predicho'] === 'media') {
+                $score += 3.0;
+            }
+
+            if ($p['tendencia_porcentual'] > 0) {
+                $score += min(5.0, $p['tendencia_porcentual'] / 10);
+            }
+
+            $score += min(5.0, $p['indice_demanda_relativa']);
+            $score += min(5.0, $p['ventas_estimadas_proximo_periodo'] / 10);
+
+            if ($p['stock_actual'] <= $p['stock_seguridad_dinamico']) {
+                $score += 8.0;
+            } elseif ($p['stock_actual'] <= $p['stock_seguridad_dinamico'] * 1.5) {
+                $score += 4.0;
+            }
+
+            return [
+                'producto' => $p['producto'],
+                'categoria' => $p['categoria'],
+                'stock_actual' => $p['stock_actual'],
+                'stock_seguridad_dinamico' => $p['stock_seguridad_dinamico'],
+                'ventas_estimadas_proximo_periodo' => $p['ventas_estimadas_proximo_periodo'],
+                'indice_demanda_relativa' => $p['indice_demanda_relativa'],
+                'estado_demanda_predicho' => $p['estado_demanda_predicho'],
+                'tendencia_porcentual' => $p['tendencia_porcentual'],
+                'rotacion_stock' => $p['rotacion_stock'],
+                'ratio_cobertura' => $p['ratio_cobertura'],
+                'nivel_riesgo_stock' => $p['nivel_riesgo_stock'],
+                'nivel_recomendacion' => $p['nivel_recomendacion'],
+                'motivo' => $p['motivo'],
+                'monitoreo_score' => $score,
+            ];
+        })
+        ->sortByDesc('monitoreo_score')
+        ->take(10)
+        ->values();
     }
 
     private function canalRelevante(Collection $productos): string

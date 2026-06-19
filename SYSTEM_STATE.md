@@ -109,7 +109,8 @@ Este sistema posee un backend moderno y estructurado que combina la agilidad de 
 
 - **Módulo de Inteligencia de Ventas (Predicciones)**:
     - Creación del dominio `app/Domains/InteligenciaVentas/` con todas sus capas (Actions de generación/limpieza, DTOs de resultados y abastecimiento, Enums de demanda y riesgo, y Repositories dedicados).
-    - Creación de las vistas React y pestañas de navegación para: Categorías, Productos (con filtros avanzados), Canales de venta, Recomendaciones de Abastecimiento y Conclusiones automáticas.
+    - Creación de las vistas React y pestañas de navegación para: Categorías, Productos (con filtros avanzados, búsqueda y ordenamiento interactivo), Canales de venta, Recomendaciones de Abastecimiento y Conclusiones automáticas.
+    - La pantalla de productos de InteligenciaVentas incorpora búsqueda, filtros por categoría/estado/tendencia y ordenamiento ascendente-descendente para facilitar el análisis comercial durante la defensa.
     - Modelos `PrediccionVenta` y `ConfiguracionInteligenciaVentas` con sus respectivas migraciones de tablas de base de datos.
 - **Módulo de Ventas por Redes Sociales**:
     - Creación del dominio `app/Domains/VentasRedes/` (Actions para CRUD de la venta y sus detalles, DTOs estructurados y Repositories de integración).

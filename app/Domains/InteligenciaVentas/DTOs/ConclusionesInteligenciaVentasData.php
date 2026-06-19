@@ -19,14 +19,28 @@ readonly class ConclusionesInteligenciaVentasData
         $tipoAnalisis = $data['tipo_analisis'] ?? 'meses';
         $temporada = $data['temporada'] ?? 'invierno';
 
+        $normalizeId = function ($val) {
+            if ($val === null || $val === '' || $val === 'todos' || $val === 'all' || !is_numeric($val)) {
+                return null;
+            }
+            return (int) $val;
+        };
+
+        $normalizeString = function ($val) {
+            if ($val === null || $val === '' || $val === 'todos' || $val === 'all') {
+                return null;
+            }
+            return (string) $val;
+        };
+
         return new self(
             tipoAnalisis: in_array($tipoAnalisis, ['meses', 'temporada'], true) ? $tipoAnalisis : 'meses',
             horizonteMeses: min(4, max(1, (int) ($data['horizonte_meses'] ?? 1))),
             temporada: in_array($temporada, ['invierno', 'verano', 'otono', 'primavera'], true) ? $temporada : 'invierno',
-            codCategoriaProducto: isset($data['cod_categoria_producto']) && $data['cod_categoria_producto'] !== '' ? (int) $data['cod_categoria_producto'] : null,
-            codCanalVenta: isset($data['cod_canal_venta']) && $data['cod_canal_venta'] !== '' ? (int) $data['cod_canal_venta'] : null,
-            nivelRiesgoStock: $data['nivel_riesgo_stock'] ?? null,
-            nivelRecomendacion: $data['nivel_recomendacion'] ?? null,
+            codCategoriaProducto: $normalizeId($data['cod_categoria_producto'] ?? null),
+            codCanalVenta: $normalizeId($data['cod_canal_venta'] ?? null),
+            nivelRiesgoStock: $normalizeString($data['nivel_riesgo_stock'] ?? null),
+            nivelRecomendacion: $normalizeString($data['nivel_recomendacion'] ?? null),
         );
     }
 

@@ -77,7 +77,7 @@ class InteligenciaVentasService
                 $anteriores = $this->metricasVentas->ventasEntre($ventasProducto, $hasta->copy()->subDays(59)->startOfDay(), $hasta->copy()->subDays(30)->endOfDay());
                 $tendencia = $this->metricasVentas->tendencia($ventas30, $anteriores);
                 $proyeccion = $this->prediccionDemanda->estimar($promedioVentasPeriodo, $tendencia, $estadoPredicho, $configuracion);
-                $stockActual = $this->inventario->stockActual($producto->cod_producto);
+                $stockActual = $this->inventario->stockTotalProducto($producto->cod_producto);
                 $recomendacion = $this->recomendacion->calcular($ventasPeriodo, $proyeccion['ventas_estimadas_proximo_periodo'], $stockActual, $estadoPredicho, $configuracion);
                 $canal = $this->canalDominante->calcular($ventasProductoPeriodo);
                 $precioPromedio = $this->metricasVentas->precioPromedio($ventasProducto);

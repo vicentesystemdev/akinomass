@@ -50,7 +50,18 @@ export default function Abastecimiento({ predicciones = [] }) {
                                 <TableWrapper.Cell align="right">{formatNumber(item.stock_seguridad_dinamico)}</TableWrapper.Cell>
                                 <TableWrapper.Cell align="right" className="font-bold text-terracota-700">{formatNumber(item.cantidad_sugerida_abastecimiento)}</TableWrapper.Cell>
                                 <TableWrapper.Cell><CoverageBar value={item.ratio_cobertura} /></TableWrapper.Cell>
-                                <TableWrapper.Cell align="right">{formatDecimal(item.rotacion_stock, 2)}</TableWrapper.Cell>
+                                <TableWrapper.Cell align="right">
+                                    {Number(item.rotacion_stock) >= 999 ? (
+                                        <span
+                                            className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold bg-red-50 text-red-700 border-red-100 cursor-help"
+                                            title="Ventas registradas sin stock disponible"
+                                        >
+                                            Stock agotado
+                                        </span>
+                                    ) : (
+                                        formatDecimal(item.rotacion_stock, 2)
+                                    )}
+                                </TableWrapper.Cell>
                                 <TableWrapper.Cell align="right">{formatBOB(item.ingreso_estimado)}</TableWrapper.Cell>
                                 <TableWrapper.Cell><RiesgoBadge value={item.nivel_riesgo_stock} /></TableWrapper.Cell>
                                 <TableWrapper.Cell><RecomendacionBadge value={item.nivel_recomendacion} /></TableWrapper.Cell>

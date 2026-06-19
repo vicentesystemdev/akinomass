@@ -65,7 +65,7 @@ Alimentado por los stocks mínimos y la proyección de ventas, el sistema genera
 2. **Historial de Live Sales**: Mostrar la sesión programada y las finalizadas, evidenciando cómo los comentarios se convierten en leads o pedidos.
 3. **Control de Pagos**: Verificación de comprobantes de pago subidos por la tienda online (se asocian al archivo `/storage/demo/comprobantes/placeholder.png`).
 4. **CRM & Clientes**: Visualización de perfiles con sus respectivos clusters calculados.
-5. **Reporte de Machine Learning**: Proyecciones y recomendaciones sugeridas para compra de mercadería.
+5. **Reporte de Machine Learning**: Proyecciones y recomendaciones sugeridas para compra de mercadería. En la sección Inteligencia de Ventas > Productos se recomienda ordenar por índice descendente y filtrar por demanda alta para mostrar productos prioritarios de abastecimiento.
 
 ## Imágenes Demo de Productos
 
