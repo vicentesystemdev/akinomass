@@ -75,6 +75,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'pagos_tienda.aceptar',
             'pagos_tienda.observar',
             'pagos_tienda.rechazar',
+            'backups.ver',
+            'backups.generar',
+            'backups.descargar',
         ];
 
         foreach ($permissions as $permission) {

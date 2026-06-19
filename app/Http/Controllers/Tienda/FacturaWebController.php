@@ -23,7 +23,7 @@ class FacturaWebController extends Controller
             abort(404);
         }
 
-        $factura->load('detalles');
+        $factura->load(['detalles', 'pago']);
 
         if ($request->expectsJson()) {
             return response()->json([

@@ -135,11 +135,13 @@ export default function VentaRedForm({
         };
 
         if (isEdit) {
-            form.transform(() => payload).put(route('ventas-redes.update', venta.cod_venta_red));
+            form.transform(() => payload);
+            form.put(route('ventas-redes.update', venta.cod_venta_red));
             return;
         }
 
-        form.transform(() => payload).post(route('ventas-redes.store'));
+        form.transform(() => payload);
+        form.post(route('ventas-redes.store'));
     };
 
     return (

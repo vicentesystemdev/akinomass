@@ -110,4 +110,30 @@ class ConfiguracionTiendaService
     {
         return $this->obtenerEntero('carrito_max_extensiones', 1);
     }
+
+    public function obtenerMediosPago(): array
+    {
+        return [
+            'qr' => [
+                'imagen' => $this->obtenerString('pago_qr_imagen'),
+                'titulo' => $this->obtenerString('pago_qr_titulo', 'Escanea el código QR'),
+                'instrucciones' => $this->obtenerString('pago_qr_instrucciones', 'Realiza el pago escaneando el código QR y adjunta tu comprobante de transferencia.'),
+            ],
+            'transferencia' => [
+                'banco' => $this->obtenerString('pago_transferencia_banco', 'Banco de Crédito BCP'),
+                'cuenta' => $this->obtenerString('pago_transferencia_cuenta'),
+                'titular' => $this->obtenerString('pago_transferencia_titular'),
+                'cci' => $this->obtenerString('pago_transferencia_cci'),
+                'imagen' => $this->obtenerString('pago_transferencia_imagen'),
+                'instrucciones' => $this->obtenerString('pago_transferencia_instrucciones', 'Realiza la transferencia al número de cuenta indicado y adjunta tu comprobante.'),
+            ],
+            'deposito' => [
+                'banco' => $this->obtenerString('pago_deposito_banco', 'Banco de Crédito BCP'),
+                'cuenta' => $this->obtenerString('pago_deposito_cuenta'),
+                'titular' => $this->obtenerString('pago_deposito_titular'),
+                'imagen' => $this->obtenerString('pago_deposito_imagen'),
+                'instrucciones' => $this->obtenerString('pago_deposito_instrucciones', 'Realiza el depósito en ventanilla al número de cuenta indicado y adjunta tu comprobante.'),
+            ],
+        ];
+    }
 }

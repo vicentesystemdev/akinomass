@@ -59,6 +59,107 @@ class ConfiguracionTiendaSeeder extends Seeder
                 'descripcion_cti' => 'Máximo de extensiones de reserva',
                 'activo_cti' => true,
             ],
+            // Medios de pago - QR
+            [
+                'clave_cti' => 'pago_qr_imagen',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Ruta de imagen del código QR de la empresa',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_qr_titulo',
+                'valor_cti' => 'Escanea el código QR',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Título del método de pago QR',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_qr_instrucciones',
+                'valor_cti' => 'Realiza el pago escaneando el código QR y adjunta tu comprobante de transferencia.',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Instrucciones para el pago por QR',
+                'activo_cti' => true,
+            ],
+            // Medios de pago - Transferencia
+            [
+                'clave_cti' => 'pago_transferencia_banco',
+                'valor_cti' => 'Banco de Crédito BCP',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Nombre del banco para transferencia',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_transferencia_cuenta',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Número de cuenta bancaria para transferencia',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_transferencia_titular',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Nombre del titular de la cuenta de transferencia',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_transferencia_cci',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'CCI de la cuenta de transferencia',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_transferencia_imagen',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Ruta de imagen de datos bancarios para transferencia',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_transferencia_instrucciones',
+                'valor_cti' => 'Realiza la transferencia al número de cuenta indicado y adjunta tu comprobante.',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Instrucciones para el pago por transferencia',
+                'activo_cti' => true,
+            ],
+            // Medios de pago - Depósito
+            [
+                'clave_cti' => 'pago_deposito_banco',
+                'valor_cti' => 'Banco de Crédito BCP',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Nombre del banco para depósito',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_deposito_cuenta',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Número de cuenta bancaria para depósito',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_deposito_titular',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Nombre del titular de la cuenta de depósito',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_deposito_imagen',
+                'valor_cti' => '',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Ruta de imagen de datos bancarios para depósito',
+                'activo_cti' => true,
+            ],
+            [
+                'clave_cti' => 'pago_deposito_instrucciones',
+                'valor_cti' => 'Realiza el depósito en ventanilla al número de cuenta indicado y adjunta tu comprobante.',
+                'tipo_cti' => 'string',
+                'descripcion_cti' => 'Instrucciones para el pago por depósito',
+                'activo_cti' => true,
+            ],
         ];
 
         foreach ($configuraciones as $config) {

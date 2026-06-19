@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
-import { ShoppingCart, User, Menu, X, LogOut, Package, MapPin, ChevronDown } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, MapPin, ChevronDown, LayoutGrid } from 'lucide-react';
 
 export default function StorefrontHeader({ auth, cartCount = 0, onCartClick, badgePulse = false }) {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -149,6 +149,32 @@ export default function StorefrontHeader({ auth, cartCount = 0, onCartClick, bad
                                 </span>
                             )}
                         </button>
+
+                        {user && !isCliente && (
+                            <Link
+                                href="/dashboard"
+                                className="hidden md:flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all"
+                                style={{
+                                    background: '#3C473A',
+                                    color: 'white',
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    textDecoration: 'none',
+                                    boxShadow: '0 2px 8px rgba(60,71,58,0.25)',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(60,71,58,0.35)';
+                                    e.currentTarget.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(60,71,58,0.25)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                <LayoutGrid size={15} strokeWidth={2.2} />
+                                Dashboard
+                            </Link>
+                        )}
 
                         {user ? (
                             <div className="relative">
@@ -373,6 +399,23 @@ export default function StorefrontHeader({ auth, cartCount = 0, onCartClick, bad
                         >
                             Catálogo
                         </Link>
+                        {user && !isCliente && (
+                            <Link
+                                href="/dashboard"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
+                                style={{ fontSize: 14, fontWeight: 600, color: '#3C473A', textDecoration: 'none', background: '#F0F5EE' }}
+                                onClick={() => setMenuOpen(false)}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#E4EDE2';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#F0F5EE';
+                                }}
+                            >
+                                <LayoutGrid size={16} style={{ color: '#3C473A' }} strokeWidth={2.2} />
+                                Dashboard
+                            </Link>
+                        )}
                         <button
                             type="button"
                             onClick={() => {

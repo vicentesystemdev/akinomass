@@ -26,7 +26,16 @@ class ConfiguracionTiendaController extends Controller
         ActualizarConfiguracionTiendaRequest $request,
         ActualizarConfiguracionTiendaAction $action,
     ): RedirectResponse|JsonResponse {
-        $action->execute($request->user()->id, $request->validated());
+        $datos = $request->validated();
+
+        $archivosClave = ['pago_qr_imagen', 'pago_transferencia_imagen', 'pago_deposito_imagen'];
+        foreach ($archivosClave as $clave) {
+            if ($request->hasFile($clave)) {
+                $datos[$clave] = $request->file($clave);
+            }
+        }
+
+        $action->execute($request->user()->id, $datos);
 
         if ($request->expectsJson()) {
             return response()->json(['success' => 'Configuración de tienda actualizada.']);

@@ -330,6 +330,8 @@ class CheckoutController extends Controller
                 : 'No tienes productos reservados.',
         ];
 
+        $checkoutArray['medios_pago'] = $configService->obtenerMediosPago();
+
         return $checkoutArray;
     }
 }

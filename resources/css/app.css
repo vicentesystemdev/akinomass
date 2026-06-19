@@ -157,3 +157,117 @@
         animation: row-highlight 4s ease-out;
     }
 }
+
+/* ============================================
+   ESTILOS DE IMPRESIÓN — FACTURA
+   ============================================ */
+@media print {
+    @page {
+        margin: 12mm 15mm;
+        size: A4;
+    }
+
+    /* Ocultar todo el layout de la tienda */
+    body {
+        background: white !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Ocultar header, footer, sidebar, carrito, botones, navegación */
+    .storefront-header,
+    .storefront-footer,
+    .cart-drawer,
+    .print-hidden,
+    nav,
+    header,
+    [data-cart-drawer],
+    .fixed {
+        display: none !important;
+    }
+
+    /* El contenedor principal de la factura */
+    .factura-print-area {
+        position: relative;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* Eliminar sombras y bordes de la tarjeta de la factura */
+    .factura-print-area > div {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* La tabla de detalle no debe tener scroll horizontal */
+    .factura-print-area table {
+        width: 100% !important;
+        font-size: 11pt !important;
+    }
+
+    .factura-print-area table th,
+    .factura-print-area table td {
+        padding: 6pt 4pt !important;
+        font-size: 10pt !important;
+    }
+
+    /* Totales — asegurar que no se rompa en página */
+    .factura-totales {
+        page-break-inside: avoid;
+    }
+
+    /* Ocultar el footer del CustomerLayout */
+    .min-h-screen > main + div,
+    .min-h-screen > footer {
+        display: none !important;
+    }
+
+    /* Forzar color de fondo en encabezado de factura */
+    .factura-header {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    /* Watermark de anulada */
+    .factura-anulada-watermark {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Botones y acciones — ocultar */
+    button.print-hidden,
+    a.print-hidden {
+        display: none !important;
+    }
+
+    /* Sidebar del customer layout — ocultar */
+    .md\:col-span-1 {
+        display: none !important;
+    }
+
+    .md\:col-span-3 {
+        grid-column: span 1 / span 1 !important;
+        max-width: none !important;
+    }
+
+    /* Grid del layout — simplificar para impresión */
+    .factura-outer-grid {
+        display: block !important;
+    }
+
+    /* Evitar saltos de página dentro de secciones importantes */
+    .factura-header,
+    .factura-cliente,
+    .factura-detalle,
+    .factura-totales,
+    .factura-footer {
+        page-break-inside: avoid;
+    }
+}

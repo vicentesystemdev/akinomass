@@ -45,12 +45,13 @@ class CatalogoPublicoRepository
         }
 
         if ($soloDisponibles) {
-            $query->where(function ($disponibleQuery) {
-                $disponibleQuery->where(function ($baseQuery) {
+            $ahora = now()->toDateTimeString();
+            $query->where(function ($disponibleQuery) use ($ahora) {
+                $disponibleQuery->where(function ($baseQuery) use ($ahora) {
                     $baseQuery->whereDoesntHave('variantes', fn ($varianteQuery) => $varianteQuery
                         ->where('activo_variante_producto', true)
                         ->where('estado_variante_producto', 'activo'))
-                        ->whereHas('inventario', function ($q) {
+                        ->whereHas('inventario', function ($q) use ($ahora) {
                             $q->where('activo_inv', true)
                                 ->whereRaw(
                                     'stock_actual_inv > (
@@ -59,12 +60,12 @@ class CatalogoPublicoRepository
                                         WHERE reservas_stock_carrito.cod_producto = inventarios.cod_producto
                                           AND reservas_stock_carrito.cod_variante_producto IS NULL
                                           AND reservas_stock_carrito.estado_res = ?
-                                          AND reservas_stock_carrito.expira_en_res > CURRENT_TIMESTAMP
+                                          AND reservas_stock_carrito.expira_en_res > ?
                                     )',
-                                    ['activa'],
+                                    ['activa', $ahora],
                                 );
                         });
-                })->orWhereHas('variantes.inventario', function ($q) {
+                })->orWhereHas('variantes.inventario', function ($q) use ($ahora) {
                     $q->where('activo_inv', true)
                         ->whereRaw(
                             'stock_actual_inv > (
@@ -72,9 +73,9 @@ class CatalogoPublicoRepository
                                 FROM reservas_stock_carrito
                                 WHERE reservas_stock_carrito.cod_variante_producto = inventarios.cod_variante_producto
                                   AND reservas_stock_carrito.estado_res = ?
-                                  AND reservas_stock_carrito.expira_en_res > CURRENT_TIMESTAMP
+                                  AND reservas_stock_carrito.expira_en_res > ?
                             )',
-                            ['activa'],
+                            ['activa', $ahora],
                         );
                 });
             });

@@ -8,6 +8,7 @@ services:
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html
+      - backups_data:/var/www/html/storage/app/private/backups_bd
     ports:
       - "8013:8000"
     depends_on:
@@ -35,6 +36,7 @@ services:
       POSTGRES_DB: akinomass_db
       POSTGRES_USER: akinomass_user
       POSTGRES_PASSWORD: akinomass_pass
+      TZ: America/La_Paz
     ports:
       - "5443:5432"
     volumes:
@@ -58,6 +60,9 @@ volumes:
 
   akinomass_redis_data:
     name: akinomass_redis_data
+
+  backups_data:
+    name: akinomass_backups_data
 
 networks:
   akinomass_network:

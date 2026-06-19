@@ -17,7 +17,7 @@ class ObtenerFacturaClienteAction
             return null;
         }
 
-        return Factura::with('detalles')
+        return Factura::with(['detalles', 'pago'])
             ->where('cod_pedido', $codPedido)
             ->first();
     }

@@ -1,7 +1,7 @@
 import { ShoppingCart, ChevronRight, Shield, Truck, RefreshCw, Clock } from 'lucide-react';
 import CountdownTimer from '@/Components/Tienda/CountdownTimer';
 
-export default function CartStep({ checkout, onNext }) {
+export default function CartStep({ checkout, onNext, onExpireReserva }) {
     const carrito = checkout?.carrito;
     const items = carrito?.detalles || [];
     const subtotal = checkout ? Number(checkout.subtotal_che) : 0;
@@ -76,6 +76,7 @@ export default function CartStep({ checkout, onNext }) {
                                                 <CountdownTimer
                                                     seconds={reservas.tiempo_restante_segundos}
                                                     expiredLabel="0s"
+                                                    onExpire={onExpireReserva}
                                                 />{' '}
                                                 de reserva.
                                             </>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Head, router } from '@inertiajs/react';
 import StorefrontLayout from '@/Layouts/StorefrontLayout';
 import CountdownTimer from '@/Components/Tienda/CountdownTimer';
@@ -7,7 +7,7 @@ import CartStep from '@/Components/Tienda/Checkout/CartStep';
 import ShippingStep from '@/Components/Tienda/Checkout/ShippingStep';
 import PaymentStep from '@/Components/Tienda/Checkout/PaymentStep';
 import ConfirmationStep from '@/Components/Tienda/Checkout/ConfirmationStep';
-import { AlertCircle, ChevronLeft, Clock } from 'lucide-react';
+import { AlertCircle, ChevronLeft, Clock, XCircle } from 'lucide-react';
 
 function extractFirstError(errors) {
     const first = Object.values(errors || {})[0];
@@ -52,6 +52,8 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
     const [serverError, setServerError] = useState(null);
     const [pedido, setPedido] = useState(pedidoProp || null);
     const [processing, setProcessing] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
 
     const token = checkout?.token_che;
     const checkoutEstado = checkout?.estado_che;
@@ -156,6 +158,33 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
         });
     }
 
+    function handleCancelCheckout() {
+        setCancelling(true);
+        router.post(`/tienda/checkout/${token}/cancelar`, {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                router.visit('/tienda/carrito');
+            },
+            onError: () => {
+                setServerError('No se pudo cancelar el checkout. Intenta de nuevo.');
+                setCancelling(false);
+                setShowCancelModal(false);
+            },
+        });
+    }
+
+    function handleVolverAlCarrito() {
+        router.post(`/tienda/checkout/${token}/volver-carrito`, {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                router.visit('/tienda/carrito');
+            },
+            onError: () => {
+                setServerError('No se pudo volver al carrito. Intenta de nuevo.');
+            },
+        });
+    }
+
     return (
         <StorefrontLayout auth={auth}>
             <Head title="Checkout - AKINOMASS" />
@@ -165,14 +194,32 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                 <div className="max-w-5xl mx-auto px-4 md:px-8">
                     <div className="flex items-center justify-between" style={{ height: 48 }}>
                         <button
-                            onClick={() => step > 1 && step < 4 ? setStep(step - 1) : router.visit('/tienda/carrito')}
+                            onClick={() => {
+                                if (step > 1 && step < 4) {
+                                    setStep(step - 1);
+                                } else if (step === 1) {
+                                    handleVolverAlCarrito();
+                                }
+                            }}
                             className="flex items-center gap-1.5 hover:text-terracota-500 transition-colors"
                             style={{ fontSize: 13, color: '#6B7280', fontWeight: 500, background: 'none', border: 'none', cursor: step === 4 ? 'default' : 'pointer', visibility: step === 4 ? 'hidden' : 'visible' }}
                         >
                             <ChevronLeft size={16} />
                             {step > 1 ? 'Paso anterior' : 'Volver al carrito'}
                         </button>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-3">
+                            {step < 4 && (
+                                <button
+                                    onClick={() => setShowCancelModal(true)}
+                                    className="flex items-center gap-1.5 transition-colors"
+                                    style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.color = '#DC2626'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; }}
+                                >
+                                    <XCircle size={14} />
+                                    Cancelar
+                                </button>
+                            )}
                             <span style={{ fontSize: 12, color: '#6B7280' }}>Pago seguro</span>
                         </div>
                     </div>
@@ -199,6 +246,10 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                                         <CountdownTimer
                                             seconds={tiempoCheckout.tiempo_restante_segundos}
                                             expiredLabel="expirado"
+                                            onExpire={() => {
+                                                setServerError('El tiempo de checkout ha expirado. Volviendo al carrito...');
+                                                setTimeout(() => router.visit('/tienda/carrito'), 2000);
+                                            }}
                                         />
                                     </p>
                                     <p style={{ fontSize: 12, color: '#6B7280', marginTop: 3 }}>
@@ -226,7 +277,16 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                     </div>
                 )}
 
-                {step === 1 && <CartStep checkout={checkout} onNext={() => setStep(2)} />}
+                {step === 1 && (
+                    <CartStep
+                        checkout={checkout}
+                        onNext={() => setStep(2)}
+                        onExpireReserva={() => {
+                            setServerError('La reserva de stock ha expirado. Volviendo al carrito...');
+                            setTimeout(() => router.visit('/tienda/carrito'), 2000);
+                        }}
+                    />
+                )}
                 {step === 2 && (
                     <ShippingStep
                         data={shippingData}
@@ -246,10 +306,49 @@ export default function CheckoutIndex({ checkout, pedido: pedidoProp, auth }) {
                         processing={processing}
                         comprobanteError={comprobanteError}
                         onComprobanteError={setComprobanteError}
+                        mediosPago={checkout.medios_pago || {}}
                     />
                 )}
                 {step === 4 && <ConfirmationStep checkout={checkout} pedido={pedido} />}
             </main>
+
+            {/* Cancel Checkout Modal */}
+            {showCancelModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6" style={{ border: '1px solid rgba(0,0,0,0.08)' }}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FEF2F2' }}>
+                                <XCircle size={20} style={{ color: '#DC2626' }} />
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#2B221E' }}>Cancelar checkout</h3>
+                                <p style={{ fontSize: 12.5, color: '#6B7280', marginTop: 2 }}>Esta acción no se puede deshacer</p>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: 13.5, color: '#544a45', lineHeight: 1.55, marginBottom: 20 }}>
+                            Si cancelas, se liberarán todos los productos reservados en tu carrito y perderás el progreso de este checkout.
+                        </p>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setShowCancelModal(false)}
+                                disabled={cancelling}
+                                className="px-4 py-2.5 rounded-xl transition-colors"
+                                style={{ fontSize: 13, fontWeight: 600, color: '#6B7280', border: '1px solid #E5E7EB', background: 'white', cursor: cancelling ? 'not-allowed' : 'pointer', opacity: cancelling ? 0.5 : 1 }}
+                            >
+                                Continuar comprando
+                            </button>
+                            <button
+                                onClick={handleCancelCheckout}
+                                disabled={cancelling}
+                                className="px-4 py-2.5 rounded-xl transition-colors"
+                                style={{ fontSize: 13, fontWeight: 600, color: 'white', background: '#DC2626', border: 'none', cursor: cancelling ? 'not-allowed' : 'pointer', opacity: cancelling ? 0.7 : 1 }}
+                            >
+                                {cancelling ? 'Cancelando...' : 'Sí, cancelar checkout'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </StorefrontLayout>
     );
 }

@@ -20,6 +20,7 @@ use App\Http\Controllers\Analitica\InteligenciaVentasController;
 use App\Http\Controllers\Tienda\AdminPedidoTiendaController;
 use App\Http\Controllers\Tienda\AdminPagoTiendaController;
 use App\Http\Controllers\Tienda\ConfiguracionTiendaController;
+use App\Http\Controllers\Admin\BackupBdController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -138,6 +139,12 @@ Route::middleware(['auth', 'redirect.cliente'])->group(function () {
             ->name('admin.tienda.pagos.observar');
         Route::post('/{pago}/rechazar', [AdminPagoTiendaController::class, 'rechazar'])
             ->name('admin.tienda.pagos.rechazar');
+    });
+
+    Route::prefix('admin/backups')->name('backups.')->middleware('permission:backups.ver')->group(function () {
+        Route::get('/', [BackupBdController::class, 'index'])->name('index');
+        Route::post('/generar', [BackupBdController::class, 'create'])->name('create');
+        Route::get('/{backup}/descargar', [BackupBdController::class, 'download'])->name('download');
     });
 
 });
